@@ -1,0 +1,33 @@
+PORTAIL DE GESTION SCOLAIRE — Architecture du projet
+=====================================================
+
+Gardez tous ces fichiers ENSEMBLE, dans le meme dossier, en respectant
+les sous-dossiers css/ et js/. Ouvrez ensuite portail.html (ou app.html).
+
+  portail.html        Page d'accueil du portail (connexion + directions + espace admin)
+  app.html            Application de gestion financiere (DigiGesPro)
+  css/
+    style.css         Tout le style de l'application
+  js/
+    config.js         Constantes et etat global
+    data.js           Chargement des donnees et calculs
+    transactions.js   Saisie, paiements, gestion des mois
+    eleves.js         Liste des eleves, import Excel, historique
+    salaires.js       Employes et bulletins de paie
+    exports.js        Exports Excel / PDF et recus
+    dashboard.js      Indicateurs, selecteurs et graphiques
+    reporting.js      Reporting financier detaille (recettes, depenses, recouvrement)
+    app.js            Navigation, barre laterale et demarrage
+
+Le code JavaScript n'a pas ete modifie : il a seulement ete reparti par
+theme. Le comportement de l'application est identique.
+
+--- MODULES DU PORTAIL SCOLAIRE ---
+  portail.html       Page d'accueil (directions + espace admin)
+  scolarite.html     Direction de la scolarite (registre eleves, inscriptions, certificats)
+  etudes.html        Direction des etudes (matieres, enseignants, notes, bulletins, emplois du temps)
+  surveillance.html  Surveillance et discipline (appel, absences, retards, sanctions, permissions)
+  secretariat.html   Secretariat (courrier arrivee/depart, documents/archives, notes de service)
+  direction.html    Direction generale (tableau de bord global agrege, personnel, decisions, conseil de gestion)
+  calendrier.html   Calendrier scolaire partage (rentree, conges, examens, conseils, reunions)
+  Donnees partagees : eleves et classes saisis dans la Scolarite sont reutilises par les Etudes.

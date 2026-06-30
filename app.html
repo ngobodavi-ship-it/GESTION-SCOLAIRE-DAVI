@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DigiGesPro - Gestion de Caisse Scolaire</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="js/etablissement.js"></script>
+    <script src="js/auth.js"></script>
+</head>
+<body>
+    <!-- Écran d'activation (première utilisation) -->
+    <!-- Écran de connexion -->
+    <div class="container" id="mainApp">
+        <div class="header">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .75rem;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <svg width="38" height="38" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Fond du logo -->
+                        <rect width="60" height="60" rx="12" fill="white" fill-opacity="0.15"/>
+                        <!-- Icône graphique stylisée -->
+                        <path d="M15 35L25 25L35 32L45 20" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="25" cy="25" r="2.5" fill="white"/>
+                        <circle cx="35" cy="32" r="2.5" fill="white"/>
+                        <circle cx="45" cy="20" r="2.5" fill="white"/>
+                        <!-- Document stylisé -->
+                        <rect x="18" y="40" width="24" height="3" rx="1.5" fill="white" fill-opacity="0.8"/>
+                        <rect x="18" y="46" width="18" height="2" rx="1" fill="white" fill-opacity="0.6"/>
+                    </svg>
+                    <div>
+                        <h1 style="margin: 0; font-size: 1.5rem; font-weight: 700; color: white; letter-spacing: -0.5px;">DigiGesPro</h1>
+                        <p style="color: rgba(255,255,255,0.9); font-size: 0.8rem; margin: 0;">Gestion digitale de caisse scolaire</p>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div class="date-selector">
+                        <span>📅</span>
+                        <input type="date" id="dashboardDate" onchange="updateUI()">
+                    </div>
+                    <button class="btn btn-light btn-sm" onclick="logout()" style="display:flex;align-items:center;gap:0.4rem;font-weight:600;">
+                        <i class="bi bi-arrow-left"></i> Portail
+                    </button>
+                </div>
+            </div>
+        </div>
+
+                <div class="layout">
+            <nav class="sidebar" id="sidebar" aria-label="Navigation principale">
+                <button class="sidebar-toggle" type="button" onclick="toggleSidebar()" aria-label="Réduire ou agrandir le menu">
+                    <i class="bi bi-chevron-left" id="sidebarToggleIcon"></i><span class="nav-label">Réduire</span>
+                </button>
+                <button class="tab active" data-tab="dashboard" onclick="showTab('dashboard')"><i class="bi bi-speedometer2"></i><span class="nav-label">Tableau de bord</span></button>
+                <button class="tab" data-tab="transactions" onclick="showTab('transactions')"><i class="bi bi-credit-card"></i><span class="nav-label">Transactions</span></button>
+                <button class="tab" data-tab="students" onclick="showTab('students')"><i class="bi bi-mortarboard"></i><span class="nav-label">Élèves</span><span class="nav-badge"><span id="studentCount">0</span></span></button>
+                <button class="tab" data-tab="tarifs" onclick="showTab('tarifs')"><i class="bi bi-cash-coin"></i><span class="nav-label">Grille tarifaire</span></button>
+                <button class="tab" data-tab="impayes" onclick="showTab('impayes')"><i class="bi bi-exclamation-octagon"></i><span class="nav-label">Impayés / Relances</span></button>
+                <button class="tab" data-tab="reductions" onclick="showTab('reductions')"><i class="bi bi-percent"></i><span class="nav-label">Réductions / Bourses</span></button>
+                <button class="tab" data-tab="echeancier" onclick="showTab('echeancier')"><i class="bi bi-calendar-check"></i><span class="nav-label">Échéancier de paiement</span></button>
+                <button class="tab" data-tab="budget" onclick="showTab('budget')"><i class="bi bi-pie-chart"></i><span class="nav-label">Budget</span></button>
+                <button class="tab" data-tab="historique" onclick="showTab('historique')"><i class="bi bi-file-earmark-text"></i><span class="nav-label">État général</span></button>
+                <button class="tab" data-tab="salaires" onclick="showTab('salaires')"><i class="bi bi-briefcase"></i><span class="nav-label">Salaires</span><span class="nav-badge"><span id="employeeCount">0</span></span></button>
+                <button class="tab" data-tab="enseignants" onclick="showTab('enseignants')"><i class="bi bi-person-badge"></i><span class="nav-label">Enseignants (paie)</span></button>
+                <button class="tab" data-tab="vacations" onclick="showTab('vacations')"><i class="bi bi-clock-history"></i><span class="nav-label">Vacations enseignants</span></button>
+                <button class="tab" data-tab="reports" onclick="showTab('reports')"><i class="bi bi-bar-chart-line"></i><span class="nav-label">Reporting</span></button>
+            </nav>
+            <div class="content-area">
+                <div class="module-header">
+                    <i class="bi bi-speedometer2" id="moduleIcon"></i>
+                    <h2 id="moduleTitle">Tableau de bord</h2>
+                </div>
+
+        <!-- Dashboard -->
+        <div id="dashboard" class="tab-content">
+            <div class="grid-2" style="margin-bottom: 1.5rem;">
+                <div class="card">
+                    <p style="color: #64748b; font-size: 0.875rem; margin-bottom: 0.5rem;">📝 Inscriptions du jour</p>
+                    <h2 style="font-size: 2rem; font-weight: 700; color: #1B6BFF;">
+                        <span id="inscriptionsJour">0</span> <span style="font-size: 1rem;">FCFA</span>
+                    </h2>
+                </div>
+                <div class="card">
+                    <p style="color: #64748b; font-size: 0.875rem; margin-bottom: 0.5rem;">🔄 Réinscriptions du jour</p>
+                    <h2 style="font-size: 2rem; font-weight: 700; color: #8b5cf6;">
+                        <span id="reinscriptionsJour">0</span> <span style="font-size: 1rem;">FCFA</span>
+                    </h2>
+                </div>
+                <div class="card">
+                    <p style="color: #64748b; font-size: 0.875rem; margin-bottom: 0.5rem;">📚 Frais scolaires du jour</p>
+                    <h2 style="font-size: 2rem; font-weight: 700; color: #10b981;">
+                        <span id="fraisScolairesJour">0</span> <span style="font-size: 1rem;">FCFA</span>
+                    </h2>
+                </div>
+                <div class="card">
+                    <p style="color: #64748b; font-size: 0.875rem; margin-bottom: 0.5rem;">💸 Dépenses du jour</p>
+                    <h2 style="font-size: 2rem; font-weight: 700; color: #ef4444;">
+                        <span id="depensesJour">0</span> <span style="font-size: 1rem;">FCFA</span>
+                    </h2>
+                </div>
+                <div class="card">
+                    <p style="color: #64748b; font-size: 0.875rem; margin-bottom: 0.5rem;">💰 Solde du jour</p>
+                    <h2 style="font-size: 2rem; font-weight: 700;" id="soldeJour">0 <span style="font-size: 1rem;">FCFA</span></h2>
+                </div>
+            </div>
+
+            <div class="card" id="depensesList">
+                <h4 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 1rem;">💸 Détail des dépenses</h4>
+                <div id="depensesContent"></div>
+            </div>
+
+            <div class="grid-2" style="margin-top: 1.5rem;">
+                <div class="card">
+                    <h4 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 1rem;">📊 Répartition du jour</h4>
+                    <canvas id="chartRepartition" style="max-height: 300px;"></canvas>
+                </div>
+                <div class="card">
+                    <h4 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 1rem;">📈 Évolution sur 7 jours</h4>
+                    <canvas id="chartEvolution" style="max-height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transactions -->
+        <div id="transactions" class="tab-content hidden">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                    <h3 style="font-size: 1.25rem; font-weight: 700;">Transactions</h3>
+                    <button class="btn btn-primary" onclick="showAddTransactionModal()">➕ Nouvelle transaction</button>
+                </div>
+                <input type="text" id="searchTrans" placeholder="🔍 Rechercher..." oninput="renderTransactions()">
+            </div>
+            <div class="card" style="max-height: 500px; overflow-y: auto;">
+                <div id="transactionsList"></div>
+            </div>
+        </div>
+
+        <!-- Budget -->
+        <div id="budget" class="tab-content hidden">
+            <div class="card">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+                    <div>
+                        <h3 style="font-size:1.25rem;font-weight:700;margin:0;">Suivi budgétaire</h3>
+                        <p style="color:#64748b;font-size:0.85rem;margin:0.25rem 0 0;">Définissez un budget prévu par poste de dépense. Le réalisé est calculé à partir de vos dépenses ; l'app indique le reste et les dépassements.</p>
+                    </div>
+                    <div style="display:flex;gap:0.5rem;align-items:end;flex-wrap:wrap;">
+                        <div><label class="form-label" style="font-weight:600;font-size:0.82rem;">Réalisé du</label><input type="date" id="bgDebut" onchange="renderBudget()" style="margin:0;"></div>
+                        <div><label class="form-label" style="font-weight:600;font-size:0.82rem;">au</label><input type="date" id="bgFin" onchange="renderBudget()" style="margin:0;"></div>
+                        <button class="btn btn-secondary" onclick="bgAddPoste()">➕ Poste</button>
+                        <button class="btn btn-primary" onclick="bgImprimer()">🖨️ Imprimer</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card" id="budgetBox" style="overflow-x:auto;"></div>
+        </div>
+
+        <!-- Échéancier de paiement -->
+        <div id="echeancier" class="tab-content hidden">
+            <div class="card">
+                <h3 style="font-size:1.25rem;font-weight:700;margin:0;">Échéancier de paiement</h3>
+                <p style="color:#64748b;font-size:0.85rem;margin:0.25rem 0 1rem;">Définissez un plan de versements (montants + dates) pour un élève. Le suivi (payé / en retard / à venir) se calcule à partir des paiements de scolarité déjà encaissés.</p>
+                <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-end;">
+                    <div style="flex:1;min-width:240px;"><label class="form-label" style="font-weight:600;font-size:0.85rem;">Élève</label><select id="echEleve" onchange="renderEcheancier()" style="margin:0;"></select></div>
+                    <button class="btn btn-secondary" onclick="echApercuRetards()">⏰ Échéances en retard (tous)</button>
+                </div>
+            </div>
+            <div class="card" id="echBox"></div>
+        </div>
+
+        <!-- Réductions / Bourses -->
+        <div id="reductions" class="tab-content hidden">
+            <div class="card">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+                    <div>
+                        <h3 style="font-size:1.25rem;font-weight:700;margin:0;">Réductions &amp; bourses</h3>
+                        <p style="color:#64748b;font-size:0.85rem;margin:0.25rem 0 0;">Appliquez une réduction sur la scolarité mensuelle d'un élève (fratrie, enfant du personnel, bourse, cas social…). Le « reste à payer » et les impayés en tiennent compte automatiquement.</p>
+                    </div>
+                    <div><label class="form-label" style="font-weight:600;font-size:0.85rem;">Classe</label><select id="redClasse" onchange="renderReductions()" style="margin:0;"></select></div>
+                </div>
+            </div>
+            <div class="card" id="redBox" style="overflow-x:auto;"></div>
+        </div>
+
+        <!-- Impayés / Relances -->
+        <div id="impayes" class="tab-content hidden">
+            <div class="card">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+                    <div>
+                        <h3 style="font-size:1.25rem;font-weight:700;margin:0;">Impayés &amp; relances</h3>
+                        <p style="color:#64748b;font-size:0.85rem;margin:0.25rem 0 0;">Élèves ayant un reste à payer (calculé sur la grille tarifaire). Imprimez la liste ou un avis d'impayé pour le parent.</p>
+                    </div>
+                    <div style="display:flex;gap:0.5rem;align-items:end;flex-wrap:wrap;">
+                        <div><label class="form-label" style="font-weight:600;font-size:0.85rem;">Classe</label><select id="imClasse" onchange="renderImpayes()" style="margin:0;"></select></div>
+                        <button class="btn btn-primary" onclick="imImprimerListe()">🖨️ Imprimer la liste</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card" id="imBox" style="overflow-x:auto;"></div>
+        </div>
+
+        <!-- Grille tarifaire (frais par classe) -->
+        <div id="tarifs" class="tab-content hidden">
+            <div class="card">
+                <h3 style="font-size:1.25rem;font-weight:700;margin:0 0 0.25rem;">Grille tarifaire par classe</h3>
+                <p style="color:#64748b;font-size:0.85rem;margin:0;">Définissez une fois les frais de chaque classe. Ces montants <strong>se remplissent automatiquement</strong> lors de l'inscription/réinscription et des paiements mensuels, et servent à calculer le <strong>reste à payer</strong>.</p>
+            </div>
+            <div class="card" id="tarifsBox" style="overflow-x:auto;"></div>
+        </div>
+
+        <!-- Students -->
+        <div id="students" class="tab-content hidden">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                    <h3 style="font-size: 1.25rem; font-weight: 700;">Élèves (<span id="studentCount2">0</span>)</h3>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="openInscriptionModal()">📝 Inscription / Réinscription</button>
+                        <label class="btn btn-secondary" style="cursor: pointer;">
+                            📤 Importer Excel
+                            <input type="file" accept=".xlsx,.xls" id="csvFile" style="display: none;" onchange="handleFileUpload(event)">
+                        </label>
+                        <button class="btn btn-danger" onclick="clearAllStudents()">🗑️ Vider tout</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Matricule</th>
+                            <th>Nom</th>
+                            <th>Classe</th>
+                            <th>Reste à payer</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Historique -->
+        <div id="historique" class="tab-content hidden">
+            <div class="card">
+                <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem;">État général par élève</h3>
+                <select id="selectStudentHisto" onchange="showStudentHistory()">
+                    <option value="">-- Sélectionner un élève --</option>
+                </select>
+            </div>
+            <div id="studentHistoryContent"></div>
+        </div>
+
+        <!-- Salaires -->
+        <div id="salaires" class="tab-content hidden">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                    <h3 style="font-size: 1.25rem; font-weight: 700;">💼 Gestion des Salaires</h3>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <select id="salaireMois" onchange="renderSalaires()" style="padding: 0.5rem; border: 2px solid #e2e8f0; border-radius: 8px;">
+                            <option value="01">Janvier</option>
+                            <option value="02">Février</option>
+                            <option value="03">Mars</option>
+                            <option value="04">Avril</option>
+                            <option value="05">Mai</option>
+                            <option value="06">Juin</option>
+                            <option value="07">Juillet</option>
+                            <option value="08">Août</option>
+                            <option value="09">Septembre</option>
+                            <option value="10">Octobre</option>
+                            <option value="11">Novembre</option>
+                            <option value="12">Décembre</option>
+                        </select>
+                        <input type="file" id="importSalaireFile" accept=".xlsx,.xls" style="display: none;" onchange="importSalairesExcel(event)">
+                        <button class="btn btn-primary" onclick="document.getElementById('importSalaireFile').click()" style="padding: 0.5rem 1rem;">
+                            📥 Importer Excel
+                        </button>
+                        <button class="btn btn-primary" onclick="exportSalairesExcel()" style="padding: 0.5rem 1rem;">
+                            📤 Export Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                    <div style="background: #f0f9ff; padding: 1rem; border-radius: 8px; border-left: 4px solid #0ea5e9;">
+                        <p style="color: #64748b; font-size: 0.875rem; margin-bottom: 0.25rem;">Nombre d'employés</p>
+                        <h3 style="font-size: 1.75rem; font-weight: 700; color: #0369a1;" id="totalEmployees">0</h3>
+                    </div>
+                    <div style="background: #d1fae5; padding: 1rem; border-radius: 8px; border-left: 4px solid #10b981;">
+                        <p style="color: #64748b; font-size: 0.875rem; margin-bottom: 0.25rem;">Masse salariale totale</p>
+                        <h3 style="font-size: 1.75rem; font-weight: 700; color: #059669;" id="masseSalarialeTotale">0</h3>
+                    </div>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Poste</th>
+                                <th style="text-align: right;">Salaire Net (FCFA)</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="salairesTableBody">
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 2rem; color: #64748b;">
+                                    📥 Importez un fichier Excel avec les colonnes : <strong>Nom | Poste | Salaire</strong>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enseignants (paie : salaires fixes + vacations) -->
+        <div id="enseignants" class="tab-content hidden">
+            <div class="card">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:0.5rem;">
+                    <div>
+                        <h3 style="font-size:1.25rem;font-weight:700;margin:0;">Corps enseignant — paie</h3>
+                        <p style="color:#64748b;font-size:0.85rem;margin:0.25rem 0 0;">Les enseignants et leurs montants (salaire fixe, taux horaire) sont définis par la <strong>Direction des études</strong> et apparaissent ici automatiquement.</p>
+                    </div>
+                    <div style="display:flex;gap:0.5rem;align-items:end;flex-wrap:wrap;">
+                        <div><label class="form-label" style="font-weight:600;font-size:0.85rem;">Mois de paie</label><input type="month" id="egPeriode" onchange="renderEnseignantsGestion()" style="margin:0;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card" id="egListeBox" style="overflow-x:auto;"></div>
+            <div class="card" id="egPaieBox" style="overflow-x:auto;"></div>
+        </div>
+
+        <!-- Export -->
+        <div id="vacations" class="tab-content hidden">
+            <div class="card">
+                <h3 style="font-weight:700;margin-bottom:0.25rem;">État de paie des vacations enseignants</h3>
+                <p style="color:#64748b;margin-bottom:1rem;">Récupération automatique des heures validées par la Direction des études, multipliées par le tarif horaire de chaque enseignant.</p>
+                <div style="display:flex;flex-wrap:wrap;gap:1rem;align-items:end;margin-bottom:1rem;">
+                    <div><label class="form-label" style="font-weight:600;">Du</label><input type="date" id="vacDebut" onchange="renderVacations()" style="margin:0;"></div>
+                    <div><label class="form-label" style="font-weight:600;">Au</label><input type="date" id="vacFin" onchange="renderVacations()" style="margin:0;"></div>
+                    <button class="btn btn-secondary" onclick="vacSetMois()">Ce mois</button>
+                    <button class="btn btn-secondary" onclick="vacSetTrimestre()">Ce trimestre</button>
+                    <button class="btn btn-secondary" onclick="vacSetAnnee()">Année scolaire</button>
+                    <label style="display:flex;align-items:center;gap:0.4rem;margin:0;cursor:pointer;"><input type="checkbox" id="vacNonPayees" checked onchange="renderVacations()"> Non encore payées</label>
+                </div>
+                <div id="vacKpis"></div>
+                <div id="vacTable"></div>
+                <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1rem;">
+                    <button class="btn btn-primary" onclick="exportVacationsExcel()">📊 Exporter Excel</button>
+                    <button class="btn btn-primary" onclick="imprimerVacations()">🖨️ Imprimer l'état</button>
+                    <button class="btn btn-success" onclick="payerVacations()">💰 Enregistrer le paiement en dépenses</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="reports" class="tab-content hidden">
+            <div class="card">
+                <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;">
+                    <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-end;">
+                        <div>
+                            <label style="display:block;margin-bottom:0.4rem;font-weight:600;font-size:0.875rem;">Du</label>
+                            <input type="date" id="repDateDebut" onchange="renderReporting()" style="margin-bottom:0;">
+                        </div>
+                        <div>
+                            <label style="display:block;margin-bottom:0.4rem;font-weight:600;font-size:0.875rem;">Au</label>
+                            <input type="date" id="repDateFin" onchange="renderReporting()" style="margin-bottom:0;">
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                        <button class="btn btn-secondary" onclick="repSetMonth()">Ce mois</button>
+                        <button class="btn btn-secondary" onclick="repSetYear()">Cette année</button>
+                        <button class="btn btn-secondary" onclick="repSetAll()">Tout</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2" style="grid-template-columns:repeat(auto-fit,minmax(185px,1fr));margin-bottom:1.5rem;">
+                <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">💰 Recettes totales</p><h2 style="font-size:1.5rem;font-weight:700;color:#198754;margin:0;" id="repRecettes">0 FCFA</h2></div>
+                <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">💸 Dépenses totales</p><h2 style="font-size:1.5rem;font-weight:700;color:#dc3545;margin:0;" id="repDepenses">0 FCFA</h2></div>
+                <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">📊 Résultat net</p><h2 style="font-size:1.5rem;font-weight:700;margin:0;" id="repResultat">0 FCFA</h2></div>
+                <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">👔 Masse salariale</p><h2 style="font-size:1.5rem;font-weight:700;color:#1B6BFF;margin:0;" id="repMasse">0 FCFA</h2></div>
+                <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">🧾 Transactions</p><h2 style="font-size:1.5rem;font-weight:700;color:#212529;margin:0;" id="repNbTx">0</h2></div>
+                <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">🎯 Taux de recouvrement</p><h2 style="font-size:1.5rem;font-weight:700;color:#8b5cf6;margin:0;" id="repTauxRecouv">0 %</h2></div>
+            </div>
+
+            <div class="card" style="border:2px solid #198754;">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;margin-bottom:0.75rem;">
+                    <div>
+                        <h4 style="font-weight:700;margin:0;">🏦 Solde de caisse</h4>
+                        <p style="color:#64748b;font-size:0.82rem;margin:0.2rem 0 0;">Livre de caisse : recettes − dépenses, mois par mois, avec solde cumulé.</p>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:0.8rem;color:#64748b;">Solde de caisse actuel (depuis le début)</div>
+                        <div style="font-size:1.8rem;font-weight:800;" id="repSoldeCaisse">0 FCFA</div>
+                    </div>
+                </div>
+                <div style="overflow-x:auto;" id="repCaisseTable"></div>
+            </div>
+
+            <div class="grid-2">
+                <div class="card"><h4 style="font-weight:700;margin-bottom:1rem;">Détail des recettes</h4><div style="overflow-x:auto;" id="repRecettesTable"></div></div>
+                <div class="card"><h4 style="font-weight:700;margin-bottom:1rem;">Répartition des recettes</h4><canvas id="repChartType" style="max-height:280px;"></canvas></div>
+            </div>
+
+            <div class="grid-2">
+                <div class="card"><h4 style="font-weight:700;margin-bottom:1rem;">Modes de paiement (encaissements)</h4><div style="overflow-x:auto;" id="repPaymentTable"></div></div>
+                <div class="card"><h4 style="font-weight:700;margin-bottom:1rem;">Répartition par mode</h4><canvas id="repChartPayment" style="max-height:280px;"></canvas></div>
+            </div>
+
+            <div class="card">
+                <h4 style="font-weight:700;margin-bottom:1rem;">Évolution mensuelle — <span id="repYear"></span></h4>
+                <canvas id="repChartMonthly" style="max-height:320px;"></canvas>
+            </div>
+
+            <div class="card">
+                <h4 style="font-weight:700;margin-bottom:1rem;">Recouvrement de la scolarité</h4>
+                <div class="grid-2" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin-bottom:1.5rem;">
+                    <div style="background:#f0f9ff;padding:1rem;border-radius:8px;border-left:4px solid #0ea5e9;"><p style="color:#64748b;font-size:0.8rem;margin-bottom:0.25rem;">Total dû</p><h3 style="font-size:1.25rem;font-weight:700;margin:0;" id="repDu">0</h3></div>
+                    <div style="background:#d1fae5;padding:1rem;border-radius:8px;border-left:4px solid #10b981;"><p style="color:#64748b;font-size:0.8rem;margin-bottom:0.25rem;">Total payé</p><h3 style="font-size:1.25rem;font-weight:700;margin:0;" id="repPaye">0</h3></div>
+                    <div style="background:#fee2e2;padding:1rem;border-radius:8px;border-left:4px solid #ef4444;"><p style="color:#64748b;font-size:0.8rem;margin-bottom:0.25rem;">Reste à recouvrer</p><h3 style="font-size:1.25rem;font-weight:700;margin:0;" id="repReste">0</h3></div>
+                    <div style="background:#ede9fe;padding:1rem;border-radius:8px;border-left:4px solid #8b5cf6;"><p style="color:#64748b;font-size:0.8rem;margin-bottom:0.25rem;">Taux</p><h3 style="font-size:1.25rem;font-weight:700;margin:0;" id="repTaux2">0 %</h3></div>
+                </div>
+                <h5 style="font-weight:700;margin-bottom:0.75rem;">Principaux débiteurs</h5>
+                <div style="overflow-x:auto;" id="repDebiteurs"></div>
+            </div>
+
+            <div class="card"><h4 style="font-weight:700;margin-bottom:1rem;">Dépenses par nature</h4><div style="overflow-x:auto;" id="repDepensesNature"></div></div>
+
+            <div class="card"><h4 style="font-weight:700;margin-bottom:1rem;">Détail des transactions de la période</h4><div style="overflow:auto;max-height:430px;" id="repTxTable"></div></div>
+
+            <div class="card">
+                <h4 style="font-weight:700;margin-bottom:0.5rem;">Télécharger le rapport</h4>
+                <p style="color:#64748b;font-size:0.875rem;margin-bottom:1rem;">Exportez vos données dans le format souhaité.</p>
+                <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+                    <button class="btn btn-primary" onclick="exportExcel()">📊 Excel classique</button>
+                    <button class="btn btn-primary" onclick="exportExcelStyled()">🎨 Excel stylé</button>
+                    <button class="btn btn-primary" onclick="exportPDF()">📄 PDF professionnel</button>
+                </div>
+            </div>
+        </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Transaction -->
+    <!-- Modal Inscription / Réinscription -->
+    <div id="inscriptionModal" class="app-modal-overlay hidden">
+        <div class="app-modal" style="max-width:920px;">
+            <div style="display: flex; justify-content: space-between; align-items:flex-start; margin-bottom: 1rem;">
+                <div>
+                    <h3 style="font-size: 1.4rem; font-weight: 700;">📝 Inscription / Réinscription</h3>
+                    <p style="color:#64748b; font-size:0.85rem; margin:0.25rem 0 0;">L'élève est <strong>transmis à la Direction de la scolarité</strong> et les <strong>frais sont encaissés</strong>. Matricule généré automatiquement.</p>
+                </div>
+                <button onclick="closeInscriptionModal()" style="background: none; border: none; cursor: pointer; font-size: 1.5rem;">✖</button>
+            </div>
+
+            <div class="row g-2 align-items-end" style="margin-bottom:0.5rem;">
+                <div class="col-md-4"><label class="form-label" style="font-weight:600;">Type</label>
+                    <select id="gxType" onchange="gxToggleType()" style="margin:0;">
+                        <option value="Nouvelle inscription">Nouvelle inscription</option>
+                        <option value="Réinscription">Réinscription (élève existant)</option>
+                    </select>
+                </div>
+                <div class="col-md-8" id="gxExistingWrap" style="display:none;">
+                    <label class="form-label" style="font-weight:600;">Élève à réinscrire</label>
+                    <select id="gxExisting" onchange="gxPickExisting()" style="margin:0;"><option value="">-- Choisir l'élève --</option></select>
+                </div>
+            </div>
+
+            <div class="row g-3" style="margin-top:0.25rem;">
+                <div class="col-md-2" style="text-align:center;">
+                    <label class="form-label" style="font-weight:600;display:block;">Photo</label>
+                    <img id="gxPhotoPreview" src="" alt="" style="display:none;width:96px;height:120px;object-fit:cover;border:1px solid #cbd5e1;border-radius:8px;margin:0 auto 0.5rem;">
+                    <input type="file" id="gxPhoto" accept="image/*" onchange="chargerPhotoGestion(this)" style="font-size:0.78rem;margin:0;">
+                    <button type="button" class="btn btn-secondary" style="padding:0.25rem 0.5rem;font-size:0.75rem;margin-top:0.35rem;" onclick="retirerPhotoGestion()">Retirer</button>
+                </div>
+                <div class="col-md-10">
+                    <div class="row g-2">
+                        <div class="col-md-6"><label class="form-label" style="font-weight:600;">Nom *</label><input type="text" id="gxNom" style="margin:0;"></div>
+                        <div class="col-md-6"><label class="form-label" style="font-weight:600;">Prénom *</label><input type="text" id="gxPrenom" style="margin:0;"></div>
+                        <div class="col-md-3"><label class="form-label" style="font-weight:600;">Sexe</label><select id="gxSexe" style="margin:0;"><option value="M">Masculin</option><option value="F">Féminin</option></select></div>
+                        <div class="col-md-3"><label class="form-label" style="font-weight:600;">Date de naissance</label><input type="date" id="gxDateN" style="margin:0;"></div>
+                        <div class="col-md-3"><label class="form-label" style="font-weight:600;">Lieu de naissance</label><input type="text" id="gxLieuN" style="margin:0;"></div>
+                        <div class="col-md-3"><label class="form-label" style="font-weight:600;">Classe *</label><input type="text" id="gxClasse" list="gxClasseList" placeholder="Ex : 6ème A" onchange="gxAutoMontant()" style="margin:0;"><datalist id="gxClasseList"></datalist></div>
+                        <div class="col-md-3"><label class="form-label" style="font-weight:600;">Année scolaire</label><input type="text" id="gxAnnee" placeholder="2025-2026" style="margin:0;"></div>
+                        <div class="col-md-5"><label class="form-label" style="font-weight:600;">Parent / Tuteur</label><input type="text" id="gxTuteur" style="margin:0;"></div>
+                        <div class="col-md-4"><label class="form-label" style="font-weight:600;">Téléphone</label><input type="text" id="gxTel" style="margin:0;"></div>
+                        <div class="col-md-12"><label class="form-label" style="font-weight:600;">Adresse (domicile)</label><input type="text" id="gxAdresse" placeholder="Quartier, avenue, ville…" style="margin:0;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="border-top:1px dashed #e2e8f0;margin:1rem 0 0.75rem;padding-top:0.75rem;">
+                <p style="font-weight:700;margin:0 0 0.5rem;">💰 Frais payés au guichet</p>
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-3"><label class="form-label" style="font-weight:600;">Type de frais</label><select id="gxFrais" onchange="gxAutoMontant()" style="margin:0;"><option value="inscription">📝 Frais d'inscription</option><option value="reinscription">🔄 Frais de réinscription</option></select></div>
+                    <div class="col-md-3"><label class="form-label" style="font-weight:600;">Montant (FCFA)</label><input type="number" id="gxMontant" min="0" step="500" placeholder="Ex : 25000" style="margin:0;"></div>
+                    <div class="col-md-2"><label class="form-label" style="font-weight:600;">Date de l'action</label><input type="date" id="gxDate" style="margin:0;"></div>
+                    <div class="col-md-2"><label class="form-label" style="font-weight:600;">Moyen</label><select id="gxMoyen" style="margin:0;"><option value="especes">Espèces</option><option value="airtel">Airtel Money</option><option value="mtn">MTN MoMo</option><option value="virement">Virement</option></select></div>
+                    <div class="col-md-2"><label class="form-label" style="font-weight:600;">École (reçu)</label><input type="text" id="gxEcole" placeholder="Nom de l'école" style="margin:0;"></div>
+                </div>
+            </div>
+
+            <div style="display:flex;gap:0.75rem;margin-top:1.25rem;flex-wrap:wrap;">
+                <button class="btn btn-secondary" onclick="closeInscriptionModal()" style="flex:1;min-width:120px;">Annuler</button>
+                <button class="btn btn-secondary" onclick="enregistrerInscription(true)" style="flex:1;min-width:160px;">✓ Enregistrer + Reçu</button>
+                <button class="btn btn-primary" onclick="enregistrerInscription(false)" style="flex:1;min-width:140px;">✓ Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="addTransactionModal" class="app-modal-overlay hidden">
+        <div class="app-modal">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 1.5rem;">
+                <h3 style="font-size: 1.5rem; font-weight: 700;" id="modalTitle">Nouvelle transaction</h3>
+                <button onclick="hideModal()" style="background: none; border: none; cursor: pointer; font-size: 1.5rem;">✖</button>
+            </div>
+
+            <form onsubmit="saveTransaction(event)">
+                <input type="hidden" id="editTransactionId">
+                
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Type de transaction</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                    <div class="payment-type-card selected" id="typePaiement" onclick="selectTransactionType('paiement')">
+                        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">💰</div>
+                        <strong>Paiement élève</strong>
+                    </div>
+                    <div class="payment-type-card" id="typeDepense" onclick="selectTransactionType('depense')">
+                        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">💸</div>
+                        <strong>Dépense</strong>
+                    </div>
+                </div>
+                
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Date</label>
+                <input type="date" id="transDate" required>
+
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Nom de l'école</label>
+                <input type="text" id="nomEcole" placeholder="Ex: Collège Saint-Joseph" required>
+                <p style="font-size: 0.875rem; color: #64748b; margin: -0.5rem 0 1rem 0;">Ce nom apparaîtra sur le reçu</p>
+
+                <!-- Section Paiement -->
+                <div id="paiementSection">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Type de frais</label>
+                    <select id="typeFrais" style="margin-bottom: 1.5rem;">
+                        <option value="scolarite">📚 Frais scolaires (mensuel)</option>
+                        <option value="inscription">📝 Frais d'inscription</option>
+                        <option value="reinscription">🔄 Frais de réinscription</option>
+                    </select>
+
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Élève</label>
+                    <select id="studentSelect" onchange="loadStudentMonths()">
+                        <option value="">-- Choisir --</option>
+                    </select>
+
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Classe</label>
+                    <input type="text" id="studentClasse" placeholder="6ème A">
+
+                    <div id="prixFixeSection">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Prix fixe mensuel (FCFA)</label>
+                        <input type="number" id="prixFixeMensuel" placeholder="Saisir le montant" step="1">
+                        <p style="font-size: 0.875rem; color: #64748b; margin: -0.5rem 0 1rem 0;">Le montant total à payer par mois</p>
+                    </div>
+
+                    <div style="margin: 1.5rem 0;">
+                        <label style="display: block; margin-bottom: 1rem; font-weight: 600;">Type de paiement</label>
+                        <div class="payment-type-selector">
+                            <div class="payment-type-card selected" id="paiementComplet" onclick="selectPaymentType('complet')">
+                                <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">✓</div>
+                                <strong>Complet</strong>
+                                <p style="font-size: 0.75rem; color: #64748b; margin-top: 0.25rem;">Un mois, paiement total</p>
+                            </div>
+                            <div class="payment-type-card" id="paiementMultiple" onclick="selectPaymentType('multiple')">
+                                <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📅</div>
+                                <strong>Plusieurs mois</strong>
+                                <p style="font-size: 0.75rem; color: #64748b; margin-top: 0.25rem;">Paiement complet sur plusieurs mois</p>
+                            </div>
+                            <div class="payment-type-card" id="paiementEcheance" onclick="selectPaymentType('echeance')">
+                                <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">⚡</div>
+                                <strong>Échéance</strong>
+                                <p style="font-size: 0.75rem; color: #64748b; margin-top: 0.25rem;">Avance partielle</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin: 1.5rem 0;">
+                        <label style="display: block; margin-bottom: 1rem; font-weight: 600;">Sélectionner les mois</label>
+                        <div class="month-grid" id="monthGrid"></div>
+                    </div>
+                </div>
+
+                <!-- Section Dépense -->
+                <div id="depenseSection" class="hidden">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Nature de la dépense</label>
+                    <input type="text" id="depenseNature" placeholder="Ex: Fournitures de bureau, Électricité...">
+                </div>
+
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Montant (FCFA)</label>
+                <input type="number" id="transAmount" required placeholder="Saisir le montant" step="1">
+                <p style="font-size: 0.875rem; color: #64748b; margin: -0.5rem 0 1rem 0;" id="montantInfo"></p>
+
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Moyen de paiement</label>
+                <select id="paymentMethod" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-bottom: 1rem; font-size: 1rem;">
+                    <option value="especes">💵 Espèces</option>
+                    <option value="airtel">📱 Airtel Money</option>
+                    <option value="mtn">📱 MTN Mobile Money</option>
+                    <option value="virement">🏦 Virement bancaire</option>
+                </select>
+
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Description</label>
+                <textarea id="transDescription" placeholder="Ex: Paiement janvier" rows="2"></textarea>
+
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="hideModal()" style="flex: 1;">Annuler</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">✓ Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Reçu -->
+    <div id="receiptModal" class="app-modal-overlay hidden" style="display:none;">
+        <div class="app-modal" style="max-width:600px;">
+            <div id="receiptContent" style="padding:2rem;"></div>
+            <div style="display:flex;gap:1rem;margin-top:2rem;justify-content:center;" class="no-print">
+                <button class="btn btn-primary" onclick="window.print()">🖨️ Imprimer</button>
+                <button class="btn btn-secondary" onclick="hideReceipt()">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+        <script src="js/config.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/transactions.js"></script>
+    <script src="js/eleves.js"></script>
+    <script src="js/salaires.js"></script>
+    <script src="js/exports.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/reporting.js"></script>
+    <script src="js/vacations.js"></script>
+    <script src="js/ens_gestion.js"></script>
+    <script src="js/tarifs.js"></script>
+    <script src="js/impayes.js"></script>
+    <script src="js/reductions.js"></script>
+    <script src="js/echeancier.js"></script>
+    <script src="js/budget.js"></script>
+    <script src="js/app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direction des études</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="js/etablissement.js"></script>
+    <script src="js/auth.js"></script>
+</head>
+<body>
+    <div class="container" style="max-width:1200px;">
+        <div class="header">
+            <div style="display:flex;align-items:center;gap:0.85rem;">
+                <div style="width:38px;height:38px;border-radius:0.6rem;background:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#fff;"><i class="bi bi-mortarboard"></i></div>
+                <div>
+                    <h1 style="font-size:1.4rem;font-weight:700;color:#fff;margin:0;">Direction des études</h1>
+                    <p style="color:rgba(255,255,255,0.9);font-size:0.8rem;margin:0;">Matières, enseignants, notes, bulletins et emplois du temps</p>
+                </div>
+            </div>
+            <div class="ms-auto" style="display:flex;align-items:center;gap:0.75rem;"><div class="date-selector"><span>📅</span><input type="date" id="headerDate" onchange="if(window.onHeaderDate)onHeaderDate(this.value)"></div><button class="btn btn-light btn-sm" onclick="logout()"><i class="bi bi-arrow-left"></i> Portail</button></div>
+        </div>
+
+        <div class="layout">
+            <nav class="sidebar" id="sidebar" aria-label="Navigation">
+                <button class="sidebar-toggle" type="button" onclick="toggleSidebar()" aria-label="Réduire ou agrandir">
+                    <i class="bi bi-chevron-left" id="sidebarToggleIcon"></i><span class="nav-label">Réduire</span>
+                </button>
+                <button class="tab active" data-tab="dashboard" onclick="showSection('dashboard')"><i class="bi bi-speedometer2"></i><span class="nav-label">Tableau de bord</span></button>
+                <button class="tab" data-tab="matieres" onclick="showSection('matieres')"><i class="bi bi-journal-bookmark"></i><span class="nav-label">Matières</span></button>
+                <button class="tab" data-tab="enseignants" onclick="showSection('enseignants')"><i class="bi bi-person-workspace"></i><span class="nav-label">Enseignants</span></button>
+                <button class="tab" data-tab="notes" onclick="showSection('notes')"><i class="bi bi-pencil-square"></i><span class="nav-label">Saisie des notes</span></button>
+                <button class="tab" data-tab="bulletins" onclick="showSection('bulletins')"><i class="bi bi-file-earmark-text"></i><span class="nav-label">Bulletins</span></button>
+                <button class="tab" data-tab="passage" onclick="showSection('passage')"><i class="bi bi-arrow-up-circle"></i><span class="nav-label">Passage / Fin d'année</span></button>
+                <button class="tab" data-tab="archives" onclick="showSection('archives')"><i class="bi bi-archive"></i><span class="nav-label">Archives (années)</span></button>
+                <button class="tab" data-tab="examens" onclick="showSection('examens')"><i class="bi bi-award"></i><span class="nav-label">Examens officiels</span></button>
+                <button class="tab" data-tab="cahier" onclick="showSection('cahier')"><i class="bi bi-journal-text"></i><span class="nav-label">Cahier de textes</span></button>
+                <button class="tab" data-tab="assiduite" onclick="showSection('assiduite')"><i class="bi bi-calendar2-check"></i><span class="nav-label">Assiduité du personnel</span></button>
+                <button class="tab" data-tab="edt" onclick="showSection('edt')"><i class="bi bi-calendar3"></i><span class="nav-label">Emplois du temps</span></button>
+                <button class="tab" data-tab="reporting" onclick="showSection('reporting')"><i class="bi bi-bar-chart-line"></i><span class="nav-label">Reporting</span></button>
+                <button class="tab" data-tab="heures" onclick="showSection('heures')"><i class="bi bi-clock-history"></i><span class="nav-label">Validation des heures</span></button>
+            </nav>
+
+            <div class="content-area">
+                <div class="module-header">
+                    <i class="bi bi-speedometer2" id="moduleIcon"></i>
+                    <h2 id="moduleTitle">Tableau de bord</h2>
+                </div>
+
+                <!-- Validation finale des heures enseignants -->
+                <div id="sec-heures" class="section hidden">
+                    <div class="card">
+                        <h3 style="font-size:1.15rem;font-weight:700;margin-bottom:0.25rem;">Validation des heures de cours</h3>
+                        <p style="color:#64748b;margin:0 0 1rem;">Déclarations confirmées par le Surveillant et le Chef de scolarité. Votre validation est <strong>définitive</strong> : les heures deviennent payables et l'enseignant reçoit la notification.</p>
+                        <div id="valHeuresBox"></div>
+                    </div>
+                </div>
+
+                <!-- Tableau de bord -->
+                <div id="sec-dashboard" class="section">
+                    <div class="grid-2" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:1.5rem;">
+                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">🏫 Classes</p><h2 style="font-size:1.75rem;font-weight:700;color:#1B6BFF;margin:0;" id="etuClasses">0</h2></div>
+                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">📚 Matières</p><h2 style="font-size:1.75rem;font-weight:700;color:#10b981;margin:0;" id="etuMatieres">0</h2></div>
+                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">👨‍🏫 Enseignants</p><h2 style="font-size:1.75rem;font-weight:700;color:#0ea5e9;margin:0;" id="etuEnseignants">0</h2></div>
+                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">👨‍🎓 Élèves</p><h2 style="font-size:1.75rem;font-weight:700;color:#8b5cf6;margin:0;" id="etuEleves">0</h2></div>
+                    </div>
+                    <div class="card">
+                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1rem;">
+                            <h4 style="font-weight:700;margin:0;">Moyenne générale par classe</h4>
+                            <select id="dashTrimestre" onchange="renderDashboard()" style="width:auto;margin:0;"></select>
+                        </div>
+                        <div style="overflow-x:auto;" id="dashMoyennes"></div>
+                    </div>
+                </div>
+
+                <!-- Matières -->
+                <div id="sec-matieres" class="section hidden">
+                    <div class="card">
+                        <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:1rem;">Matières et coefficients</h3>
+                        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-end;">
+                            <div><label class="form-label" style="font-weight:600;">Matière</label><input type="text" id="matNom" placeholder="Ex : Mathématiques" style="margin:0;"></div>
+                            <div><label class="form-label" style="font-weight:600;">Coefficient</label><input type="number" id="matCoef" min="1" step="1" placeholder="Ex : 4" style="width:120px;margin:0;"></div>
+                            <button class="btn btn-primary" id="matBtn" onclick="saveMatiere()">➕ Ajouter</button>
+                        </div>
+                        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.7rem;">
+                            <button class="btn btn-secondary" onclick="chargerMatieresPrimaire()"><i class="bi bi-mortarboard"></i> Primaire</button>
+                            <button class="btn btn-secondary" onclick="chargerMatieresCollegeGeneral()"><i class="bi bi-mortarboard"></i> Collège général</button>
+                            <button class="btn btn-secondary" onclick="chargerMatieresCollegeTechnique()"><i class="bi bi-tools"></i> Collège technique</button>
+                            <button class="btn btn-secondary" onclick="chargerMatieresLyceeGeneral()"><i class="bi bi-mortarboard"></i> Lycée général</button>
+                            <button class="btn btn-secondary" onclick="chargerMatieresLyceeTechInd()"><i class="bi bi-tools"></i> Lycée technique industriel (F)</button>
+                            <button class="btn btn-secondary" onclick="chargerMatieresLyceeTechCom()"><i class="bi bi-briefcase"></i> Lycée technique commercial (G)</button>
+                        </div>
+                        <p style="color:#64748b;font-size:0.82rem;margin:0.6rem 0 0;">Chargez d'un clic les disciplines <strong>avec leurs coefficients</strong> selon la filière (général ou technique). Le bulletin de chaque classe n'affiche que les matières de <strong>son type</strong> (défini dans « Scolarité → Classes »). Coefficients modifiables avec ✏️ — au lycée ils varient selon la série.</p>
+                    </div>
+                    <div class="card" style="overflow-x:auto;">
+                        <table><thead><tr><th>Matière</th><th style="text-align:center;">Coefficient</th><th>Cycle</th><th style="text-align:right;">Actions</th></tr></thead>
+                        <tbody id="matieresTable"></tbody></table>
+                    </div>
+                </div>
+
+                <!-- Enseignants -->
+                <div id="sec-enseignants" class="section hidden">
+                    <div class="card">
+                        <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:1rem;">Corps enseignant</h3>
+                        <div class="row g-2 align-items-end">
+                            <div class="col-md-3"><label class="form-label" style="font-weight:600;">Nom</label><input type="text" id="enNom" style="margin:0;"></div>
+                            <div class="col-md-3"><label class="form-label" style="font-weight:600;">Prénom</label><input type="text" id="enPrenom" style="margin:0;"></div>
+                            <div class="col-md-2"><label class="form-label" style="font-weight:600;">Matière</label><select id="enMatiere" style="margin:0;"></select></div>
+                            <div class="col-md-2"><label class="form-label" style="font-weight:600;">Si « Autre »</label><input type="text" id="enMatiereAutre" placeholder="préciser" style="margin:0;"></div>
+                            <div class="col-md-2"><label class="form-label" style="font-weight:600;">Téléphone</label><input type="text" id="enTel" style="margin:0;"></div>
+                            <div class="col-md-3"><label class="form-label" style="font-weight:600;">Niveau / Fonction</label><select id="enNiveau" style="margin:0;"><option value="Primaire">Primaire</option><option value="Collège" selected>Collège</option><option value="Lycée">Lycée</option><option value="Collège et Lycée">Collège et Lycée</option></select></div>
+                            <div class="col-md-3"><label class="form-label" style="font-weight:600;">Classe (titulaire)</label><select id="enClasse" style="margin:0;"></select></div>
+                            <div class="col-md-3"><label class="form-label" style="font-weight:600;">Salaire fixe (FCFA)</label><input type="number" min="0" step="1000" id="enFixe" placeholder="ex. 80000" style="margin:0;"></div>
+                            <div class="col-md-3"><label class="form-label" style="font-weight:600;">Taux horaire (FCFA/h)</label><input type="number" min="0" step="100" id="enTaux" placeholder="ex. 2000" style="margin:0;"></div>
+                            <div class="col-md-3"><label class="form-label" style="font-weight:600;">Date de naissance</label><input type="date" id="enDateN" style="margin:0;"></div>
+                            <div class="col-md-5"><label class="form-label" style="font-weight:600;">Adresse</label><input type="text" id="enAdresse" placeholder="Quartier, avenue, ville…" style="margin:0;"></div>
+                            <div class="col-md-4">
+                                <label class="form-label" style="font-weight:600;">Photo</label>
+                                <div style="display:flex;align-items:center;gap:0.5rem;">
+                                    <img id="enPhotoPreview" src="" alt="" style="display:none;width:48px;height:60px;object-fit:cover;border:1px solid #cbd5e1;border-radius:6px;">
+                                    <input type="file" id="enPhoto" accept="image/*" onchange="chargerPhotoEnseignant(this)" style="margin:0;font-size:0.8rem;">
+                                    <button type="button" class="btn btn-secondary" style="padding:0.2rem 0.5rem;font-size:0.75rem;" onclick="retirerPhotoEnseignant()">Retirer</button>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary mt-3" id="enBtn" onclick="saveEnseignant()">➕ Ajouter</button>
+                    </div>
+                    <div class="card" style="overflow-x:auto;">
+                        <table><thead><tr><th>Nom et prénom</th><th>Niveau</th><th>Classe</th><th>Matière</th><th>Téléphone</th><th style="text-align:right;">Taux horaire</th><th style="text-align:right;">Salaire fixe</th><th style="text-align:right;">Actions</th></tr></thead>
+                        <tbody id="enseignantsTable"></tbody></table>
+                    </div>
+                </div>
+
+                <!-- Saisie des notes -->
+                <div id="sec-notes" class="section hidden">
+                    <div class="card">
+                        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-end;">
+                            <div><label class="form-label" style="font-weight:600;">Classe</label><select id="notesClasse" style="margin:0;"></select></div>
+                            <div><label class="form-label" style="font-weight:600;">Trimestre</label><select id="notesTrimestre" style="margin:0;"></select></div>
+                            <button class="btn btn-secondary" onclick="chargerNotes()"><i class="bi bi-table"></i> Charger</button>
+                            <button class="btn btn-primary" onclick="saveNotes()"><i class="bi bi-save"></i> Enregistrer les notes</button>
+                            <button class="btn btn-secondary" onclick="afficherHistoriqueNotes()"><i class="bi bi-clock-history"></i> Historique des modifications</button>
+                        </div>
+                    </div>
+                    <div class="card"><div id="notesGrid"></div></div>
+                    <div class="card" id="notesHistoBox" style="display:none;"></div>
+                </div>
+
+                <!-- Bulletins -->
+                <div id="sec-bulletins" class="section hidden">
+                    <div class="card">
+                        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-end;">
+                            <div><label class="form-label" style="font-weight:600;">Classe</label><select id="bulClasse" onchange="renderBulletinsList()" style="margin:0;"></select></div>
+                            <div><label class="form-label" style="font-weight:600;">Trimestre</label><select id="bulTrimestre" onchange="renderBulletinsList()" style="margin:0;"></select></div>
+                            <button class="btn btn-primary" onclick="genererTousBulletins()"><i class="bi bi-printer"></i> Imprimer tous les bulletins</button>
+                            <button class="btn btn-secondary" onclick="genererTableauHonneur()"><i class="bi bi-award"></i> Tableau d'honneur</button>
+                            <button class="btn btn-secondary" onclick="genererTousBulletinsAnnuels()"><i class="bi bi-calendar-check"></i> Bulletins annuels</button>
+                        </div>
+                    </div>
+                    <div class="card"><div id="bulletinsContent"></div></div>
+                </div>
+
+                <!-- Passage / Fin d'année -->
+                <div id="sec-passage" class="section hidden">
+                    <div class="card">
+                        <h3 style="font-size:1.2rem;font-weight:700;margin:0 0 0.25rem;">Passage de classe / Clôture d'année</h3>
+                        <p style="color:#64748b;font-size:0.85rem;margin:0 0 1rem;">La décision (Admis / Redouble) est proposée selon la <strong>moyenne annuelle</strong> (seuil 10/20 au secondaire, 5/10 au primaire). Vérifiez, ajustez si besoin, puis appliquez : les admis passent dans la classe supérieure, les redoublants conservent leur classe.</p>
+                        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-end;">
+                            <div><label class="form-label" style="font-weight:600;">Classe</label><select id="passClasse" onchange="renderPassage()" style="margin:0;"></select></div>
+                            <button class="btn btn-primary" onclick="appliquerPassage()"><i class="bi bi-arrow-up-circle"></i> Appliquer le passage</button>
+                        </div>
+                    </div>
+                    <div class="card" style="overflow-x:auto;" id="passageBox"></div>
+                </div>
+
+                <!-- Archives (années scolaires) -->
+                <div id="sec-archives" class="section hidden">
+                    <div class="card">
+                        <h3 style="font-size:1.2rem;font-weight:700;margin:0 0 0.25rem;">Archives des années scolaires</h3>
+                        <p style="color:#64748b;font-size:0.85rem;margin:0 0 1rem;">Avant de faire le <strong>passage de classe</strong>, archivez l'année en cours : élèves, classes, notes, bulletins et effectifs sont figés et conservés. Vous pourrez toujours les consulter et les imprimer plus tard.</p>
+                        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-end;">
+                            <div><label class="form-label" style="font-weight:600;">Année à archiver</label><input type="text" id="arAnnee" placeholder="ex: 2025-2026" style="margin:0;width:160px;"></div>
+                            <button class="btn btn-primary" onclick="archiverAnnee()"><i class="bi bi-archive"></i> Archiver l'année</button>
+                        </div>
+                    </div>
+                    <div class="card" style="overflow-x:auto;" id="archivesBox"></div>
+                </div>
+
+                <!-- Examens officiels (CEPE / BEPC / BAC) -->
+                <div id="sec-examens" class="section hidden">
+                    <div class="card">
+                        <h3 style="font-size:1.2rem;font-weight:700;margin:0 0 0.25rem;">Examens officiels</h3>
+                        <p style="color:#64748b;font-size:0.85rem;margin:0 0 1rem;">Saisissez les résultats au CEPE, BEPC ou BAC, et obtenez le <strong>taux de réussite</strong> par classe. Choisissez l'examen, la session et la classe, puis renseignez le résultat de chaque candidat.</p>
+                        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-end;">
+                            <div><label class="form-label" style="font-weight:600;">Examen</label>
+                                <select id="exExam" onchange="renderExamens()" style="margin:0;">
+                                    <option value="CEPE">CEPE (primaire)</option>
+                                    <option value="BEPC">BEPC (collège)</option>
+                                    <option value="BAC">Baccalauréat (lycée)</option>
+                                </select>
+                            </div>
+                            <div><label class="form-label" style="font-weight:600;">Session (année)</label><input type="text" id="exAnnee" onchange="renderExamens()" placeholder="ex: 2026" style="margin:0;width:120px;"></div>
+                            <div><label class="form-label" style="font-weight:600;">Classe</label><select id="exClasse" onchange="renderExamens()" style="margin:0;"></select></div>
+                            <button class="btn btn-secondary" onclick="exImprimer()"><i class="bi bi-printer"></i> Imprimer (classe)</button>
+                            <button class="btn btn-primary" onclick="exGlobal()"><i class="bi bi-bar-chart"></i> Taux par classe</button>
+                        </div>
+                    </div>
+                    <div class="card" id="examensBox" style="overflow-x:auto;"></div>
+                </div>
+
+                <!-- Cahier de textes (journal des leçons) -->
+                <div id="sec-cahier" class="section hidden">
+                    <div class="card">
+                        <h3 style="font-size:1.2rem;font-weight:700;margin:0 0 0.25rem;">Cahier de textes</h3>
+                        <p style="color:#64748b;font-size:0.85rem;margin:0 0 1rem;">Journal des leçons : enregistrez ce qui a été fait en classe, par date / classe / matière, ainsi que les devoirs donnés.</p>
+                        <div class="grid-2">
+                            <div>
+                                <label class="form-label" style="font-weight:600;">Date</label>
+                                <input type="date" id="ctDate" style="margin-bottom:0.75rem;">
+                                <label class="form-label" style="font-weight:600;">Classe</label>
+                                <select id="ctClasse" style="margin-bottom:0.75rem;"></select>
+                                <label class="form-label" style="font-weight:600;">Matière</label>
+                                <select id="ctMatiere" style="margin-bottom:0.75rem;"></select>
+                                <label class="form-label" style="font-weight:600;">Enseignant (optionnel)</label>
+                                <select id="ctEnseignant" style="margin-bottom:0.75rem;"></select>
+                            </div>
+                            <div>
+                                <label class="form-label" style="font-weight:600;">Leçon du jour / contenu</label>
+                                <textarea id="ctLecon" rows="4" placeholder="Ex: Théorème de Pythagore — définition et exercices d'application" style="margin-bottom:0.75rem;"></textarea>
+                                <label class="form-label" style="font-weight:600;">Devoirs / observations</label>
+                                <textarea id="ctDevoirs" rows="3" placeholder="Ex: Exercices 4 et 5 page 32 pour le prochain cours" style="margin-bottom:0.75rem;"></textarea>
+                            </div>
+                        </div>
+                        <input type="hidden" id="ctEditId" value="">
+                        <div style="display:flex;gap:0.75rem;">
+                            <button class="btn btn-primary" onclick="ctEnregistrer()"><i class="bi bi-check-lg"></i> Enregistrer la leçon</button>
+                            <button class="btn btn-secondary" onclick="ctReset()">Annuler</button>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:0.75rem;margin-bottom:0.75rem;">
+                            <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+                                <div><label class="form-label" style="font-weight:600;font-size:0.85rem;">Filtrer par classe</label><select id="ctFiltreClasse" onchange="renderCahier()" style="margin:0;"></select></div>
+                                <div><label class="form-label" style="font-weight:600;font-size:0.85rem;">Matière</label><select id="ctFiltreMatiere" onchange="renderCahier()" style="margin:0;"></select></div>
+                            </div>
+                            <button class="btn btn-secondary" onclick="ctImprimer()"><i class="bi bi-printer"></i> Imprimer le cahier</button>
+                        </div>
+                        <div style="overflow-x:auto;" id="cahierBox"></div>
+                    </div>
+                </div>
+
+                <!-- Assiduité du personnel -->
+                <div id="sec-assiduite" class="section hidden">
+                    <div class="card">
+                        <h3 style="font-size:1.2rem;font-weight:700;margin:0 0 0.25rem;">Assiduité du personnel — saisie du jour</h3>
+                        <p style="color:#64748b;font-size:0.85rem;margin:0 0 1rem;">Pointez la présence des enseignants et agents. Le statut de chaque personne est enregistré automatiquement.</p>
+                        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:0.5rem;">
+                            <div><label class="form-label" style="font-weight:600;">Date</label><input type="date" id="asDate" onchange="renderAssiduite()" style="margin:0;"></div>
+                            <button class="btn btn-secondary" onclick="asTousPresents()">✓ Tous présents</button>
+                            <button class="btn btn-secondary" onclick="asImprimerJour()"><i class="bi bi-printer"></i> Feuille du jour</button>
+                        </div>
+                        <div id="asResume" style="display:flex;gap:0.6rem;flex-wrap:wrap;margin:0.5rem 0;"></div>
+                        <div style="overflow-x:auto;" id="assiduiteBox"></div>
+                    </div>
+                    <div class="card">
+                        <h3 style="font-size:1.1rem;font-weight:700;margin:0 0 0.5rem;">Récapitulatif sur une période</h3>
+                        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:0.75rem;">
+                            <div><label class="form-label" style="font-weight:600;font-size:0.85rem;">Du</label><input type="date" id="asDebut" style="margin:0;"></div>
+                            <div><label class="form-label" style="font-weight:600;font-size:0.85rem;">Au</label><input type="date" id="asFin" style="margin:0;"></div>
+                            <button class="btn btn-primary" onclick="asRecap()"><i class="bi bi-bar-chart"></i> Récapituler</button>
+                            <button class="btn btn-secondary" onclick="asImprimerRecap()"><i class="bi bi-printer"></i> Imprimer le récap</button>
+                        </div>
+                        <div style="overflow-x:auto;" id="asRecapBox"></div>
+                    </div>
+                </div>
+
+                <!-- Emplois du temps -->
+                <div id="sec-reporting" class="section hidden">
+                    <div class="card" style="margin-bottom:1.5rem;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+                            <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+                                <label style="font-weight:600;margin:0;">Trimestre :</label>
+                                <select id="repEtuTrimestre" onchange="renderEtuReporting()" style="width:auto;margin:0;"></select>
+                            </div>
+                            <button class="btn btn-secondary" onclick="exporterResultatsExcel()"><i class="bi bi-file-earmark-spreadsheet"></i> Exporter Excel</button>
+                        </div>
+                    </div>
+                    <div class="grid-2" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:1.5rem;">
+                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">📊 Moyenne de l'école</p><h2 style="font-size:1.6rem;font-weight:700;color:#10b981;margin:0;" id="repEtuMoyenne">-</h2></div>
+                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">✅ Taux de réussite</p><h2 style="font-size:1.6rem;font-weight:700;color:#16a34a;margin:0;" id="repEtuReussite">-</h2></div>
+                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">🏆 Meilleure classe</p><h2 style="font-size:1.4rem;font-weight:700;color:#1B6BFF;margin:0;" id="repEtuMeilleureClasse">-</h2></div>
+                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">📝 Élèves notés</p><h2 style="font-size:1.6rem;font-weight:700;color:#8b5cf6;margin:0;" id="repEtuNotes">0</h2></div>
+                    </div>
+                    <div class="card" style="margin-bottom:1.5rem;"><h4 style="font-weight:700;margin-bottom:1rem;">Moyennes par classe</h4><div style="overflow-x:auto;" id="repEtuTableClasse"></div></div>
+                    <div class="grid-2" style="margin-bottom:1.5rem;">
+                        <div class="card"><h4 style="font-weight:700;margin-bottom:1rem;">Moyenne par classe</h4><canvas id="repEtuChartClasse" style="max-height:300px;"></canvas></div>
+                        <div class="card"><h4 style="font-weight:700;margin-bottom:1rem;">Répartition des mentions</h4><canvas id="repEtuChartMention" style="max-height:300px;"></canvas></div>
+                    </div>
+                    <div class="card" style="margin-bottom:1.5rem;"><h4 style="font-weight:700;margin-bottom:1rem;">Moyenne par matière</h4><canvas id="repEtuChartMatiere" style="max-height:340px;"></canvas></div>
+                    <div class="card"><h4 style="font-weight:700;margin-bottom:1rem;">Top 10 des élèves</h4><div style="overflow-x:auto;" id="repEtuTop"></div></div>
+                </div>
+
+                <div id="sec-edt" class="section hidden">
+                    <div class="card">
+                        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-end;">
+                            <div><label class="form-label" style="font-weight:600;">Classe</label><select id="edtClasse" style="margin:0;"></select></div>
+                            <button class="btn btn-secondary" onclick="chargerEdt()"><i class="bi bi-table"></i> Charger</button>
+                            <button class="btn btn-primary" onclick="saveEdt()"><i class="bi bi-save"></i> Enregistrer</button>
+                        </div>
+                    </div>
+                    <div class="card"><div id="edtGrid"></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="apprModal" class="app-modal-overlay hidden">
+        <div class="app-modal">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+                <h3 style="font-size:1.25rem;font-weight:700;margin:0;">Appréciation du conseil de classe</h3>
+                <button onclick="hideApprModal()" style="background:none;border:none;cursor:pointer;font-size:1.4rem;">✖</button>
+            </div>
+            <p style="font-weight:600;color:#475569;margin-bottom:1rem;" id="apprEleveNom"></p>
+            <div class="row g-2">
+                <div class="col-md-6"><label class="form-label" style="font-weight:600;">Conduite</label><select id="apprConduite" style="margin:0;"></select></div>
+                <div class="col-md-6"><label class="form-label" style="font-weight:600;">Décision du conseil</label><select id="apprDecision" style="margin:0;"></select></div>
+                <div class="col-md-12"><label class="form-label" style="font-weight:600;">Appréciation générale</label><textarea id="apprTexte" rows="3" style="margin:0;"></textarea></div>
+            </div>
+            <div style="display:flex;gap:1rem;margin-top:1.5rem;">
+                <button type="button" class="btn btn-secondary" onclick="hideApprModal()" style="flex:1;">Annuler</button>
+                <button type="button" class="btn btn-primary" onclick="saveAppreciation()" style="flex:1;">✓ Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="js/etudes.js"></script>
+    <script src="js/heures.js"></script>
+    <script src="js/headerdate.js"></script>
+</body>
+</html>

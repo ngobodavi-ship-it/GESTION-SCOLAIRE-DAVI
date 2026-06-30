@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direction générale</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="js/auth.js"></script>
+</head>
+<body>
+    <div class="container" style="max-width:1200px;">
+        <div class="header">
+            <div style="display:flex;align-items:center;gap:0.85rem;">
+                <div style="width:38px;height:38px;border-radius:0.6rem;background:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#fff;"><i class="bi bi-building-gear"></i></div>
+                <div>
+                    <h1 style="font-size:1.4rem;font-weight:700;color:#fff;margin:0;">Direction générale</h1>
+                    <p style="color:rgba(255,255,255,0.9);font-size:0.8rem;margin:0;">Pilotage global de l'établissement</p>
+                </div>
+            </div>
+            <div class="ms-auto" style="display:flex;align-items:center;gap:0.75rem;"><div class="date-selector"><span>📅</span><input type="date" id="headerDate" onchange="if(window.onHeaderDate)onHeaderDate(this.value)"></div><button class="btn btn-light btn-sm" onclick="logout()"><i class="bi bi-arrow-left"></i> Portail</button></div>
+        </div>
+
+        <div class="layout">
+            <nav class="sidebar" id="sidebar" aria-label="Navigation">
+                <button class="sidebar-toggle" type="button" onclick="toggleSidebar()" aria-label="Réduire ou agrandir">
+                    <i class="bi bi-chevron-left" id="sidebarToggleIcon"></i><span class="nav-label">Réduire</span>
+                </button>
+                <button class="tab active" data-tab="dashboard" onclick="showSection('dashboard')"><i class="bi bi-speedometer2"></i><span class="nav-label">Tableau de bord</span></button>
+                <button class="tab" data-tab="personnel" onclick="showSection('personnel')"><i class="bi bi-people-fill"></i><span class="nav-label">Personnel</span></button>
+                <button class="tab" data-tab="decisions" onclick="showSection('decisions')"><i class="bi bi-megaphone"></i><span class="nav-label">Décisions & circulaires</span></button>
+                <button class="tab" data-tab="conseil" onclick="showSection('conseil')"><i class="bi bi-people"></i><span class="nav-label">Conseil de gestion</span></button>
+                <button class="tab" data-tab="recouvrement" onclick="showSection('recouvrement')"><i class="bi bi-cash-stack"></i><span class="nav-label">Recouvrement / Impayés</span></button>
+                <button class="tab" data-tab="sauvegarde" onclick="showSection('sauvegarde')"><i class="bi bi-database"></i><span class="nav-label">Sauvegarde / Restauration</span></button>
+            </nav>
+
+            <div class="content-area">
+                <div class="module-header">
+                    <i class="bi bi-speedometer2" id="moduleIcon"></i>
+                    <h2 id="moduleTitle">Tableau de bord global</h2>
+                </div>
+
+                <!-- Tableau de bord global -->
+                <div id="sec-dashboard" class="section">
+                    <h4 style="font-weight:700;margin:0 0 0.75rem;color:#475569;"><i class="bi bi-people"></i> Effectifs</h4>
+                    <div class="grid-2" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:1.5rem;">
+                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">👨‍🎓 Total élèves</p><h2 style="font-size:1.6rem;font-weight:700;color:#1B6BFF;margin:0;" id="dgTotal">0</h2></div>
+                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">👦 Garçons</p><h2 style="font-size:1.6rem;font-weight:700;color:#0ea5e9;margin:0;" id="dgGarcons">0</h2></div>
+                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">👧 Filles</p><h2 style="font-size:1.6rem;font-weight:700;color:#ec4899;margin:0;" id="dgFilles">0</h2></div>
+                    </div>
+
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.75rem;">
+                        <h4 style="font-weight:700;margin:0;color:#475569;"><i class="bi bi-mortarboard"></i> Résultats</h4>
+                        <select id="dgTrimestre" onchange="renderDashboard()" style="width:auto;margin:0;"></select>
+                    </div>
+                    <div class="grid-2" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:1.5rem;">
+                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">📊 Moyenne de l'école</p><h2 style="font-size:1.6rem;font-weight:700;color:#10b981;margin:0;" id="dgMoyenne">-</h2></div>
+                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">✅ Taux de réussite</p><h2 style="font-size:1.6rem;font-weight:700;color:#16a34a;margin:0;" id="dgReussite">-</h2></div>
+                    </div>
+
+                    <h4 style="font-weight:700;margin:0 0 0.75rem;color:#475569;"><i class="bi bi-shield-check"></i> Vie scolaire (mois en cours)</h4>
+                    <div class="grid-2" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:1.5rem;">
+                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">❌ Absences</p><h2 style="font-size:1.6rem;font-weight:700;color:#dc3545;margin:0;" id="dgAbsences">0</h2></div>
+                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">⏰ Retards</p><h2 style="font-size:1.6rem;font-weight:700;color:#f59e0b;margin:0;" id="dgRetards">0</h2></div>
+                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">⚠️ Sanctions</p><h2 style="font-size:1.6rem;font-weight:700;color:#8b5cf6;margin:0;" id="dgSanctions">0</h2></div>
+                    </div>
+
+                    <h4 style="font-weight:700;margin:0 0 0.75rem;color:#475569;"><i class="bi bi-cash-coin"></i> Finances (année en cours)</h4>
+                    <div class="grid-2" style="grid-template-columns:repeat(auto-fit,minmax(185px,1fr));margin-bottom:1.5rem;">
+                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">💰 Recettes</p><h2 style="font-size:1.35rem;font-weight:700;color:#16a34a;margin:0;" id="dgRecettes">0</h2></div>
+                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">💸 Dépenses</p><h2 style="font-size:1.35rem;font-weight:700;color:#dc3545;margin:0;" id="dgDepenses">0</h2></div>
+                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">📈 Résultat net</p><h2 style="font-size:1.35rem;font-weight:700;margin:0;" id="dgResultat">0</h2></div>
+                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">👔 Masse salariale</p><h2 style="font-size:1.35rem;font-weight:700;color:#1B6BFF;margin:0;" id="dgMasse">0</h2></div>
+                    </div>
+
+                    <h4 style="font-weight:700;margin:0 0 0.75rem;color:#475569;"><i class="bi bi-person-workspace"></i> Personnel</h4>
+                    <div class="grid-2" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:1.5rem;">
+                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">👨‍🏫 Enseignants</p><h2 style="font-size:1.6rem;font-weight:700;color:#0ea5e9;margin:0;" id="dgEnseignants">0</h2></div>
+                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">🧑‍💼 Personnel admin. & appui</p><h2 style="font-size:1.6rem;font-weight:700;color:#8b5cf6;margin:0;" id="dgPersonnel">0</h2></div>
+                    </div>
+
+                    <div class="card"><h4 style="font-weight:700;margin-bottom:1rem;">Effectifs et moyennes par classe</h4><div style="overflow-x:auto;" id="dgParClasse"></div></div>
+                </div>
+
+                <!-- Personnel -->
+                <div id="sec-personnel" class="section hidden">
+                    <div class="card">
+                        <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:1rem;">Personnel administratif et d'appui</h3>
+                        <div class="row g-2 align-items-end">
+                            <div class="col-md-3"><label class="form-label" style="font-weight:600;">Nom</label><input type="text" id="pNom" style="margin:0;"></div>
+                            <div class="col-md-3"><label class="form-label" style="font-weight:600;">Prénom</label><input type="text" id="pPrenom" style="margin:0;"></div>
+                            <div class="col-md-3"><label class="form-label" style="font-weight:600;">Fonction</label><input type="text" id="pFonction" placeholder="Censeur, secrétaire, comptable..." style="margin:0;"></div>
+                            <div class="col-md-2"><label class="form-label" style="font-weight:600;">Téléphone</label><input type="text" id="pTel" style="margin:0;"></div>
+                            <div class="col-md-1"><label class="form-label" style="font-weight:600;">Statut</label><select id="pStatut" style="margin:0;"><option>Actif</option><option>Inactif</option></select></div>
+                        </div>
+                        <button class="btn btn-primary mt-3" id="pBtn" onclick="addOrUpdatePersonnel()">➕ Ajouter</button>
+                    </div>
+                    <div class="card" style="overflow-x:auto;">
+                        <table><thead><tr><th>Nom et prénom</th><th>Fonction</th><th>Téléphone</th><th>Statut</th><th style="text-align:right;">Actions</th></tr></thead>
+                        <tbody id="personnelTable"></tbody></table>
+                    </div>
+                </div>
+
+                <!-- Décisions & circulaires -->
+                <div id="sec-decisions" class="section hidden">
+                    <div class="card">
+                        <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:1rem;">Nouvelle décision / circulaire</h3>
+                        <div class="row g-2">
+                            <div class="col-md-3"><label class="form-label" style="font-weight:600;">Type</label><select id="decType" style="margin:0;"></select></div>
+                            <div class="col-md-3"><label class="form-label" style="font-weight:600;">Date</label><input type="date" id="decDate" style="margin:0;"></div>
+                            <div class="col-md-6"><label class="form-label" style="font-weight:600;">Objet</label><input type="text" id="decObjet" style="margin:0;"></div>
+                            <div class="col-md-12"><label class="form-label" style="font-weight:600;">Contenu</label><textarea id="decContenu" rows="5" style="margin:0;"></textarea></div>
+                        </div>
+                        <button class="btn btn-primary mt-3" onclick="addDecision()">➕ Créer (numérotation automatique)</button>
+                    </div>
+                    <div class="card" style="overflow-x:auto;">
+                        <table><thead><tr><th>Numéro</th><th>Date</th><th>Type</th><th>Objet</th><th style="text-align:right;">Actions</th></tr></thead>
+                        <tbody id="decisionsTable"></tbody></table>
+                    </div>
+                </div>
+
+                <!-- Conseil de gestion -->
+                <div id="sec-conseil" class="section hidden">
+                    <div class="card">
+                        <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:1rem;">Réunion du conseil de gestion</h3>
+                        <div class="row g-2">
+                            <div class="col-md-3"><label class="form-label" style="font-weight:600;">Date</label><input type="date" id="conDate" style="margin:0;"></div>
+                            <div class="col-md-9"><label class="form-label" style="font-weight:600;">Objet</label><input type="text" id="conObjet" style="margin:0;"></div>
+                            <div class="col-md-12"><label class="form-label" style="font-weight:600;">Participants</label><input type="text" id="conParticipants" placeholder="Chef d'établissement, censeur, représentant des parents..." style="margin:0;"></div>
+                            <div class="col-md-12"><label class="form-label" style="font-weight:600;">Délibérations / décisions (PV)</label><textarea id="conPv" rows="5" style="margin:0;"></textarea></div>
+                        </div>
+                        <button class="btn btn-primary mt-3" onclick="addConseil()">➕ Enregistrer la réunion</button>
+                    </div>
+                    <div class="card" style="overflow-x:auto;">
+                        <table><thead><tr><th>Date</th><th>Objet</th><th>Participants</th><th style="text-align:right;">Actions</th></tr></thead>
+                        <tbody id="conseilsTable"></tbody></table>
+                    </div>
+                </div>
+
+                <!-- Recouvrement / Impayés -->
+                <div id="sec-recouvrement" class="section hidden">
+                    <div class="card">
+                        <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:0.5rem;">Frais de scolarité attendus par classe</h3>
+                        <p style="color:#64748b;margin-bottom:1rem;">Indiquez le montant annuel attendu par élève pour chaque classe. Le « payé » est calculé automatiquement à partir des paiements enregistrés dans la Gestion financière.</p>
+                        <div id="fraisConfigBox" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:0.75rem;"></div>
+                    </div>
+                    <div class="card">
+                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1rem;">
+                            <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+                                <div style="display:flex;align-items:center;gap:0.5rem;"><label style="font-weight:600;margin:0;">Classe :</label><select id="recClasse" onchange="renderRecouvrement()" style="width:auto;margin:0;"></select></div>
+                                <label style="display:flex;align-items:center;gap:0.4rem;margin:0;cursor:pointer;"><input type="checkbox" id="recImpayes" onchange="renderRecouvrement()"> Impayés uniquement</label>
+                            </div>
+                        </div>
+                        <div id="recKpis" style="margin-bottom:1rem;"></div>
+                        <div style="overflow-x:auto;"><table>
+                            <thead><tr><th>Élève</th><th>Classe</th><th style="text-align:right;">Attendu</th><th style="text-align:right;">Payé</th><th style="text-align:right;">Reste</th></tr></thead>
+                            <tbody id="recTable"></tbody>
+                        </table></div>
+                    </div>
+                </div>
+
+                <!-- Sauvegarde / Restauration -->
+                <div id="sec-sauvegarde" class="section hidden">
+                    <div class="card">
+                        <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:0.5rem;">État des données</h3>
+                        <p style="color:#64748b;margin-bottom:1rem;">Toutes les données de l'application sont enregistrées sur cet ordinateur. Exportez régulièrement une sauvegarde pour ne rien perdre.</p>
+                        <div id="sauvegardeStats"></div>
+                    </div>
+                    <div class="card">
+                        <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:0.75rem;"><i class="bi bi-download"></i> Exporter une sauvegarde</h3>
+                        <p style="color:#64748b;margin-bottom:1rem;">Crée un fichier <strong>.json</strong> contenant toutes les données (élèves, notes, finances, personnel, etc.). Conservez-le en lieu sûr (clé USB, e-mail).</p>
+                        <button class="btn btn-primary" onclick="exporterSauvegarde()"><i class="bi bi-download"></i> Télécharger la sauvegarde</button>
+                    </div>
+                    <div class="card">
+                        <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:0.75rem;"><i class="bi bi-upload"></i> Restaurer une sauvegarde</h3>
+                        <p style="color:#b91c1c;margin-bottom:1rem;">⚠️ La restauration remplace les données actuelles par celles du fichier choisi.</p>
+                        <input type="file" id="importFile" accept=".json,application/json" onchange="importerSauvegarde(event)" style="display:none;">
+                        <button class="btn btn-danger" onclick="document.getElementById('importFile').click()"><i class="bi bi-upload"></i> Choisir un fichier de sauvegarde</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/direction.js"></script>
+    <script src="js/headerdate.js"></script>
+</body>
+</html>

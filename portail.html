@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portail de gestion scolaire</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        :root{ --brand:#1B6BFF; --brand-2:#28C6F5; --brand-dark:#2E2769; }
+        body{ background:#f4f5f9; min-height:100vh; }
+        .btn-primary{
+            --bs-btn-bg:#1B6BFF; --bs-btn-border-color:#1B6BFF;
+            --bs-btn-hover-bg:#1559e0; --bs-btn-hover-border-color:#1559e0;
+            --bs-btn-active-bg:#1450C8; --bs-btn-active-border-color:#1450C8;
+        }
+        .text-brand{ color:#1B6BFF; }
+
+        /* Connexion */
+        #loginScreen{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:1rem; }
+        .login-card{ background:#fff; border-radius:1rem; padding:2.25rem; max-width:400px; width:100%;
+            box-shadow:0 1rem 3rem rgba(46,39,105,.15); }
+        .login-logo{ width:64px; height:64px; border-radius:1rem; margin:0 auto 1rem;
+            background:linear-gradient(135deg,var(--brand),var(--brand-2)); color:#fff;
+            display:flex; align-items:center; justify-content:center; font-size:2rem; }
+
+        /* En-tête */
+        .portal-header{ background:linear-gradient(135deg,var(--brand),var(--brand-2));
+            border-radius:.75rem; padding:.6rem 1.1rem; color:#fff; margin:1rem 0 1.5rem;
+            display:flex; align-items:center; gap:.85rem; flex-wrap:wrap;
+            box-shadow:0 .25rem .7rem rgba(27,107,255,.28); }
+        .portal-header .ph-logo{ width:38px; height:38px; border-radius:.6rem; flex-shrink:0;
+            background:rgba(255,255,255,.18); display:flex; align-items:center; justify-content:center; font-size:1.2rem; }
+        .portal-header h1{ font-size:1.4rem; font-weight:700; margin:0; }
+        .portal-header p{ font-size:.8rem; margin:0; color:rgba(255,255,255,.9); }
+
+        /* Tuiles directions */
+        .dir-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:1.1rem; }
+        .dir-card{ background:#fff; border:1px solid #e9ecef; border-radius:1rem; padding:1.25rem;
+            cursor:pointer; transition:transform .15s, box-shadow .15s, border-color .15s;
+            display:flex; flex-direction:column; gap:.6rem; position:relative; text-align:left; }
+        .dir-card:hover{ transform:translateY(-3px); box-shadow:0 .5rem 1.25rem rgba(46,39,105,.12); border-color:#cdd2f5; }
+        .dir-card.available{ border:2px solid #198754; }
+        .dir-card.admin{ border:2px solid #6056C4; }
+        .dir-ico{ width:48px; height:48px; border-radius:.75rem; background:#EEEDFE; color:#3C3489;
+            display:flex; align-items:center; justify-content:center; font-size:1.5rem; }
+        .dir-ico.dark{ background:var(--brand-dark); color:#fff; }
+        .dir-card h3{ font-size:1.05rem; font-weight:700; margin:0; color:#212529; }
+        .dir-card .dir-desc{ font-size:.85rem; color:#64748b; margin:0; }
+        .dir-badge{ position:absolute; top:.9rem; right:.9rem; font-size:.72rem; font-weight:600;
+            padding:.18rem .6rem; border-radius:.5rem; }
+        .badge-ok{ background:#d1e7dd; color:#0f5132; }
+        .badge-soon{ background:#e9ecef; color:#495057; }
+        .badge-adm{ background:#EEEDFE; color:#3C3489; }
+
+        /* Espace admin */
+        .admin-banner{ background:var(--brand-dark); color:#fff; border-radius:1rem; padding:1.1rem 1.25rem;
+            display:flex; align-items:center; gap:.9rem; margin-bottom:1.25rem; flex-wrap:wrap; }
+        .admin-banner .dir-ico{ background:rgba(255,255,255,.14); color:#fff; }
+        .admin-banner h2{ font-size:1.2rem; font-weight:700; margin:0; }
+        .admin-banner p{ font-size:.82rem; margin:0; color:#CECBF6; }
+        .admin-nav{ display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:1.25rem; }
+        .admin-nav button{ border:0; background:#fff; color:#495057; font-weight:600; font-size:.9rem;
+            padding:.5rem 1rem; border-radius:.6rem; cursor:pointer; box-shadow:0 .075rem .25rem rgba(0,0,0,.06); }
+        .admin-nav button.active{ background:linear-gradient(135deg,var(--brand),var(--brand-2)); color:#fff; }
+        .card-soft{ background:#fff; border-radius:1rem; padding:1.5rem; box-shadow:0 .125rem .6rem rgba(13,30,73,.08); margin-bottom:1.25rem; }
+        .dir-row{ border:1px solid #e9ecef; border-radius:.75rem; padding:1rem; margin-bottom:1rem; }
+        table.tbl{ width:100%; border-collapse:collapse; }
+        table.tbl th, table.tbl td{ padding:.6rem .5rem; text-align:left; border-bottom:1px solid #e9ecef; vertical-align:middle; }
+        table.tbl th{ background:#f8f9fa; font-weight:600; }
+        .hidden{ display:none !important; }
+        .form-label{ font-weight:600; font-size:.875rem; }
+    </style>
+</head>
+<body>
+
+    <!-- ÉCRAN DE CONNEXION -->
+    <div id="loginScreen">
+        <div class="login-card">
+            <div class="login-logo"><i class="bi bi-mortarboard-fill"></i></div>
+            <h1 class="h5 text-center fw-bold mb-1" id="loginTitle">Portail de gestion scolaire</h1>
+            <p class="text-center text-secondary mb-4" style="font-size:.85rem;" id="loginSubtitle">Espace d'administration de l'établissement</p>
+            <label class="form-label">Identifiant <span class="text-secondary" style="font-weight:400;">(laisser vide pour l'accès administrateur)</span></label>
+            <input type="text" id="loginUser" class="form-control mb-2" placeholder="Identifiant" onkeydown="if(event.key==='Enter')doLogin()">
+            <label class="form-label">Mot de passe</label>
+            <input type="password" id="loginPassword" class="form-control mb-2" placeholder="Saisissez le mot de passe" onkeydown="if(event.key==='Enter')doLogin()">
+            <p id="loginError" class="text-danger small mb-3 hidden"><i class="bi bi-exclamation-circle"></i> Identifiant ou mot de passe incorrect.</p>
+            <button class="btn btn-primary w-100" onclick="doLogin()"><i class="bi bi-box-arrow-in-right"></i> Se connecter</button>
+            <p class="text-center text-secondary mt-3 mb-0" style="font-size:.75rem;">Chaque utilisateur accède aux modules autorisés par son rôle</p>
+        </div>
+    </div>
+
+    <!-- APPLICATION (après connexion) -->
+    <div id="appScreen" class="container hidden" style="max-width:1100px;">
+        <div class="portal-header">
+            <div class="ph-logo"><i class="bi bi-mortarboard-fill"></i></div>
+            <div>
+                <h1 id="portalName">Portail de gestion scolaire</h1>
+                <p id="portalSubtitle">Espace d'administration de l'établissement</p>
+            </div>
+            <button class="btn btn-light btn-sm ms-auto" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Déconnexion</button>
+        </div>
+
+        <!-- VUE ACCUEIL -->
+        <div id="homeView">
+            <p class="text-secondary mb-3" style="font-size:.9rem;">Choisissez une direction</p>
+            <div class="dir-grid" id="dirGrid"></div>
+        </div>
+
+        <!-- VUE ADMIN -->
+        <div id="adminView" class="hidden">
+            <button class="btn btn-link text-decoration-none px-0 mb-2" onclick="showHome()"><i class="bi bi-arrow-left"></i> Retour au portail</button>
+            <div class="admin-banner">
+                <div class="dir-ico"><i class="bi bi-shield-lock"></i></div>
+                <div>
+                    <h2>Espace administrateur</h2>
+                    <p>Accès complet : créer, modifier et supprimer sur toutes les directions</p>
+                </div>
+            </div>
+
+            <div class="admin-nav" id="adminNav">
+                <button data-sec="directions" class="active" onclick="showAdminSection('directions')"><i class="bi bi-grid-1x2"></i> Directions</button>
+                <button data-sec="users" onclick="showAdminSection('users')"><i class="bi bi-people"></i> Utilisateurs et rôles</button>
+                <button data-sec="settings" onclick="showAdminSection('settings')"><i class="bi bi-gear"></i> Paramètres</button>
+                <button data-sec="backup" onclick="showAdminSection('backup')"><i class="bi bi-database"></i> Données et sauvegardes</button>
+            </div>
+
+            <!-- Section : Directions -->
+            <div id="sec-directions" class="admin-section">
+                <div class="card-soft">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                        <h3 class="h6 fw-bold mb-0">Gérer les directions</h3>
+                        <button class="btn btn-primary btn-sm" onclick="addDirection()"><i class="bi bi-plus-lg"></i> Ajouter une direction</button>
+                    </div>
+                    <p class="text-secondary small mb-3">Modifiez le nom, la description, le statut et le lien de chaque module. Le statut « Disponible » rend la tuile cliquable.</p>
+                    <div id="adminDirList"></div>
+                </div>
+            </div>
+
+            <!-- Section : Utilisateurs -->
+            <div id="sec-users" class="admin-section hidden">
+                <div class="card-soft">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                        <h3 class="h6 fw-bold mb-0">Utilisateurs et rôles</h3>
+                        <button class="btn btn-primary btn-sm" onclick="addUser()"><i class="bi bi-person-plus"></i> Ajouter un utilisateur</button>
+                    </div>
+                    <p class="text-secondary small mb-3">Créez les comptes et attribuez un rôle. L'administrateur a accès à tout ; un responsable de direction n'accède qu'à sa direction.</p>
+                    <div style="overflow-x:auto;">
+                        <table class="tbl">
+                            <thead><tr><th>Nom</th><th>Identifiant</th><th>Mot de passe</th><th>Rôle / Direction</th><th style="text-align:right;">Action</th></tr></thead>
+                            <tbody id="usersTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section : Paramètres -->
+            <div id="sec-settings" class="admin-section hidden">
+                <div class="card-soft">
+                    <h3 class="h6 fw-bold mb-3">Identité de l'établissement <span class="text-secondary" style="font-weight:400;font-size:.85rem;">(apparaît sur les documents imprimés)</span></h3>
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label">Nom de l'établissement</label>
+                            <input type="text" id="etabNom" class="form-control mb-2" placeholder="Ex: Complexe Scolaire Les Élites">
+                            <div class="row g-2">
+                                <div class="col-md-6"><label class="form-label">Ville</label><input type="text" id="etabVille" class="form-control" placeholder="Brazzaville"></div>
+                                <div class="col-md-6"><label class="form-label">Boîte postale</label><input type="text" id="etabBP" class="form-control" placeholder="BP 1234"></div>
+                                <div class="col-md-6"><label class="form-label">Téléphone</label><input type="text" id="etabTel" class="form-control" placeholder="06 000 00 00"></div>
+                                <div class="col-md-6"><label class="form-label">E-mail</label><input type="text" id="etabEmail" class="form-control" placeholder="ecole@email.cg"></div>
+                                <div class="col-12"><label class="form-label">Nom du chef d'établissement</label><input type="text" id="etabDirecteur" class="form-control" placeholder="M./Mme ..."></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <label class="form-label d-block">Logo</label>
+                            <img id="etabLogoPreview" src="" alt="" style="display:none;max-width:140px;max-height:140px;object-fit:contain;border:1px solid #dee2e6;border-radius:8px;margin-bottom:.5rem;">
+                            <input type="file" accept="image/*" onchange="chargerLogoEtab(event)" class="form-control form-control-sm mb-2">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="retirerLogoEtab()">Retirer le logo</button>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary mt-3" onclick="saveEtablissement()"><i class="bi bi-check-lg"></i> Enregistrer l'identité de l'établissement</button>
+                </div>
+                <div class="card-soft">
+                    <h3 class="h6 fw-bold mb-3">Identité du portail</h3>
+                    <label class="form-label">Nom du portail</label>
+                    <input type="text" id="setName" class="form-control mb-3">
+                    <label class="form-label">Sous-titre</label>
+                    <input type="text" id="setSubtitle" class="form-control mb-3">
+                    <button class="btn btn-primary" onclick="saveIdentity()"><i class="bi bi-check-lg"></i> Enregistrer l'identité</button>
+                </div>
+                <div class="card-soft">
+                    <h3 class="h6 fw-bold mb-3">Mot de passe d'accès</h3>
+                    <label class="form-label">Nouveau mot de passe</label>
+                    <input type="text" id="setPassword" class="form-control mb-3" placeholder="Nouveau mot de passe">
+                    <button class="btn btn-primary" onclick="savePassword()"><i class="bi bi-shield-check"></i> Modifier le mot de passe</button>
+                    <p class="text-secondary small mt-2 mb-0">Protection simple, stockée localement sur cet appareil.</p>
+                </div>
+            </div>
+
+            <!-- Section : Sauvegardes -->
+            <div id="sec-backup" class="admin-section hidden">
+                <div class="card-soft mb-3" style="border:2px solid #4338ca;">
+                    <h3 class="h6 fw-bold mb-2"><i class="bi bi-shield-check"></i> Sauvegarde complète de l'école</h3>
+                    <p class="text-secondary small mb-3">Enregistre <strong>toutes les données</strong> dans un seul fichier : élèves, classes, matières, notes, bulletins, enseignants, heures, paiements/caisse, grille tarifaire, paramètres… Conservez ce fichier en lieu sûr (clé USB, e-mail). En cas de problème (cache effacé, nouveau PC), vous restaurez tout en un clic.</p>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button class="btn btn-primary" onclick="exportAllData()"><i class="bi bi-download"></i> Exporter toutes les données</button>
+                        <label class="btn btn-secondary mb-0">
+                            <i class="bi bi-upload"></i> Restaurer une sauvegarde complète
+                            <input type="file" accept=".json" class="hidden" onchange="importAllData(event)">
+                        </label>
+                    </div>
+                    <p class="text-secondary small mb-0 mt-2">💡 Conseil : faites une sauvegarde à la fin de chaque journée importante (inscriptions, paie, fin de trimestre).</p>
+                </div>
+                <div class="card-soft">
+                    <h3 class="h6 fw-bold mb-3">Configuration du portail uniquement</h3>
+                    <p class="text-secondary small mb-3">Exportez seulement la configuration du portail (directions, utilisateurs, paramètres), ou restaurez-la.</p>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button class="btn btn-primary" onclick="exportConfig()"><i class="bi bi-download"></i> Exporter la configuration</button>
+                        <label class="btn btn-secondary mb-0">
+                            <i class="bi bi-upload"></i> Importer une sauvegarde
+                            <input type="file" accept=".json" class="hidden" onchange="importConfig(event)">
+                        </label>
+                        <button class="btn btn-danger" onclick="resetConfig()"><i class="bi bi-arrow-counterclockwise"></i> Réinitialiser</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/etablissement.js"></script>
+    <script>
+        // ============================================
+        // Portail de gestion scolaire — configuration locale
+        // ============================================
+        const STORAGE_KEY = 'portail_config_v1';
+
+        const DEFAULT_CONFIG = {
+            name: 'Portail de gestion scolaire',
+            subtitle: "Espace d'administration de l'établissement",
+            password: '2025',
+            directions: [
+                { id: 'd1', name: 'Direction générale',            desc: "Pilotage et administration de l'établissement", icon: 'bi-building',        status: 'available', url: 'direction.html' },
+                { id: 'd4', name: 'Direction des études',           desc: 'Cours, notes et emplois du temps',              icon: 'bi-book',           status: 'available', url: 'etudes.html' },
+                { id: 'd2', name: 'Direction de la scolarité',      desc: 'Inscriptions, dossiers et certificats',         icon: 'bi-person-vcard',   status: 'available', url: 'scolarite.html' },
+                { id: 'd3', name: 'Gestion financière',             desc: 'Caisse, paiements et salaires — DigiGesPro',    icon: 'bi-cash-coin',      status: 'available', url: 'app.html' },
+                { id: 'd5', name: 'Surveillance et discipline',     desc: 'Présences, retards et discipline',              icon: 'bi-shield-check',   status: 'available', url: 'surveillance.html' },
+                { id: 'd6', name: 'Secrétariat',                    desc: 'Courrier, documents et archives',               icon: 'bi-folder',         status: 'available', url: 'secretariat.html' },
+                { id: 'd7', name: 'Calendrier scolaire',            desc: 'Rentrée, congés, examens, conseils, réunions',  icon: 'bi-calendar-event',  status: 'available', url: 'calendrier.html' },
+                { id: 'd8', name: 'Consultation parents / élèves',  desc: 'Notes, bulletins, assiduité et frais par matricule', icon: 'bi-search',        status: 'available', url: 'consultation.html' },
+                { id: 'd9', name: 'Espace enseignant',              desc: 'Saisie des devoirs et compositions par les professeurs', icon: 'bi-person-workspace', status: 'available', url: 'enseignant.html' }
+            ],
+            users: [
+                { id: 'u1', nom: 'Administrateur', login: 'admin', role: 'Administrateur' }
+            ]
+        };
+
+        let config = loadConfig();
+
+        function loadConfig() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+                const c = JSON.parse(raw);
+                if (!c.directions) c.directions = [];
+                if (!c.users) c.users = [];
+                // Migration : ajouter le Calendrier scolaire s'il manque
+                if (!c.directions.some(d => d.url === 'calendrier.html')) {
+                    c.directions.push({ id: 'd7', name: 'Calendrier scolaire', desc: 'Rentrée, congés, examens, conseils, réunions', icon: 'bi-calendar-event', status: 'available', url: 'calendrier.html' });
+                }
+                // Migration : ajouter la Consultation parents/élèves si elle manque
+                if (!c.directions.some(d => d.url === 'consultation.html')) {
+                    c.directions.push({ id: 'd8', name: 'Consultation parents / élèves', desc: 'Notes, bulletins, assiduité et frais par matricule', icon: 'bi-search', status: 'available', url: 'consultation.html' });
+                }
+                // Migration : ajouter l'Espace enseignant si absent
+                if (!c.directions.some(d => d.url === 'enseignant.html')) {
+                    c.directions.push({ id: 'd9', name: 'Espace enseignant', desc: 'Saisie des devoirs et compositions par les professeurs', icon: 'bi-person-workspace', status: 'available', url: 'enseignant.html' });
+                }
+                return c;
+            } catch (e) {
+                return JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+            }
+        }
+
+        function saveConfig() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+        }
+
+        // ---------- Connexion ----------
+        let currentSession = null;
+
+        function modulesAutorises(role) {
+            if (role === 'Administrateur' || role === '*') return '*';
+            const urls = ['consultation.html'];
+            config.directions.forEach(d => { if (d.name === role && d.url) urls.push(d.url.toLowerCase()); });
+            return urls;
+        }
+        function setSession(sess) {
+            currentSession = sess;
+            sessionStorage.setItem('portail_session', JSON.stringify(sess));
+        }
+        function doLogin() {
+            const login = (document.getElementById('loginUser').value || '').trim();
+            const pass = document.getElementById('loginPassword').value;
+            // Accès administrateur global via le mot de passe maître (sans identifiant)
+            if (!login && pass === config.password) {
+                setSession({ nom: 'Administrateur', role: 'Administrateur' });
+                enterApp(); return;
+            }
+            // Compte utilisateur (identifiant + mot de passe)
+            const u = config.users.find(x => (x.login || '').toLowerCase() === login.toLowerCase() && login);
+            if (u && pass !== '' && (u.password || '') === pass) {
+                setSession({ nom: u.nom, role: u.role, login: u.login });
+                enterApp(); return;
+            }
+            document.getElementById('loginError').classList.remove('hidden');
+        }
+
+        function logout() {
+            sessionStorage.removeItem('portail_session');
+            currentSession = null;
+            document.getElementById('appScreen').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginUser').value = '';
+            document.getElementById('loginError').classList.add('hidden');
+        }
+
+        function enterApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('appScreen').classList.remove('hidden');
+            applyIdentity();
+            renderHome();
+            showHome();
+        }
+
+        function applyIdentity() {
+            document.getElementById('portalName').textContent = config.name;
+            document.getElementById('portalSubtitle').textContent = config.subtitle;
+            document.getElementById('loginTitle').textContent = config.name;
+            document.getElementById('loginSubtitle').textContent = config.subtitle;
+            document.title = config.name;
+        }
+
+        // ---------- Vue accueil ----------
+        function renderHome() {
+            const grid = document.getElementById('dirGrid');
+            const role = currentSession ? currentSession.role : 'Administrateur';
+            const autorises = modulesAutorises(role);
+            let html = '';
+            config.directions.forEach(d => {
+                if (d.status === 'hidden') return;
+                if (autorises !== '*' && autorises.indexOf((d.url || '').toLowerCase()) === -1) return;
+                const badge = d.status === 'available'
+                    ? '<span class="dir-badge badge-ok">Disponible</span>'
+                    : '<span class="dir-badge badge-soon">Bientôt</span>';
+                html += `
+                    <div class="dir-card ${d.status === 'available' ? 'available' : ''}" onclick="openDirection('${d.id}')">
+                        ${badge}
+                        <div class="dir-ico"><i class="bi ${escapeAttr(d.icon)}"></i></div>
+                        <h3>${escapeHtml(d.name)}</h3>
+                        <p class="dir-desc">${escapeHtml(d.desc)}</p>
+                    </div>`;
+            });
+            // Tuile Espace admin réservée aux administrateurs
+            if (autorises === '*') {
+                html += `
+                    <button class="dir-card admin" onclick="showAdmin()">
+                        <span class="dir-badge badge-adm">Admin</span>
+                        <div class="dir-ico dark"><i class="bi bi-shield-lock"></i></div>
+                        <h3>Espace admin</h3>
+                        <p class="dir-desc">Gérer tout le portail — accès complet</p>
+                    </button>`;
+            }
+            grid.innerHTML = html;
+        }
+
+        function openDirection(id) {
+            const d = config.directions.find(x => x.id === id);
+            if (!d) return;
+            if (d.status === 'available' && d.url) {
+                window.location.href = d.url;
+            } else if (d.status === 'available' && !d.url) {
+                alert('Aucun lien défini pour « ' + d.name + ' ». Renseignez-le dans l\'espace admin.');
+            } else {
+                alert('« ' + d.name +' » sera bientôt disponible.');
+            }
+        }
+
+        // ---------- Navigation accueil / admin ----------
+        function showHome() {
+            document.getElementById('homeView').classList.remove('hidden');
+            document.getElementById('adminView').classList.add('hidden');
+        }
+        function showAdmin() {
+            document.getElementById('homeView').classList.add('hidden');
+            document.getElementById('adminView').classList.remove('hidden');
+            showAdminSection('directions');
+        }
+        function showAdminSection(sec) {
+            document.querySelectorAll('.admin-section').forEach(s => s.classList.add('hidden'));
+            document.getElementById('sec-' + sec).classList.remove('hidden');
+            document.querySelectorAll('#adminNav button').forEach(b => b.classList.toggle('active', b.dataset.sec === sec));
+            if (sec === 'directions') renderAdminDirections();
+            if (sec === 'users') renderUsers();
+            if (sec === 'settings') { fillSettings(); if (typeof loadEtablissementForm === 'function') loadEtablissementForm(); }
+        }
+
+        // ---------- Admin : directions ----------
+        function renderAdminDirections() {
+            const box = document.getElementById('adminDirList');
+            box.innerHTML = config.directions.map(d => `
+                <div class="dir-row">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label">Nom</label>
+                            <input type="text" class="form-control" value="${escapeAttr(d.name)}" oninput="updateDir('${d.id}','name',this.value)">
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Description</label>
+                            <input type="text" class="form-control" value="${escapeAttr(d.desc)}" oninput="updateDir('${d.id}','desc',this.value)">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Statut</label>
+                            <select class="form-select" onchange="updateDir('${d.id}','status',this.value)">
+                                <option value="available" ${d.status==='available'?'selected':''}>Disponible</option>
+                                <option value="soon" ${d.status==='soon'?'selected':''}>Bientôt</option>
+                                <option value="hidden" ${d.status==='hidden'?'selected':''}>Masqué</option>
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Lien (page à ouvrir)</label>
+                            <input type="text" class="form-control" value="${escapeAttr(d.url)}" placeholder="ex : app.html" oninput="updateDir('${d.id}','url',this.value)">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Icône (Bootstrap Icons)</label>
+                            <input type="text" class="form-control" value="${escapeAttr(d.icon)}" placeholder="ex : bi-cash-coin" oninput="updateDir('${d.id}','icon',this.value)">
+                        </div>
+                        <div class="col-md-3 text-md-end">
+                            <div class="btn-group w-100">
+                                <button class="btn btn-outline-secondary" onclick="moveDirection('${d.id}',-1)" title="Monter"><i class="bi bi-arrow-up"></i></button>
+                                <button class="btn btn-outline-secondary" onclick="moveDirection('${d.id}',1)" title="Descendre"><i class="bi bi-arrow-down"></i></button>
+                                <button class="btn btn-danger" onclick="deleteDirection('${d.id}')" title="Supprimer"><i class="bi bi-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateDir(id, field, value) {
+            const d = config.directions.find(x => x.id === id);
+            if (!d) return;
+            d[field] = value;
+            saveConfig();
+            renderHome();
+        }
+
+        function addDirection() {
+            config.directions.push({
+                id: 'd' + Date.now(),
+                name: 'Nouvelle direction',
+                desc: 'Description',
+                icon: 'bi-grid',
+                status: 'soon',
+                url: ''
+            });
+            saveConfig();
+            renderAdminDirections();
+            renderHome();
+        }
+
+        function moveDirection(id, delta) {
+            const i = config.directions.findIndex(x => x.id === id);
+            const j = i + delta;
+            if (i < 0 || j < 0 || j >= config.directions.length) return;
+            const arr = config.directions;
+            const tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+            saveConfig();
+            renderAdminDirections();
+            renderHome();
+        }
+
+        function deleteDirection(id) {
+            if (!confirm('Supprimer cette direction ?')) return;
+            config.directions = config.directions.filter(x => x.id !== id);
+            saveConfig();
+            renderAdminDirections();
+            renderHome();
+        }
+
+        // ---------- Admin : utilisateurs ----------
+        function roleOptions(selected) {
+            let opts = `<option value="Administrateur" ${selected==='Administrateur'?'selected':''}>Administrateur (accès complet)</option>`;
+            config.directions.forEach(d => {
+                opts += `<option value="${escapeAttr(d.name)}" ${selected===d.name?'selected':''}>${escapeHtml(d.name)}</option>`;
+            });
+            return opts;
+        }
+
+        function renderUsers() {
+            const body = document.getElementById('usersTableBody');
+            if (!config.users.length) {
+                body.innerHTML = '<tr><td colspan="5" class="text-center text-secondary py-3">Aucun utilisateur.</td></tr>';
+                return;
+            }
+            body.innerHTML = config.users.map(u => `
+                <tr>
+                    <td><input type="text" class="form-control form-control-sm" value="${escapeAttr(u.nom)}" oninput="updateUser('${u.id}','nom',this.value)"></td>
+                    <td><input type="text" class="form-control form-control-sm" value="${escapeAttr(u.login)}" oninput="updateUser('${u.id}','login',this.value)"></td>
+                    <td><input type="text" class="form-control form-control-sm" value="${escapeAttr(u.password || '')}" placeholder="mot de passe" oninput="updateUser('${u.id}','password',this.value)"></td>
+                    <td><select class="form-select form-select-sm" onchange="updateUser('${u.id}','role',this.value)">${roleOptions(u.role)}</select></td>
+                    <td style="text-align:right;"><button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')"><i class="bi bi-trash"></i></button></td>
+                </tr>
+            `).join('');
+        }
+
+        function updateUser(id, field, value) {
+            const u = config.users.find(x => x.id === id);
+            if (!u) return;
+            u[field] = value;
+            saveConfig();
+        }
+
+        function addUser() {
+            config.users.push({ id: 'u' + Date.now(), nom: 'Nouvel utilisateur', login: '', password: '', role: 'Administrateur' });
+            saveConfig();
+            renderUsers();
+        }
+
+        function deleteUser(id) {
+            if (!confirm('Supprimer cet utilisateur ?')) return;
+            config.users = config.users.filter(x => x.id !== id);
+            saveConfig();
+            renderUsers();
+        }
+
+        // ---------- Admin : paramètres ----------
+        function fillSettings() {
+            document.getElementById('setName').value = config.name;
+            document.getElementById('setSubtitle').value = config.subtitle;
+            document.getElementById('setPassword').value = '';
+        }
+
+        function saveIdentity() {
+            config.name = document.getElementById('setName').value.trim() || config.name;
+            config.subtitle = document.getElementById('setSubtitle').value.trim();
+            saveConfig();
+            applyIdentity();
+            alert('Identité enregistrée.');
+        }
+
+        function savePassword() {
+            const np = document.getElementById('setPassword').value.trim();
+            if (!np) { alert('Saisissez un nouveau mot de passe.'); return; }
+            config.password = np;
+            saveConfig();
+            document.getElementById('setPassword').value = '';
+            alert('Mot de passe modifié.');
+        }
+
+        // ---------- Admin : sauvegardes ----------
+        // Sauvegarde COMPLÈTE : toutes les clés de l'application (école + caisse + portail)
+        function _estCleApp(k) { return /^(ecole_|digigespro_|portail_)/.test(k || ''); }
+        function exportAllData() {
+            const data = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const k = localStorage.key(i);
+                if (_estCleApp(k)) data[k] = localStorage.getItem(k);
+            }
+            const nb = Object.keys(data).length;
+            const payload = { _type: 'sauvegarde_ecole', _date: new Date().toISOString(), _version: 1, data: data };
+            const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            const stamp = new Date().toISOString().slice(0, 10);
+            a.download = `sauvegarde_ecole_${stamp}.json`;
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+            alert(`Sauvegarde créée (${nb} éléments).\nConservez le fichier « sauvegarde_ecole_${stamp}.json » en lieu sûr.`);
+        }
+        function importAllData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const p = JSON.parse(e.target.result);
+                    const data = (p && p.data && typeof p.data === 'object') ? p.data : null;
+                    if (!data) throw new Error('Ce fichier n\'est pas une sauvegarde complète valide.');
+                    const nb = Object.keys(data).length;
+                    if (!confirm(`Restaurer cette sauvegarde (${nb} éléments) ?\n\n⚠️ ATTENTION : toutes les données actuelles seront REMPLACÉES par celles du fichier. Cette action est irréversible.\n\nConseil : exportez d'abord une sauvegarde de l'état actuel si vous avez un doute.`)) { event.target.value = ''; return; }
+                    // Supprimer les clés application existantes
+                    const aSupprimer = [];
+                    for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (_estCleApp(k)) aSupprimer.push(k); }
+                    aSupprimer.forEach(k => localStorage.removeItem(k));
+                    // Restaurer
+                    Object.keys(data).forEach(k => { if (_estCleApp(k)) localStorage.setItem(k, data[k]); });
+                    alert('Sauvegarde restaurée avec succès. La page va se recharger.');
+                    location.reload();
+                } catch (err) {
+                    alert('Fichier invalide : ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function exportConfig() {
+            const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'portail_config.json';
+            a.click();
+        }
+
+        function importConfig(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const c = JSON.parse(e.target.result);
+                    if (!c.directions || !Array.isArray(c.directions)) throw new Error('Format invalide');
+                    config = c;
+                    if (!config.users) config.users = [];
+                    saveConfig();
+                    applyIdentity();
+                    renderHome();
+                    showAdminSection('directions');
+                    alert('Configuration importée.');
+                } catch (err) {
+                    alert('Fichier invalide : ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function resetConfig() {
+            if (!confirm('Réinitialiser tout le portail à sa configuration par défaut ? Les modifications seront perdues.')) return;
+            config = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+            saveConfig();
+            applyIdentity();
+            renderHome();
+            showAdminSection('directions');
+            alert('Portail réinitialisé.');
+        }
+
+        // ---------- Utilitaires ----------
+        function escapeHtml(s) {
+            return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        }
+        function escapeAttr(s) {
+            return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        }
+
+        // ---------- Démarrage ----------
+        window.addEventListener('DOMContentLoaded', function() {
+            applyIdentity();
+            const raw = sessionStorage.getItem('portail_session');
+            if (raw) {
+                try { currentSession = JSON.parse(raw); } catch (e) { currentSession = null; }
+                if (typeof currentSession !== 'object' || currentSession === null) currentSession = { nom: 'Administrateur', role: 'Administrateur' };
+                enterApp();
+            } else {
+                document.getElementById('loginUser').focus();
+            }
+        });
+    </script>
+</body>
+</html>
