@@ -492,3 +492,16 @@ body.portal-page{ background:var(--bg) !important; }
     .header .date-selector i{ display:inline-block; }
     .header .date-selector input{ max-width:none; flex:1; font-size:.85rem; }
 }
+
+/* Comptes d'essai (mode test du portail) */
+.test-accounts{ margin-top:20px; border:1px dashed var(--warn); background:var(--warn-bg); border-radius:var(--radius); padding:12px; font-size:.8rem; }
+.test-accounts .ta-head{ font-weight:650; color:var(--warn-strong); display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:8px; }
+.test-accounts .ta-head span{ font-weight:400; color:var(--muted); }
+.test-accounts table{ width:100%; }
+.test-accounts th{ background:transparent !important; font-size:.65rem !important; padding:4px 6px; }
+.test-accounts td{ padding:5px 6px; font-size:.78rem; border-bottom:1px solid rgba(180,83,9,.15) !important; }
+.test-accounts tbody tr{ cursor:pointer; }
+.test-accounts tbody tr:hover{ background:rgba(245,158,11,.12) !important; }
+.test-accounts code{ color:var(--ink); background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:1px 5px; font-size:.76rem; }
+.test-accounts .ta-foot{ margin:8px 0 0; color:var(--muted); font-size:.72rem; }
+.login-panel{ overflow-y:auto; }
