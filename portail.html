@@ -358,7 +358,8 @@
         ];
         function testLogin(login, pass) {
             if (!MODE_TEST) return false;
-            const t = TEST_ACCOUNTS.find(a => a.login === login.toLowerCase() && a.password === pass);
+            const l = (login || '').trim().toLowerCase(), p = (pass || '').trim().toLowerCase();
+            const t = TEST_ACCOUNTS.find(a => a.login === l && a.password.toLowerCase() === p);
             if (!t) return false;
             let role = 'Administrateur';
             if (t.url) {
