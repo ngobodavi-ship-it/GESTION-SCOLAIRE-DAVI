@@ -152,15 +152,17 @@ function decisionAuto(eleveId) {
 }
 
 // Suggestion de la classe supérieure (progression congolaise standard)
-const PASS_ORDRE = ['cp1', 'cp2', 'ce1', 'ce2', 'cm1', 'cm2', '6eme', '5eme', '4eme', '3eme', '2nde', '1ere', 'terminale'];
+const PASS_ORDRE = ['p1', 'p2', 'p3', 'cp1', 'cp2', 'ce1', 'ce2', 'cm1', 'cm2', '6eme', '5eme', '4eme', '3eme', '2nde', '1ere', 'terminale'];
 function passNorm(s) { return (s || '').toString().toLowerCase().replace(/[éè]/g, 'e').replace(/è|é/g, 'e').replace(/ème|eme/g, 'eme').replace(/\s+/g, ''); }
 function prochaineClasse(nom) {
     const n = passNorm(nom);
     let idx = -1;
-    PASS_ORDRE.forEach((t, i) => { if (n.indexOf(t) >= 0) idx = i; });
+    // un niveau doit commencer le nom ou suivre un caractère non alphabétique (« p2 » ne doit pas trouver « cp2 »)
+    const aNiveau = (txt, t) => new RegExp('(^|[^a-z])' + t).test(txt);
+    PASS_ORDRE.forEach((t, i) => { if (aNiveau(n, t)) idx = i; });
     if (idx < 0 || idx >= PASS_ORDRE.length - 1) return '';
     const nextTok = PASS_ORDRE[idx + 1];
-    const cand = classes.filter(c => passNorm(c.nom).indexOf(nextTok) >= 0);
+    const cand = classes.filter(c => aNiveau(passNorm(c.nom), nextTok));
     if (!cand.length) return '';
     // garder la même section (lettre finale) si possible
     const sect = (nom.match(/([A-Da-d])\s*$/) || [])[1];
@@ -215,7 +217,7 @@ function niveauParNom(nom) {
 // type complet d'une classe : primaire | college_general | college_technique | lycee_general | lycee_technique | secondaire(indéterminé)
 function classeType(nom) {
     const c = classes.find(x => x.nom === nom);
-    if (c && c.type) return c.type;
+    if (c && c.type) return c.type === 'prescolaire' ? 'primaire' : c.type;
     if (c && c.cycle === 'primaire') return 'primaire';
     const lvl = niveauParNom(nom);
     if (lvl === 'college') return 'college_general';

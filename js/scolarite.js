@@ -46,12 +46,25 @@ function anneeScolaireCourante() {
     return d.getMonth() >= 8 ? `${y}-${y + 1}` : `${y - 1}-${y}`;
 }
 
+const CLASSES_PRESCOLAIRE = ['P1', 'P2', 'P3'];
+const CLASSES_PRIMAIRE = ['CP1', 'CP2', 'CE1', 'CE2', 'CM1', 'CM2'];
 function loadScol() {
     try { eleves = JSON.parse(localStorage.getItem(SCOL_ELEVES_KEY)) || []; } catch (e) { eleves = []; }
     try { classes = JSON.parse(localStorage.getItem(SCOL_CLASSES_KEY)) || []; } catch (e) { classes = []; }
     if (!classes.length) {
-        classes = ['6ème', '5ème', '4ème', '3ème', '2nde', '1ère', 'Terminale'].map((n, i) => ({ id: 'c' + i, nom: n }));
+        // Classes par défaut : préscolaire, primaire, secondaire
+        classes = CLASSES_PRESCOLAIRE.map((n, i) => ({ id: 'cpre' + i, nom: n, type: 'prescolaire', cycle: 'primaire' }))
+            .concat(CLASSES_PRIMAIRE.map((n, i) => ({ id: 'cpri' + i, nom: n, type: 'primaire', cycle: 'primaire' })))
+            .concat(['6ème', '5ème', '4ème', '3ème', '2nde', '1ère', 'Terminale'].map((n, i) => ({ id: 'c' + i, nom: n })));
         saveClasses();
+        try { localStorage.setItem('ecole_classes_cycles_v2', '1'); } catch (e) { }
+    } else if (!localStorage.getItem('ecole_classes_cycles_v2')) {
+        // Mise à jour : ajoute une fois le préscolaire et le primaire s'ils manquent (rien n'est supprimé)
+        const existe = n => classes.some(c => String(c.nom).toLowerCase().replace(/\s+/g, '') === n.toLowerCase());
+        const ajout = CLASSES_PRESCOLAIRE.filter(n => !existe(n)).map((n, i) => ({ id: 'cpre' + Date.now() + i, nom: n, type: 'prescolaire', cycle: 'primaire' }))
+            .concat(CLASSES_PRIMAIRE.filter(n => !existe(n)).map((n, i) => ({ id: 'cpri' + Date.now() + i, nom: n, type: 'primaire', cycle: 'primaire' })));
+        if (ajout.length) { classes = ajout.concat(classes); saveClasses(); }
+        try { localStorage.setItem('ecole_classes_cycles_v2', '1'); } catch (e) { }
     }
     try { planActions = JSON.parse(localStorage.getItem(PLAN_KEY)) || []; } catch (e) { planActions = []; }
     try { conseilsMaitres = JSON.parse(localStorage.getItem(CONSEILS_M_KEY)) || []; } catch (e) { conseilsMaitres = []; }
@@ -288,7 +301,7 @@ function renderInscriptions() {
 }
 
 // ---------- Classes ----------
-const TYPE_LABELS = { primaire: 'Primaire', college_general: 'Collège général', college_technique: 'Collège technique', lycee_general: 'Lycée général', lycee_technique: 'Lycée technique', secondaire: 'Secondaire' };
+const TYPE_LABELS = { prescolaire: 'Préscolaire', primaire: 'Primaire', college_general: 'Collège général', college_technique: 'Collège technique', lycee_general: 'Lycée général', lycee_technique: 'Lycée technique', secondaire: 'Secondaire' };
 function classeTypeOf(c) { return c.type || (c.cycle === 'primaire' ? 'primaire' : 'secondaire'); }
 function cycleLabel(c) { return TYPE_LABELS[classeTypeOf(c)] || 'Secondaire'; }
 function renderClasses() {
@@ -298,7 +311,7 @@ function renderClasses() {
             <tbody>${classes.map(c => {
                 const n = eleves.filter(e => e.classe === c.nom).length;
                 const t = classeTypeOf(c);
-                const prim = t === 'primaire';
+                const prim = t === 'primaire' || t === 'prescolaire';
                 const tech = t.indexOf('technique') >= 0;
                 const bg = prim ? '#ecfeff' : (tech ? '#fef3c7' : '#eef2ff');
                 const fg = prim ? '#0e7490' : (tech ? '#92400e' : '#4338ca');
@@ -313,11 +326,23 @@ function addClasse() {
     if (!nom) { alert('Saisissez le nom de la classe.'); return; }
     if (classes.some(c => c.nom.toLowerCase() === nom.toLowerCase())) { alert('Cette classe existe déjà.'); return; }
     const type = document.getElementById('newClasseCycle').value || 'college_general';
-    const cycle = type === 'primaire' ? 'primaire' : 'secondaire';
+    const cycle = (type === 'primaire' || type === 'prescolaire') ? 'primaire' : 'secondaire';
     classes.push({ id: 'c' + Date.now(), nom: nom, type: type, cycle: cycle });
     saveClasses();
     document.getElementById('newClasseNom').value = '';
     renderClasses();
+}
+function ajouterClassesPrescolaire() {
+    let ajout = 0;
+    CLASSES_PRESCOLAIRE.forEach((n, i) => {
+        if (!classes.some(c => c.nom.toLowerCase().replace(/\s+/g, '') === n.toLowerCase())) {
+            classes.splice(ajout, 0, { id: 'cpre' + Date.now() + i, nom: n, type: 'prescolaire', cycle: 'primaire' });
+            ajout++;
+        }
+    });
+    saveClasses();
+    renderClasses();
+    alert(ajout ? `${ajout} classe(s) du préscolaire ajoutée(s) : P1 à P3.` : 'Les classes du préscolaire existent déjà.');
 }
 function ajouterClassesPrimaire() {
     const primaires = ['CP1', 'CP2', 'CE1', 'CE2', 'CM1', 'CM2'];

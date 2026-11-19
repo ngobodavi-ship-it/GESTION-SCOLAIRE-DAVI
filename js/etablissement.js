@@ -79,3 +79,32 @@ function saveEtablissement() {
     etabLogoTemp = undefined;
     if (typeof alert === 'function') alert('Identité de l\'établissement enregistrée. Elle apparaîtra sur les documents imprimés.');
 }
+
+// ===== Classes : préscolaire (P1–P3), primaire (CP1–CM2), secondaire (6ème–Terminale) =====
+// Crée la liste par défaut si elle est vide, et ajoute une seule fois le préscolaire et le
+// primaire manquants dans une liste existante (aucune classe n'est supprimée).
+(function assurerClassesParDefaut() {
+    try {
+        var K = 'ecole_classes', FLAG = 'ecole_classes_cycles_v2';
+        var pre = ['P1', 'P2', 'P3'], pri = ['CP1', 'CP2', 'CE1', 'CE2', 'CM1', 'CM2'], sec = ['6ème', '5ème', '4ème', '3ème', '2nde', '1ère', 'Terminale'];
+        var classes = [];
+        try { classes = JSON.parse(localStorage.getItem(K)) || []; } catch (e) { classes = []; }
+        if (!Array.isArray(classes)) classes = [];
+        var t = Date.now();
+        var mk = function (n, i, type) { return { id: (type === 'prescolaire' ? 'cpre' : 'cpri') + t + i, nom: n, type: type, cycle: 'primaire' }; };
+        if (!classes.length) {
+            classes = pre.map(function (n, i) { return mk(n, i, 'prescolaire'); })
+                .concat(pri.map(function (n, i) { return mk(n, i, 'primaire'); }))
+                .concat(sec.map(function (n, i) { return { id: 'c' + i, nom: n }; }));
+            localStorage.setItem(K, JSON.stringify(classes));
+            localStorage.setItem(FLAG, '1');
+            return;
+        }
+        if (localStorage.getItem(FLAG)) return;
+        var existe = function (n) { return classes.some(function (c) { return String(c.nom || '').toLowerCase().replace(/\s+/g, '') === n.toLowerCase(); }); };
+        var ajout = pre.filter(function (n) { return !existe(n); }).map(function (n, i) { return mk(n, i, 'prescolaire'); })
+            .concat(pri.filter(function (n) { return !existe(n); }).map(function (n, i) { return mk(n, i + 10, 'primaire'); }));
+        if (ajout.length) localStorage.setItem(K, JSON.stringify(ajout.concat(classes)));
+        localStorage.setItem(FLAG, '1');
+    } catch (e) { }
+})();

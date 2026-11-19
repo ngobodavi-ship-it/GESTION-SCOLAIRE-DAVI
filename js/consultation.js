@@ -84,7 +84,7 @@ function cNiveauParNom(nom) {
 }
 function cClasseType(nom) {
     const c = (cClasses || []).find(x => x.nom === nom);
-    if (c && c.type) return c.type;
+    if (c && c.type) return c.type === 'prescolaire' ? 'primaire' : c.type;
     if (c && c.cycle === 'primaire') return 'primaire';
     const lvl = cNiveauParNom(nom);
     if (lvl === 'college') return 'college_general';
