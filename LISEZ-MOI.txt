@@ -33,13 +33,16 @@ theme. Le comportement de l'application est identique.
   calendrier.html   Calendrier scolaire partage (rentree, conges, examens, conseils, reunions)
   Donnees partagees : eleves et classes saisis dans la Scolarite sont reutilises par les Etudes.
 
---- DESIGN (refonte premium) ---
-  css/theme.css      Toutes les couleurs sont des variables dans :root (thème clair)
-                     et html[data-bs-theme="dark"] (thème sombre). Pour changer
-                     l'identité visuelle, modifier uniquement ces variables.
-  js/theme.js        Mode clair/sombre, menu coulissant sur téléphone,
-                     icônes à la place des emojis, notifications.
+--- DESIGN « Nuit & Lumière » ---
+  css/theme.css      Design system complet : couleurs (variables dans :root),
+                     5 couleurs d'établissement (Indigo, Émeraude, Océan,
+                     Bordeaux, Ambre), mode clair / sombre, composants.
+  js/theme.js        Barre latérale groupée par thèmes, fil d'Ariane,
+                     recherche globale (Ctrl + K), mode sombre, couleur,
+                     pastilles de statut et états vides dans les tableaux,
+                     icônes à la place des emojis, notifications, menu mobile.
   js/theme-charts.js Style commun des graphiques + message « Aucune donnée ».
-  vendor/            Bootstrap, Bootstrap Icons, Chart.js, SheetJS et la police
-                     Inter copiés dans le projet : le portail fonctionne SANS internet.
+  vendor/            Bootstrap, Bootstrap Icons, Chart.js, SheetJS et les
+                     polices Inter et Plus Jakarta Sans : fonctionne SANS internet.
+  Couleur de l'interface : Espace admin > Paramètres, ou Ctrl + K.
   Les données (localStorage) et les calculs ne sont pas modifiés.

@@ -83,18 +83,20 @@
     <div id="loginScreen">
         <div class="login-split">
             <aside class="login-visual" aria-hidden="true">
+                <span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span>
                 <div class="lv-brand">
                     <div class="lv-logo" id="lvLogo"><i class="bi bi-mortarboard-fill"></i></div>
                     <strong id="lvEcole">Établissement scolaire</strong>
                 </div>
                 <div class="lv-main">
-                    <h2>Toute la vie de l'établissement, au même endroit.</h2>
+                    <span class="lv-kicker"><b></b> Plateforme de gestion scolaire</span>
+                    <h2>Toute la vie de l'établissement, <em>au même endroit.</em></h2>
                     <p>Scolarité, études, finances, discipline et secrétariat, réunis dans un seul portail sécurisé.</p>
                     <ul class="lv-features">
-                        <li><i class="bi bi-people"></i> Dossiers élèves, inscriptions et certificats</li>
-                        <li><i class="bi bi-journal-text"></i> Notes, bulletins et emplois du temps</li>
-                        <li><i class="bi bi-wallet2"></i> Caisse, paiements, impayés et salaires</li>
-                        <li><i class="bi bi-wifi-off"></i> Fonctionne même sans connexion internet</li>
+                        <li><i class="bi bi-people"></i> Élèves et inscriptions</li>
+                        <li><i class="bi bi-journal-text"></i> Notes et bulletins</li>
+                        <li><i class="bi bi-wallet2"></i> Caisse et salaires</li>
+                        <li><i class="bi bi-wifi-off"></i> Fonctionne sans internet</li>
                     </ul>
                 </div>
                 <div class="lv-foot" id="lvFoot">Année scolaire</div>
@@ -143,11 +145,14 @@
         <!-- VUE ACCUEIL -->
         <div id="homeView">
             <div class="portal-hero">
-                <div>
-                    <h2 id="heroHello">Bonjour</h2>
-                    <p id="heroSub">Choisissez un module pour commencer.</p>
+                <div class="ph-top">
+                    <div>
+                        <h2 id="heroHello">Bonjour</h2>
+                        <p id="heroSub">Choisissez un module pour commencer.</p>
+                    </div>
+                    <span class="ph-chip"><i class="bi bi-calendar3"></i> <span id="heroDate"></span></span>
                 </div>
-                <span class="ph-chip"><i class="bi bi-calendar3"></i> <span id="heroDate"></span></span>
+                <div class="ph-stats hidden" id="heroStats"></div>
             </div>
             <div id="refusBanner" class="refus-banner hidden" role="alert">
                 <i class="bi bi-lock"></i>
@@ -232,6 +237,11 @@
                         </div>
                     </div>
                     <button class="btn btn-primary mt-3" onclick="saveEtablissement()"><i class="bi bi-check-lg"></i> Enregistrer l'identité de l'établissement</button>
+                </div>
+                <div class="card-soft">
+                    <h3 class="h6 fw-bold mb-1">Couleur de l'interface</h3>
+                    <p class="text-secondary small mb-3">Choisissez la couleur qui représente l'établissement. Elle s'applique à tous les modules sur cet appareil.</p>
+                    <div class="accent-picker" id="accentPicker"></div>
                 </div>
                 <div class="card-soft">
                     <h3 class="h6 fw-bold mb-3">Identité du portail</h3>
@@ -422,7 +432,37 @@
             document.getElementById('loginError').classList.add('hidden');
         }
 
+        function heroStats() {
+            const box = document.getElementById('heroStats');
+            const s = currentSession || {};
+            if (s.role && s.role !== 'Administrateur' && s.role !== '*') { box.classList.add('hidden'); return; }
+            const lire = k => { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } };
+            const iso = d => d.toISOString().slice(0, 10);
+            const today = iso(new Date()), mois = today.slice(0, 7);
+            const eleves = lire('ecole_eleves') || lire('digigespro_students') || [];
+            const nbF = Array.isArray(eleves) ? eleves.filter(e => e && e.sexe === 'F').length : 0;
+            const tx = lire('digigespro_transactions') || [];
+            let enc = 0, nbTx = 0;
+            (Array.isArray(tx) ? tx : []).forEach(t => { if (t && t.type !== 'depense' && String(t.date || '').slice(0, 7) === mois) { enc += Number(t.amount) || 0; nbTx++; } });
+            const pres = lire('ecole_presences') || {};
+            let abs = 0, classesAppel = 0;
+            Object.keys(pres).forEach(k => { if (k.indexOf(today + '|') === 0) { classesAppel++; Object.values(pres[k] || {}).forEach(v => { if (v === 'absent') abs++; }); } });
+            const evts = (lire('ecole_evenements') || []).filter(e => e && e.date >= today).sort((a, b) => a.date.localeCompare(b.date));
+            const prochain = evts[0];
+            const fcfa = n => n.toLocaleString('fr-FR').replace(/\u202f|\u00a0/g, ' ') + ' FCFA';
+            const jour = d => new Date(d + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+            const cards = [
+                ['bi-people', 'Élèves inscrits', String(Array.isArray(eleves) ? eleves.length : 0), nbF ? nbF + ' fille(s)' : 'Registre de la scolarité'],
+                ['bi-wallet2', 'Encaissé ce mois', fcfa(enc), nbTx + ' paiement(s)'],
+                ['bi-person-x', 'Absences du jour', String(abs), classesAppel ? classesAppel + ' classe(s) appelée(s)' : "Pas encore d'appel"],
+                ['bi-calendar-event', 'Prochain événement', prochain ? jour(prochain.date) : '—', prochain ? prochain.titre : 'Rien de prévu']
+            ];
+            box.innerHTML = cards.map(c => `<div class="ph-stat"><small><i class="bi ${c[0]}"></i> ${escapeHtml(c[1])}</small><strong>${escapeHtml(c[2])}</strong><span>${escapeHtml(c[3])}</span></div>`).join('');
+            box.classList.remove('hidden');
+        }
+
         function renderHero() {
+            heroStats();
             const h = new Date().getHours();
             const salut = h < 18 ? 'Bonjour' : 'Bonsoir';
             const s = currentSession || {};
@@ -481,7 +521,7 @@
                     ? '<span class="dir-badge badge-ok">Disponible</span>'
                     : '<span class="dir-badge badge-soon">Bientôt</span>';
                 html += `
-                    <div class="dir-card ${d.status === 'available' ? 'available' : ''}" onclick="openDirection('${d.id}')">
+                    <div class="dir-card ${d.status === 'available' ? 'available' : ''}" data-mod="${escapeAttr((d.url || '').toLowerCase())}" onclick="openDirection('${d.id}')">
                         ${badge}<i class="bi bi-arrow-up-right dir-go"></i>
                         <div class="dir-ico"><i class="bi ${escapeAttr(d.icon)}"></i></div>
                         <h3>${escapeHtml(d.name)}</h3>
@@ -529,7 +569,7 @@
             document.querySelectorAll('#adminNav button').forEach(b => b.classList.toggle('active', b.dataset.sec === sec));
             if (sec === 'directions') renderAdminDirections();
             if (sec === 'users') renderUsers();
-            if (sec === 'settings') { fillSettings(); if (typeof loadEtablissementForm === 'function') loadEtablissementForm(); }
+            if (sec === 'settings') { renderAccentPicker(); fillSettings(); if (typeof loadEtablissementForm === 'function') loadEtablissementForm(); }
         }
 
         // ---------- Admin : directions ----------
@@ -773,6 +813,12 @@
             alert('Portail réinitialisé.');
         }
 
+        function renderAccentPicker() {
+            const box = document.getElementById('accentPicker');
+            const cur = document.documentElement.getAttribute('data-accent') || 'indigo';
+            box.innerHTML = (window.UI_ACCENTS || []).map(a => `<button type="button" data-accent="${a.id}" class="${a.id === cur ? 'on' : ''}" onclick="uiSetAccent('${a.id}')"><span class="sw" style="background:linear-gradient(135deg,${a.c},${a.c2})"></span>${a.nom}</button>`).join('');
+        }
+
         // ---------- Utilitaires ----------
         function escapeHtml(s) {
             return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -786,6 +832,10 @@
             try { if (!localStorage.getItem(STORAGE_KEY)) saveConfig(); } catch (e) {}
             applyIdentity();
             renderTestAccounts();
+            if (new URLSearchParams(location.search).get('logout') === '1') {
+                sessionStorage.removeItem('portail_session');
+                history.replaceState(null, '', location.pathname);
+            }
             const raw = sessionStorage.getItem('portail_session');
             if (raw) {
                 try { currentSession = JSON.parse(raw); } catch (e) { currentSession = null; }

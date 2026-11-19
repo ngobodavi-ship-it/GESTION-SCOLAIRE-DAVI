@@ -24,10 +24,11 @@
         Chart.defaults.plugins.legend.labels.boxHeight = 8;
         Chart.defaults.plugins.legend.labels.padding = 14;
         var tt = Chart.defaults.plugins.tooltip;
-        tt.backgroundColor = '#0F172A'; tt.titleColor = '#fff'; tt.bodyColor = '#E2E8F0';
+        tt.backgroundColor = '#0B1020'; tt.titleColor = '#fff'; tt.bodyColor = '#E2E8F0';
         tt.padding = 10; tt.cornerRadius = 8; tt.boxPadding = 4; tt.usePointStyle = true;
         tt.titleFont = { weight: '600' };
-        Chart.defaults.elements.bar.borderRadius = 6;
+        Chart.defaults.elements.bar.borderRadius = 8;
+        Chart.defaults.elements.bar.maxBarThickness = 42;
         Chart.defaults.elements.bar.borderSkipped = false;
         Chart.defaults.elements.line.tension = 0.35;
         Chart.defaults.elements.line.borderWidth = 2;
@@ -56,6 +57,21 @@
     Chart.register({
         id: 'uiEmptyState',
         beforeUpdate: function (chart) {
+            // l'ancien bleu de marque suit la couleur d'établissement choisie
+            var rgb = cssVar('--accent-rgb', '91,76,240');
+            var swap = function (c) {
+                if (typeof c !== 'string') return c;
+                var m = c.match(/^rgba?\(\s*27\s*,\s*107\s*,\s*255\s*(?:,\s*([\d.]+))?\)$/i);
+                if (m) return 'rgba(' + rgb + ',' + (m[1] || 1) + ')';
+                if (/^#1b6bff$/i.test(c) || /^#3b82f6$/i.test(c)) return 'rgb(' + rgb + ')';
+                return c;
+            };
+            (chart.data.datasets || []).forEach(function (ds) {
+                if (!ds.$uiOrig) ds.$uiOrig = { bg: ds.backgroundColor, bd: ds.borderColor };
+                var o = ds.$uiOrig;
+                ds.backgroundColor = Array.isArray(o.bg) ? o.bg.map(swap) : swap(o.bg);
+                ds.borderColor = Array.isArray(o.bd) ? o.bd.map(swap) : swap(o.bd);
+            });
             var empty = isEmpty(chart);
             chart.$uiEmpty = empty;
             var sc = chart.options.scales || {};
