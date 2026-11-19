@@ -134,23 +134,23 @@ function chargerGrilleEns() {
     const classe = document.getElementById('ensClasse').value;
     const trim = document.getElementById('ensTrim').value;
     const grid = document.getElementById('ensGrille');
-    if (!classe) { grid.innerHTML = '<p style="color:#dc3545;padding:0.5rem;">Choisissez une classe.</p>'; return; }
+    if (!classe) { grid.innerHTML = '<p style="color:var(--danger,#dc3545);padding:0.5rem;">Choisissez une classe.</p>'; return; }
     const list = ensEleves.filter(e => e.classe === classe);
-    if (!list.length) { grid.innerHTML = '<p style="color:#dc3545;padding:0.5rem;">Aucun élève dans cette classe.</p>'; return; }
+    if (!list.length) { grid.innerHTML = '<p style="color:var(--danger,#dc3545);padding:0.5rem;">Aucun élève dans cette classe.</p>'; return; }
     if (ensClasseCycle(classe) === 'primaire') {
         const mats = ensMatieresClasse(classe);
-        if (!mats.length) { grid.innerHTML = '<p style="color:#dc3545;padding:0.5rem;">Aucune matière du primaire. Demandez à la Direction des études de les charger.</p>'; return; }
-        grid.innerHTML = `<p style="color:#64748b;font-size:0.82rem;margin:0 0 0.5rem;">Classe du <strong>primaire</strong> : une note <strong>sur 10</strong> par discipline (bulletin complet).</p>
+        if (!mats.length) { grid.innerHTML = '<p style="color:var(--danger,#dc3545);padding:0.5rem;">Aucune matière du primaire. Demandez à la Direction des études de les charger.</p>'; return; }
+        grid.innerHTML = `<p style="color:var(--muted,#64748b);font-size:0.82rem;margin:0 0 0.5rem;">Classe du <strong>primaire</strong> : une note <strong>sur 10</strong> par discipline (bulletin complet).</p>
             <div style="overflow-x:auto;"><table>
-            <thead><tr><th style="position:sticky;left:0;background:#f8fafc;">Élève</th>${mats.map(m => `<th style="text-align:center;min-width:70px;">${enEsc(m.nom)}<br><span style="font-weight:400;color:#94a3b8;font-size:0.7rem;">coef ${enEsc(m.coefficient)} /10</span></th>`).join('')}</tr></thead>
+            <thead><tr><th style="position:sticky;left:0;background:var(--surface-2,#f8fafc);">Élève</th>${mats.map(m => `<th style="text-align:center;min-width:70px;">${enEsc(m.nom)}<br><span style="font-weight:400;color:var(--muted-2,#94a3b8);font-size:0.7rem;">coef ${enEsc(m.coefficient)} /10</span></th>`).join('')}</tr></thead>
             <tbody>${list.map(e => `<tr>
-                <td style="font-weight:600;position:sticky;left:0;background:#fff;white-space:nowrap;">${enEsc(e.nom)} ${enEsc(e.prenom)}</td>
+                <td style="font-weight:600;position:sticky;left:0;background:var(--surface,#fff);white-space:nowrap;">${enEsc(e.nom)} ${enEsc(e.prenom)}</td>
                 ${mats.map(m => { const v = noteVal(ensNotes[`${e.id}|${m.id}|${trim}`]); return `<td style="text-align:center;"><input type="number" min="0" max="10" step="0.25" value="${v === null ? '' : v}" id="ensP_${e.id}_${m.id}" style="width:56px;margin:0;padding:0.3rem 0.15rem;text-align:center;"></td>`; }).join('')}
             </tr>`).join('')}</tbody></table></div>`;
         return;
     }
     const matId = document.getElementById('ensMatiere').value;
-    if (!matId) { grid.innerHTML = '<p style="color:#dc3545;padding:0.5rem;">Choisissez une matière.</p>'; return; }
+    if (!matId) { grid.innerHTML = '<p style="color:var(--danger,#dc3545);padding:0.5rem;">Choisissez une matière.</p>'; return; }
     grid.innerHTML = `<div style="overflow-x:auto;"><table>
         <thead><tr><th>Élève</th><th style="text-align:center;">Devoir /20</th><th style="text-align:center;">Composition /20</th></tr></thead>
         <tbody>${list.map(e => {
@@ -222,7 +222,7 @@ function renderResultatsEns() {
     const matId = document.getElementById('ensMatiere').value;
     const trim = document.getElementById('ensTrim').value || E_TRIMS[0];
     const box = document.getElementById('ensResultats');
-    if (!classe || !matId) { box.innerHTML = '<p style="color:#64748b;padding:0.5rem;">Choisissez d\'abord une classe et une matière dans « Saisie des notes ».</p>'; return; }
+    if (!classe || !matId) { box.innerHTML = '<p style="color:var(--muted,#64748b);padding:0.5rem;">Choisissez d\'abord une classe et une matière dans « Saisie des notes ».</p>'; return; }
     const mat = ensMatieres.find(m => m.id === matId);
     const list = ensEleves.filter(e => e.classe === classe);
     const vals = [];
@@ -242,13 +242,13 @@ function renderResultatsEns() {
     box.innerHTML = `
         <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:0.5rem;">${enEsc(mat ? mat.nom : '')} — ${enEsc(classe)} — ${enEsc(trim)}</h3>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.75rem;margin-bottom:1rem;">
-            <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:0.8rem;text-align:center;"><div style="font-size:1.3rem;font-weight:700;color:#2E2769;">${moyClasse !== null ? moyClasse.toFixed(2) + '/20' : '-'}</div><div style="font-size:0.8rem;color:#64748b;">Moyenne de la classe</div></div>
-            <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:0.8rem;text-align:center;"><div style="font-size:1.3rem;font-weight:700;color:#16a34a;">${reussite} %</div><div style="font-size:0.8rem;color:#64748b;">Taux de réussite (≥10)</div></div>
-            <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:0.8rem;text-align:center;"><div style="font-size:1.3rem;font-weight:700;color:#0ea5e9;">${vals.length}/${list.length}</div><div style="font-size:0.8rem;color:#64748b;">Notés</div></div>
+            <div style="background:var(--surface-2,#f8fafc);border:1px solid #e2e8f0;border-radius:10px;padding:0.8rem;text-align:center;"><div style="font-size:1.3rem;font-weight:700;color:var(--brand-strong,#2E2769);">${moyClasse !== null ? moyClasse.toFixed(2) + '/20' : '-'}</div><div style="font-size:0.8rem;color:var(--muted,#64748b);">Moyenne de la classe</div></div>
+            <div style="background:var(--surface-2,#f8fafc);border:1px solid #e2e8f0;border-radius:10px;padding:0.8rem;text-align:center;"><div style="font-size:1.3rem;font-weight:700;color:var(--ok,#16a34a);">${reussite} %</div><div style="font-size:0.8rem;color:var(--muted,#64748b);">Taux de réussite (≥10)</div></div>
+            <div style="background:var(--surface-2,#f8fafc);border:1px solid #e2e8f0;border-radius:10px;padding:0.8rem;text-align:center;"><div style="font-size:1.3rem;font-weight:700;color:var(--info,#0ea5e9);">${vals.length}/${list.length}</div><div style="font-size:0.8rem;color:var(--muted,#64748b);">Notés</div></div>
         </div>
         <div style="overflow-x:auto;"><table>
             <thead><tr><th>Élève</th><th style="text-align:center;">Devoir</th><th style="text-align:center;">Compo</th><th style="text-align:center;">Moyenne</th></tr></thead>
-            <tbody>${rows || '<tr><td colspan="4" style="text-align:center;color:#64748b;">Aucun élève</td></tr>'}</tbody>
+            <tbody>${rows || '<tr><td colspan="4" style="text-align:center;color:var(--muted,#64748b);">Aucun élève</td></tr>'}</tbody>
         </table></div>`;
 }
 
@@ -261,11 +261,11 @@ function remplirInfos() {
     document.getElementById('infDiplome').value = teacher.diplome || '';
     const selMat = teacher.matieres || (teacher.matiere ? ensMatieres.filter(m => m.nom === teacher.matiere).map(m => m.id) : []);
     document.getElementById('infMatieres').innerHTML = ensMatieres.length === 0
-        ? '<span style="color:#64748b;">Aucune matière définie. Demandez à l\'administration.</span>'
+        ? '<span style="color:var(--muted,#64748b);">Aucune matière définie. Demandez à l\'administration.</span>'
         : ensMatieres.map(m => `<label style="display:flex;align-items:center;gap:0.35rem;cursor:pointer;"><input type="checkbox" id="infMat_${m.id}" ${selMat.indexOf(m.id) >= 0 ? 'checked' : ''}> ${enEsc(m.nom)}</label>`).join('');
     const selCl = teacher.classes || [];
     document.getElementById('infClasses').innerHTML = ensClasses.length === 0
-        ? '<span style="color:#64748b;">Aucune classe définie.</span>'
+        ? '<span style="color:var(--muted,#64748b);">Aucune classe définie.</span>'
         : ensClasses.map((c, i) => `<label style="display:flex;align-items:center;gap:0.35rem;cursor:pointer;"><input type="checkbox" id="infCls_${i}" ${selCl.indexOf(c.nom) >= 0 ? 'checked' : ''}> ${enEsc(c.nom)}</label>`).join('');
 }
 function enregistrerInfos() {
@@ -323,8 +323,8 @@ function renderMesHeures() {
     const valNew = mine.filter(h => h.statut === 'valide' && !h.lu);
     const rejNew = mine.filter(h => h.statut === 'rejete' && !h.lu);
     let notif = '';
-    if (valNew.length) notif += `<div style="background:#dcfce7;border:1px solid #86efac;color:#166534;border-radius:10px;padding:0.85rem 1rem;margin-bottom:0.75rem;"><strong>✓ ${valNew.length} déclaration(s) validée(s) !</strong> Vos heures ont été confirmées par le Surveillant, le Chef de scolarité et le Directeur des études. Elles sont désormais payables.</div>`;
-    if (rejNew.length) notif += `<div style="background:#fee2e2;border:1px solid #fca5a5;color:#991b1b;border-radius:10px;padding:0.85rem 1rem;margin-bottom:0.75rem;"><strong>✗ ${rejNew.length} déclaration(s) rejetée(s).</strong> Consultez le motif dans le tableau ci-dessous.</div>`;
+    if (valNew.length) notif += `<div style="background:var(--ok-bg,#dcfce7);border:1px solid #86efac;color:var(--ok-strong,#166534);border-radius:10px;padding:0.85rem 1rem;margin-bottom:0.75rem;"><strong>✓ ${valNew.length} déclaration(s) validée(s) !</strong> Vos heures ont été confirmées par le Surveillant, le Chef de scolarité et le Directeur des études. Elles sont désormais payables.</div>`;
+    if (rejNew.length) notif += `<div style="background:var(--danger-bg,#fee2e2);border:1px solid #fca5a5;color:var(--danger-strong,#991b1b);border-radius:10px;padding:0.85rem 1rem;margin-bottom:0.75rem;"><strong>✗ ${rejNew.length} déclaration(s) rejetée(s).</strong> Consultez le motif dans le tableau ci-dessous.</div>`;
     document.getElementById('ensNotif').innerHTML = notif;
 
     const taux = parseFloat(teacher.tauxHoraire) || 0;
@@ -334,15 +334,15 @@ function renderMesHeures() {
     const fcfa = n => Number(n).toLocaleString('fr-FR') + ' FCFA';
     document.getElementById('ensRemu').innerHTML = `<div class="card"><h3 style="font-size:1.05rem;font-weight:700;margin-bottom:0.75rem;">Ma rémunération</h3>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.75rem;">
-            <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:0.85rem;text-align:center;"><div style="font-size:1.25rem;font-weight:700;color:#2E2769;">${taux ? fcfa(taux) + '/h' : 'non défini'}</div><div style="font-size:0.8rem;color:#64748b;">Taux horaire</div></div>
-            <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:0.85rem;text-align:center;"><div style="font-size:1.25rem;font-weight:700;color:#16a34a;">${hVal} h</div><div style="font-size:0.8rem;color:#64748b;">Heures validées</div></div>
-            <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:0.85rem;text-align:center;"><div style="font-size:1.25rem;font-weight:700;color:#f59e0b;">${hAtt} h</div><div style="font-size:0.8rem;color:#64748b;">En attente</div></div>
-            <div style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:10px;padding:0.85rem;text-align:center;"><div style="font-size:1.25rem;font-weight:700;color:#4338ca;">${fcfa(montant)}</div><div style="font-size:0.8rem;color:#64748b;">Rémunération validée</div></div>
-        </div>${taux ? '' : '<p style="color:#b45309;font-size:0.82rem;margin:0.6rem 0 0;">Votre taux horaire n\'est pas encore défini par l\'administration (Direction des études).</p>'}</div>`;
+            <div style="background:var(--surface-2,#f8fafc);border:1px solid #e2e8f0;border-radius:10px;padding:0.85rem;text-align:center;"><div style="font-size:1.25rem;font-weight:700;color:var(--brand-strong,#2E2769);">${taux ? fcfa(taux) + '/h' : 'non défini'}</div><div style="font-size:0.8rem;color:var(--muted,#64748b);">Taux horaire</div></div>
+            <div style="background:var(--surface-2,#f8fafc);border:1px solid #e2e8f0;border-radius:10px;padding:0.85rem;text-align:center;"><div style="font-size:1.25rem;font-weight:700;color:var(--ok,#16a34a);">${hVal} h</div><div style="font-size:0.8rem;color:var(--muted,#64748b);">Heures validées</div></div>
+            <div style="background:var(--surface-2,#f8fafc);border:1px solid #e2e8f0;border-radius:10px;padding:0.85rem;text-align:center;"><div style="font-size:1.25rem;font-weight:700;color:var(--warn,#f59e0b);">${hAtt} h</div><div style="font-size:0.8rem;color:var(--muted,#64748b);">En attente</div></div>
+            <div style="background:var(--brand-bg,#eef2ff);border:1px solid #c7d2fe;border-radius:10px;padding:0.85rem;text-align:center;"><div style="font-size:1.25rem;font-weight:700;color:var(--brand-strong,#4338ca);">${fcfa(montant)}</div><div style="font-size:0.8rem;color:var(--muted,#64748b);">Rémunération validée</div></div>
+        </div>${taux ? '' : '<p style="color:var(--warn-strong,#b45309);font-size:0.82rem;margin:0.6rem 0 0;">Votre taux horaire n\'est pas encore défini par l\'administration (Direction des études).</p>'}</div>`;
 
     const list = mine.slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
     document.getElementById('ensHeuresList').innerHTML = list.length === 0
-        ? '<p style="color:#64748b;padding:0.5rem;">Aucune déclaration pour le moment.</p>'
+        ? '<p style="color:var(--muted,#64748b);padding:0.5rem;">Aucune déclaration pour le moment.</p>'
         : `<div style="overflow-x:auto;"><table>
             <thead><tr><th>Date</th><th>Classe</th><th>Matière</th><th style="text-align:center;">Heures</th><th>Sujet</th><th>Suivi de validation</th><th>Statut</th></tr></thead>
             <tbody>${list.map(h => `<tr>
@@ -382,14 +382,14 @@ function renderPlanning() {
     lignes.sort((a, b) => a.ji - b.ji || a.ci - b.ci);
     const heuresSemaine = lignes.length;
     let html = `<h3 style="font-size:1.15rem;font-weight:700;margin-bottom:0.25rem;">Mon planning</h3>
-        <p style="color:#64748b;margin:0 0 1rem;">Établi à partir des emplois du temps saisis par la Direction des études.</p>
+        <p style="color:var(--muted,#64748b);margin:0 0 1rem;">Établi à partir des emplois du temps saisis par la Direction des études.</p>
         <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;">
-            <span style="background:#eef2ff;color:#4338ca;border-radius:999px;padding:0.3rem 0.8rem;font-size:0.85rem;"><strong>Classes :</strong> ${mesClassesNoms.length ? mesClassesNoms.map(enEsc).join(', ') : 'non définies'}</span>
-            <span style="background:#ecfeff;color:#0e7490;border-radius:999px;padding:0.3rem 0.8rem;font-size:0.85rem;"><strong>Matières :</strong> ${mesMatNoms.length ? mesMatNoms.map(enEsc).join(', ') : 'non définies'}</span>
-            <span style="background:#f0fdf4;color:#166534;border-radius:999px;padding:0.3rem 0.8rem;font-size:0.85rem;"><strong>${heuresSemaine}</strong> créneau(x)/semaine</span>
+            <span style="background:var(--brand-bg,#eef2ff);color:var(--brand-strong,#4338ca);border-radius:999px;padding:0.3rem 0.8rem;font-size:0.85rem;"><strong>Classes :</strong> ${mesClassesNoms.length ? mesClassesNoms.map(enEsc).join(', ') : 'non définies'}</span>
+            <span style="background:var(--brand-bg,#ecfeff);color:var(--info,#0e7490);border-radius:999px;padding:0.3rem 0.8rem;font-size:0.85rem;"><strong>Matières :</strong> ${mesMatNoms.length ? mesMatNoms.map(enEsc).join(', ') : 'non définies'}</span>
+            <span style="background:var(--ok-bg,#f0fdf4);color:var(--ok-strong,#166534);border-radius:999px;padding:0.3rem 0.8rem;font-size:0.85rem;"><strong>${heuresSemaine}</strong> créneau(x)/semaine</span>
         </div>`;
     if (!lignes.length) {
-        html += '<p style="color:#64748b;">Aucun créneau trouvé. L\'emploi du temps de vos classes n\'a pas encore été saisi, ou vos matières/classes ne sont pas renseignées (onglet « Mes informations »).</p>';
+        html += '<p style="color:var(--muted,#64748b);">Aucun créneau trouvé. L\'emploi du temps de vos classes n\'a pas encore été saisi, ou vos matières/classes ne sont pas renseignées (onglet « Mes informations »).</p>';
     } else {
         html += `<div style="overflow-x:auto;"><table>
             <thead><tr><th>Jour</th><th>Horaire</th><th>Classe</th><th>Matière</th></tr></thead>

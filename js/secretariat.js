@@ -55,10 +55,10 @@ function renderCommunication() {
     }
     const dest = destinatairesComm();
     const total = (document.getElementById('commClasse').value ? secEleves.filter(e => e.classe === document.getElementById('commClasse').value) : secEleves).length;
-    document.getElementById('commInfo').innerHTML = `<strong>${dest.length}</strong> destinataire(s) avec numéro de téléphone parent${total > dest.length ? ` <span style="color:#b91c1c;">(${total - dest.length} sans numéro)</span>` : ''}.`;
+    document.getElementById('commInfo').innerHTML = `<strong>${dest.length}</strong> destinataire(s) avec numéro de téléphone parent${total > dest.length ? ` <span style="color:var(--danger-strong,#b91c1c);">(${total - dest.length} sans numéro)</span>` : ''}.`;
     const tbody = document.getElementById('commTable');
     tbody.innerHTML = dest.length === 0
-        ? '<tr><td colspan="3" style="text-align:center;padding:1rem;color:#64748b;">Aucun numéro de téléphone parent enregistré. Renseignez-les via les pré-inscriptions ou la fiche élève.</td></tr>'
+        ? '<tr><td colspan="3" style="text-align:center;padding:1rem;color:var(--muted,#64748b);">Aucun numéro de téléphone parent enregistré. Renseignez-les via les pré-inscriptions ou la fiche élève.</td></tr>'
         : dest.slice(0, 100).map(e => `<tr><td>${secEsc(e.nom)} ${secEsc(e.prenom)}</td><td>${secEsc(e.classe)}</td><td style="font-family:monospace;">${secEsc(telParent(e))}</td></tr>`).join('');
     renderHistoriqueComm();
 }
@@ -66,9 +66,9 @@ function renderHistoriqueComm() {
     const box = document.getElementById('commHisto');
     if (!box) return;
     box.innerHTML = communications.length === 0
-        ? '<p style="color:#64748b;padding:0.5rem;">Aucun message enregistré.</p>'
+        ? '<p style="color:var(--muted,#64748b);padding:0.5rem;">Aucun message enregistré.</p>'
         : communications.slice().reverse().slice(0, 30).map(c => `<div style="border-bottom:1px solid #eee;padding:0.5rem 0;">
-            <div style="font-size:0.8rem;color:#64748b;">${new Date(c.date).toLocaleString('fr-FR')} · ${secEsc(c.canal)} · ${c.nb} destinataire(s)${c.classe ? ' · ' + secEsc(c.classe) : ''}</div>
+            <div style="font-size:0.8rem;color:var(--muted,#64748b);">${new Date(c.date).toLocaleString('fr-FR')} · ${secEsc(c.canal)} · ${c.nb} destinataire(s)${c.classe ? ' · ' + secEsc(c.classe) : ''}</div>
             <div>${secEsc(c.message)}</div></div>`).join('');
 }
 function messagePersonnalise(e, modele) {
@@ -156,7 +156,7 @@ function renderDashboard() {
 
     const recents = courrier.slice().sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 6);
     document.getElementById('secRecents').innerHTML = recents.length === 0
-        ? '<p style="color:#64748b;padding:1rem;">Aucun courrier enregistré.</p>'
+        ? '<p style="color:var(--muted,#64748b);padding:1rem;">Aucun courrier enregistré.</p>'
         : `<table><thead><tr><th>Date</th><th>Sens</th><th>Correspondant</th><th>Objet</th><th>Statut</th></tr></thead><tbody>${recents.map(c => `
             <tr><td>${c.date ? new Date(c.date).toLocaleDateString('fr-FR') : '-'}</td>
             <td>${c.sens === 'Arrivée' ? '📥 Arrivée' : '📤 Départ'}</td>
@@ -173,7 +173,7 @@ function renderCourrier() {
     if (filtre && filtre !== 'Tous') list = list.filter(c => c.sens === filtre);
     const tbody = document.getElementById('courrierTable');
     tbody.innerHTML = list.length === 0
-        ? '<tr><td colspan="7" style="text-align:center;padding:1.5rem;color:#64748b;">Aucun courrier.</td></tr>'
+        ? '<tr><td colspan="7" style="text-align:center;padding:1.5rem;color:var(--muted,#64748b);">Aucun courrier.</td></tr>'
         : list.map(c => `<tr>
             <td>${c.date ? new Date(c.date).toLocaleDateString('fr-FR') : '-'}</td>
             <td>${c.sens === 'Arrivée' ? '📥 Arrivée' : '📤 Départ'}</td>
@@ -221,7 +221,7 @@ function renderDocuments() {
     const tbody = document.getElementById('documentsTable');
     const list = documents.slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
     tbody.innerHTML = list.length === 0
-        ? '<tr><td colspan="6" style="text-align:center;padding:1.5rem;color:#64748b;">Aucun document archivé.</td></tr>'
+        ? '<tr><td colspan="6" style="text-align:center;padding:1.5rem;color:var(--muted,#64748b);">Aucun document archivé.</td></tr>'
         : list.map(doc => `<tr>
             <td>${doc.date ? new Date(doc.date).toLocaleDateString('fr-FR') : '-'}</td>
             <td style="font-weight:600;">${secEsc(doc.titre)}</td>
@@ -259,7 +259,7 @@ function renderNotes() {
     const tbody = document.getElementById('notesTable');
     const list = notesService.slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
     tbody.innerHTML = list.length === 0
-        ? '<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:#64748b;">Aucune note de service.</td></tr>'
+        ? '<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:var(--muted,#64748b);">Aucune note de service.</td></tr>'
         : list.map(n => `<tr>
             <td style="font-weight:600;">${secEsc(n.numero)}</td>
             <td>${n.date ? new Date(n.date).toLocaleDateString('fr-FR') : '-'}</td>
@@ -299,7 +299,7 @@ function genererNote(id) {
     const n = notesService.find(x => x.id === id); if (!n) return;
     const ecole = getEcoleName();
     const html = `
-        <div style="font-family:Arial,sans-serif;max-width:780px;margin:0 auto;padding:2.5rem;color:#111;">
+        <div style="font-family:Arial,sans-serif;max-width:780px;margin:0 auto;padding:2.5rem;color:var(--ink,#111);">
             <div style="text-align:center;border-bottom:2px solid #333;padding-bottom:0.75rem;margin-bottom:1.5rem;">
                 <p style="margin:0;font-size:0.85rem;">RÉPUBLIQUE DU CONGO &nbsp;–&nbsp; Unité, Travail, Progrès<br>Ministère de l'Enseignement Préscolaire, Primaire, Secondaire et de l'Alphabétisation</p>
                 <h2 style="margin:0.4rem 0 0;text-transform:uppercase;">${secEsc(ecole)}</h2>
@@ -314,7 +314,7 @@ function genererNote(id) {
             <div style="margin-top:3rem;text-align:right;">
                 <p style="margin:0;font-weight:bold;">Le Chef d'établissement</p>
                 <div style="height:70px;"></div>
-                <p style="margin:0;color:#666;">(Signature et cachet)</p>
+                <p style="margin:0;color:var(--muted,#666);">(Signature et cachet)</p>
             </div>
         </div>`;
     const w = window.open('', '_blank');

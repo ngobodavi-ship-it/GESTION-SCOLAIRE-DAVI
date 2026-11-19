@@ -77,23 +77,23 @@ function renderVacations() {
 
     document.getElementById('vacKpis').innerHTML = `
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0.75rem;margin-bottom:1rem;">
-            <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:1rem;text-align:center;"><div style="font-size:1.4rem;font-weight:700;color:#2E2769;">${_vacRecap.length}</div><div style="color:#64748b;font-size:0.85rem;">Enseignants</div></div>
-            <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:1rem;text-align:center;"><div style="font-size:1.4rem;font-weight:700;color:#16a34a;">${totH} h</div><div style="color:#64748b;font-size:0.85rem;">Heures validées</div></div>
-            <div style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:12px;padding:1rem;text-align:center;"><div style="font-size:1.4rem;font-weight:700;color:#4338ca;">${vacFCFA(totM)}</div><div style="color:#64748b;font-size:0.85rem;">Total à payer</div></div>
+            <div style="background:var(--surface-2,#f8fafc);border:1px solid #e2e8f0;border-radius:12px;padding:1rem;text-align:center;"><div style="font-size:1.4rem;font-weight:700;color:var(--brand-strong,#2E2769);">${_vacRecap.length}</div><div style="color:var(--muted,#64748b);font-size:0.85rem;">Enseignants</div></div>
+            <div style="background:var(--surface-2,#f8fafc);border:1px solid #e2e8f0;border-radius:12px;padding:1rem;text-align:center;"><div style="font-size:1.4rem;font-weight:700;color:var(--ok,#16a34a);">${totH} h</div><div style="color:var(--muted,#64748b);font-size:0.85rem;">Heures validées</div></div>
+            <div style="background:var(--brand-bg,#eef2ff);border:1px solid #c7d2fe;border-radius:12px;padding:1rem;text-align:center;"><div style="font-size:1.4rem;font-weight:700;color:var(--brand-strong,#4338ca);">${vacFCFA(totM)}</div><div style="color:var(--muted,#64748b);font-size:0.85rem;">Total à payer</div></div>
         </div>`;
 
     box.innerHTML = _vacRecap.length === 0
-        ? '<p style="color:#64748b;padding:1rem;text-align:center;">Aucune heure validée sur cette période. Les heures doivent être validées par le Directeur des études (module Direction des études → Validation des heures).</p>'
+        ? '<p style="color:var(--muted,#64748b);padding:1rem;text-align:center;">Aucune heure validée sur cette période. Les heures doivent être validées par le Directeur des études (module Direction des études → Validation des heures).</p>'
         : `<div style="overflow-x:auto;"><table>
             <thead><tr><th>Enseignant</th><th>Matières enseignées</th><th style="text-align:center;">Heures effectuées</th><th style="text-align:right;">Tarif horaire</th><th style="text-align:right;">Montant à payer</th></tr></thead>
             <tbody>${_vacRecap.map(r => `<tr>
                 <td style="font-weight:600;">${vacEsc(r.nom)}</td>
                 <td>${vacEsc(r.matieres)}</td>
                 <td style="text-align:center;font-weight:700;">${r.heures}</td>
-                <td style="text-align:right;">${r.tarif ? vacFCFA(r.tarif) : '<span style="color:#dc3545;">à définir</span>'}</td>
-                <td style="text-align:right;font-weight:700;color:#4338ca;">${vacFCFA(r.montant)}</td>
+                <td style="text-align:right;">${r.tarif ? vacFCFA(r.tarif) : '<span style="color:var(--danger,#dc3545);">à définir</span>'}</td>
+                <td style="text-align:right;font-weight:700;color:var(--brand-strong,#4338ca);">${vacFCFA(r.montant)}</td>
             </tr>`).join('')}
-            <tr style="background:#f8fafc;font-weight:700;"><td colspan="2">TOTAL</td><td style="text-align:center;">${totH} h</td><td></td><td style="text-align:right;color:#4338ca;">${vacFCFA(totM)}</td></tr>
+            <tr style="background:var(--surface-2,#f8fafc);font-weight:700;"><td colspan="2">TOTAL</td><td style="text-align:center;">${totH} h</td><td></td><td style="text-align:right;color:var(--brand-strong,#4338ca);">${vacFCFA(totM)}</td></tr>
             </tbody></table></div>`;
 }
 
@@ -121,10 +121,10 @@ function imprimerVacations() {
     const totH = _vacRecap.reduce((s, r) => s + r.heures, 0), totM = _vacRecap.reduce((s, r) => s + r.montant, 0);
     const w = window.open('', '_blank');
     w.document.write(`<html><head><title>État de paie des vacations</title><style>
-        body{font-family:Arial,sans-serif;padding:24px;color:#1e293b;}
-        h1{font-size:1.2rem;text-align:center;margin:0;} .sub{text-align:center;color:#64748b;margin:0.25rem 0 1.25rem;}
+        body{font-family:Arial,sans-serif;padding:24px;color:var(--ink,#1e293b);}
+        h1{font-size:1.2rem;text-align:center;margin:0;} .sub{text-align:center;color:var(--muted,#64748b);margin:0.25rem 0 1.25rem;}
         table{width:100%;border-collapse:collapse;font-size:0.85rem;} th,td{border:1px solid #cbd5e1;padding:6px 8px;}
-        th{background:#f1f5f9;text-align:left;} .r{text-align:right;} .c{text-align:center;} tfoot td{font-weight:700;background:#f8fafc;}
+        th{background:var(--surface-2,#f1f5f9);text-align:left;} .r{text-align:right;} .c{text-align:center;} tfoot td{font-weight:700;background:var(--surface-2,#f8fafc);}
     </style></head><body>
         <h1>RÉPUBLIQUE DU CONGO – Unité, Travail, Progrès</h1>
         <p class="sub">${vacEsc(ecole)}<br>État de paie des vacations enseignants — Période du ${d1 ? new Date(d1).toLocaleDateString('fr-FR') : '...'} au ${d2 ? new Date(d2).toLocaleDateString('fr-FR') : '...'}</p>

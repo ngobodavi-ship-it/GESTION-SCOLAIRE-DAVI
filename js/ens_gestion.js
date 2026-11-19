@@ -55,7 +55,7 @@ function renderEnseignantsGestion() {
     if (liste) {
         liste.innerHTML = `
             <h4 style="font-weight:700;margin:0 0 0.75rem;">👥 Corps enseignant (${ens.length})</h4>
-            ${ens.length === 0 ? '<p style="color:#64748b;">Aucun enseignant. Ils sont créés par la Direction des études.</p>' : `
+            ${ens.length === 0 ? '<p style="color:var(--muted,#64748b);">Aucun enseignant. Ils sont créés par la Direction des études.</p>' : `
             <table>
                 <thead><tr><th>Nom</th><th>Niveau</th><th>Classe</th><th>Matière</th><th style="text-align:right;">Salaire fixe</th><th style="text-align:right;">Taux horaire</th></tr></thead>
                 <tbody>${ens.map(e => `<tr>
@@ -104,12 +104,12 @@ function renderEnseignantsGestion() {
             </div>
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.75rem;margin-bottom:1rem;">
-            <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:0.9rem;text-align:center;"><div style="font-size:1.3rem;font-weight:700;color:#0e7490;">${egFCFA(totFixe)}</div><div style="color:#64748b;font-size:0.82rem;">Salaires fixes</div></div>
-            <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:0.9rem;text-align:center;"><div style="font-size:1.3rem;font-weight:700;color:#16a34a;">${egFCFA(totPrime)}</div><div style="color:#64748b;font-size:0.82rem;">Primes</div></div>
-            <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:0.9rem;text-align:center;"><div style="font-size:1.3rem;font-weight:700;color:#7c3aed;">${egFCFA(totVac)}</div><div style="color:#64748b;font-size:0.82rem;">Vacations (heures)</div></div>
-            <div style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:12px;padding:0.9rem;text-align:center;"><div style="font-size:1.3rem;font-weight:700;color:#4338ca;">${egFCFA(totGen)}</div><div style="color:#64748b;font-size:0.82rem;">Total à payer</div></div>
+            <div style="background:var(--surface-2,#f8fafc);border:1px solid #e2e8f0;border-radius:12px;padding:0.9rem;text-align:center;"><div style="font-size:1.3rem;font-weight:700;color:var(--info,#0e7490);">${egFCFA(totFixe)}</div><div style="color:var(--muted,#64748b);font-size:0.82rem;">Salaires fixes</div></div>
+            <div style="background:var(--surface-2,#f8fafc);border:1px solid #e2e8f0;border-radius:12px;padding:0.9rem;text-align:center;"><div style="font-size:1.3rem;font-weight:700;color:var(--ok,#16a34a);">${egFCFA(totPrime)}</div><div style="color:var(--muted,#64748b);font-size:0.82rem;">Primes</div></div>
+            <div style="background:var(--surface-2,#f8fafc);border:1px solid #e2e8f0;border-radius:12px;padding:0.9rem;text-align:center;"><div style="font-size:1.3rem;font-weight:700;color:var(--violet,#7c3aed);">${egFCFA(totVac)}</div><div style="color:var(--muted,#64748b);font-size:0.82rem;">Vacations (heures)</div></div>
+            <div style="background:var(--brand-bg,#eef2ff);border:1px solid #c7d2fe;border-radius:12px;padding:0.9rem;text-align:center;"><div style="font-size:1.3rem;font-weight:700;color:var(--brand-strong,#4338ca);">${egFCFA(totGen)}</div><div style="color:var(--muted,#64748b);font-size:0.82rem;">Total à payer</div></div>
         </div>
-        ${recap.length === 0 ? '<p style="color:#64748b;">Aucun salaire, prime ni vacation à payer pour ce mois.</p>' : `
+        ${recap.length === 0 ? '<p style="color:var(--muted,#64748b);">Aucun salaire, prime ni vacation à payer pour ce mois.</p>' : `
         <table>
             <thead><tr><th>Enseignant</th><th>Niveau</th><th style="text-align:right;">Salaire fixe</th><th style="text-align:center;">Heures</th><th style="text-align:right;">Vacations</th><th style="text-align:right;">Prime</th><th style="text-align:right;">Total</th><th style="text-align:center;">Statut</th><th style="text-align:right;">Action</th></tr></thead>
             <tbody>${recap.map(r => {
@@ -117,18 +117,18 @@ function renderEnseignantsGestion() {
                 return `<tr>
                     <td style="font-weight:600;">${egEsc(r.nom)}</td>
                     <td>${egLigneNiveauBadge(r.niveau)}</td>
-                    <td style="text-align:right;white-space:nowrap;">${r.dejaFixe ? '<span style="color:#16a34a;">payé</span>' : (r.fixe ? egFCFA(r.fixe) : '-')}</td>
+                    <td style="text-align:right;white-space:nowrap;">${r.dejaFixe ? '<span style="color:var(--ok,#16a34a);">payé</span>' : (r.fixe ? egFCFA(r.fixe) : '-')}</td>
                     <td style="text-align:center;">${r.heures || '-'}</td>
                     <td style="text-align:right;white-space:nowrap;">${r.vac ? egFCFA(r.vac) : '-'}</td>
                     <td style="text-align:right;">${r.dejaFixe
                         ? (r.prime ? egFCFA(r.prime) : '-')
                         : `<input type="number" min="0" step="500" value="${r.prime || ''}" placeholder="0" onchange="egSetPrime('${r.id}', this.value)" style="width:90px;margin:0;padding:0.25rem;text-align:right;">`}</td>
                     <td style="text-align:right;font-weight:700;white-space:nowrap;">${egFCFA(r.total)}</td>
-                    <td style="text-align:center;">${paye ? '<span style="color:#16a34a;font-weight:600;">✓ Payé</span>' : '<span style="color:#f59e0b;font-weight:600;">À payer</span>'}</td>
+                    <td style="text-align:center;">${paye ? '<span style="color:var(--ok,#16a34a);font-weight:600;">✓ Payé</span>' : '<span style="color:var(--warn,#f59e0b);font-weight:600;">À payer</span>'}</td>
                     <td style="text-align:right;">${r.total > 0 ? `<button class="btn btn-primary" style="padding:0.3rem 0.7rem;font-size:0.82rem;" onclick="egPayer('${r.id}')">Payer</button>` : '—'}</td>
                 </tr>`;
             }).join('')}
-            <tr style="background:#f8fafc;font-weight:700;"><td colspan="6" style="text-align:right;">TOTAL GÉNÉRAL</td><td style="text-align:right;">${egFCFA(totGen)}</td><td colspan="2"></td></tr>
+            <tr style="background:var(--surface-2,#f8fafc);font-weight:700;"><td colspan="6" style="text-align:right;">TOTAL GÉNÉRAL</td><td style="text-align:right;">${egFCFA(totGen)}</td><td colspan="2"></td></tr>
             </tbody>
         </table>`}`;
 }
@@ -217,13 +217,13 @@ function egImprimer() {
     const tot = _egRecap.reduce((s, r) => s + r.total, 0);
     const w = window.open('', '_blank');
     w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>État de paie ${ym}</title></head>
-        <body style="font-family:Arial,sans-serif;padding:1.5rem;color:#111;">
+        <body style="font-family:Arial,sans-serif;padding:1.5rem;color:var(--ink,#111);">
         <div style="text-align:center;margin-bottom:0.5rem;"><p style="margin:0;font-size:0.8rem;">RÉPUBLIQUE DU CONGO — Unité · Travail · Progrès</p>
         <h2 style="margin:0.3rem 0;">${egEsc(ecole) || 'Établissement scolaire'}</h2>
         <h3 style="margin:0;">État de paie du corps enseignant — ${egEsc(ym)}</h3></div>
         <table style="width:100%;border-collapse:collapse;font-size:0.9rem;margin-top:1rem;">
-        <thead><tr style="background:#eee;"><th style="border:1px solid #999;padding:4px 8px;">Enseignant</th><th style="border:1px solid #999;padding:4px 8px;">Niveau</th><th style="border:1px solid #999;padding:4px 8px;">Salaire fixe</th><th style="border:1px solid #999;padding:4px 8px;">Heures</th><th style="border:1px solid #999;padding:4px 8px;">Vacations</th><th style="border:1px solid #999;padding:4px 8px;">Prime</th><th style="border:1px solid #999;padding:4px 8px;">Total</th></tr></thead>
-        <tbody>${lignes}<tr style="font-weight:700;background:#f5f5f5;"><td colspan="6" style="border:1px solid #999;padding:4px 8px;text-align:right;">TOTAL GÉNÉRAL</td><td style="border:1px solid #999;padding:4px 8px;text-align:right;">${egFCFA(tot)}</td></tr></tbody></table>
+        <thead><tr style="background:var(--surface-2,#eee);"><th style="border:1px solid #999;padding:4px 8px;">Enseignant</th><th style="border:1px solid #999;padding:4px 8px;">Niveau</th><th style="border:1px solid #999;padding:4px 8px;">Salaire fixe</th><th style="border:1px solid #999;padding:4px 8px;">Heures</th><th style="border:1px solid #999;padding:4px 8px;">Vacations</th><th style="border:1px solid #999;padding:4px 8px;">Prime</th><th style="border:1px solid #999;padding:4px 8px;">Total</th></tr></thead>
+        <tbody>${lignes}<tr style="font-weight:700;background:var(--surface-2,#f5f5f5);"><td colspan="6" style="border:1px solid #999;padding:4px 8px;text-align:right;">TOTAL GÉNÉRAL</td><td style="border:1px solid #999;padding:4px 8px;text-align:right;">${egFCFA(tot)}</td></tr></tbody></table>
         <div style="margin-top:2.5rem;display:flex;justify-content:space-between;font-size:0.9rem;"><div>Le Gestionnaire<br><br>__________________</div><div>Le Directeur<br><br>__________________</div></div>
         </body></html>`);
     w.document.close();

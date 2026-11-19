@@ -47,7 +47,7 @@ function renderSalaires() {
             if (employees.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="4" style="text-align: center; padding: 2rem; color: #64748b;">
+                        <td colspan="4" style="text-align: center; padding: 2rem; color: var(--muted,#64748b);">
                             📥 Importez un fichier Excel avec les colonnes : <strong>Nom | Poste | Salaire</strong>
                         </td>
                     </tr>
@@ -99,13 +99,13 @@ function printBulletinSalaire(employeeId) {
             const bulletinHTML = `
                 <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem;">
                     <div style="text-align: center; margin-bottom: 2rem; border-bottom: 3px solid #1B6BFF; padding-bottom: 1rem;">
-                        <h1 style="color: #1B6BFF; margin: 0;">📄 BULLETIN DE PAIE</h1>
-                        <h2 style="margin: 0.5rem 0; color: #1e293b;">${nomEcole}</h2>
-                        <p style="color: #64748b; margin: 0;">Congo Brazzaville</p>
+                        <h1 style="color: var(--brand,#1B6BFF); margin: 0;">📄 BULLETIN DE PAIE</h1>
+                        <h2 style="margin: 0.5rem 0; color: var(--ink,#1e293b);">${nomEcole}</h2>
+                        <p style="color: var(--muted,#64748b); margin: 0;">Congo Brazzaville</p>
                     </div>
 
-                    <div style="background: #f8fafc; padding: 1.5rem; border-radius: 10px; margin-bottom: 1.5rem;">
-                        <h3 style="margin: 0 0 1rem 0; color: #1e293b;">Période : ${moisNom} ${annee}</h3>
+                    <div style="background: var(--surface-2,#f8fafc); padding: 1.5rem; border-radius: 10px; margin-bottom: 1.5rem;">
+                        <h3 style="margin: 0 0 1rem 0; color: var(--ink,#1e293b);">Période : ${moisNom} ${annee}</h3>
                         <p style="margin: 0.5rem 0;"><strong>Employé :</strong> ${employee.nom}</p>
                         <p style="margin: 0.5rem 0;"><strong>Poste :</strong> ${employee.poste}</p>
                         <p style="margin: 0.5rem 0;"><strong>Date d'émission :</strong> ${new Date().toLocaleDateString('fr-FR')}</p>
@@ -113,7 +113,7 @@ function printBulletinSalaire(employeeId) {
 
                     <table style="width: 100%; border-collapse: collapse; margin-bottom: 1.5rem;">
                         <thead>
-                            <tr style="background: #1B6BFF; color: white;">
+                            <tr style="background: var(--brand,#1B6BFF); color: white;">
                                 <th style="padding: 1rem; text-align: left; border: 1px solid #ddd;">Description</th>
                                 <th style="padding: 1rem; text-align: right; border: 1px solid #ddd;">Montant (FCFA)</th>
                             </tr>
@@ -133,18 +133,18 @@ function printBulletinSalaire(employeeId) {
 
                     <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #ddd; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
                         <div>
-                            <p style="margin: 0; color: #64748b;">Signature de l'employeur</p>
+                            <p style="margin: 0; color: var(--muted,#64748b);">Signature de l'employeur</p>
                             <div style="height: 60px;"></div>
                             <div style="border-top: 1px solid #000; padding-top: 0.5rem;">Date et cachet</div>
                         </div>
                         <div>
-                            <p style="margin: 0; color: #64748b;">Signature de l'employé</p>
+                            <p style="margin: 0; color: var(--muted,#64748b);">Signature de l'employé</p>
                             <div style="height: 60px;"></div>
                             <div style="border-top: 1px solid #000; padding-top: 0.5rem;">Date</div>
                         </div>
                     </div>
 
-                    <div style="text-align: center; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #ddd; color: #94a3b8; font-size: 0.875rem;">
+                    <div style="text-align: center; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #ddd; color: var(--muted-2,#94a3b8); font-size: 0.875rem;">
                         <p style="margin: 0;">DigiGesPro - Gestion digitale de caisse scolaire</p>
                         <p style="margin: 0.25rem 0;">© ${annee} Tous droits réservés</p>
                     </div>

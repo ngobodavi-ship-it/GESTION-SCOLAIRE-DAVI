@@ -153,7 +153,7 @@ function renderTransactions() {
             console.log('renderTransactions appelé, nombre de transactions:', transactions.length, 'filtrées:', filtered.length);
 
             if (filtered.length === 0) {
-                document.getElementById('transactionsList').innerHTML = '<p style="text-align:center;color:#64748b;padding:2rem;">Aucune transaction</p>';
+                document.getElementById('transactionsList').innerHTML = '<p style="text-align:center;color:var(--muted,#64748b);padding:2rem;">Aucune transaction</p>';
                 return;
             }
 
@@ -161,19 +161,19 @@ function renderTransactions() {
                 if (t.type === 'depense') {
                     // Affichage pour dépense
                     return `
-                        <div style="padding:1rem;background:#fff5f5;border-left:4px solid #ef4444;border-radius:10px;margin-bottom:0.75rem;">
+                        <div style="padding:1rem;background:var(--danger-bg,#fff5f5);border-left:4px solid #ef4444;border-radius:10px;margin-bottom:0.75rem;">
                             <div style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
                                 <div style="flex:1;">
                                     <p style="font-weight:600;margin-bottom:0.5rem;">💸 ${t.nature || t.categorie || 'Dépense'}</p>
-                                    <p style="margin:0.25rem 0;color:#475569;">${t.description}</p>
-                                    <p style="font-size:0.875rem;color:#94a3b8;margin-top:0.5rem;">
+                                    <p style="margin:0.25rem 0;color:var(--muted,#475569);">${t.description}</p>
+                                    <p style="font-size:0.875rem;color:var(--muted-2,#94a3b8);margin-top:0.5rem;">
                                         📅 ${new Date(t.date).toLocaleDateString('fr-FR')} ${t.time} • ${t.reference}
                                     </p>
                                 </div>
                                 <div style="text-align:right;display:flex;flex-direction:column;gap:0.5rem;align-items:flex-end;">
                                     <div>
-                                        <p style="font-size:1.75rem;font-weight:700;color:#ef4444;">-${parseFloat(t.amount).toLocaleString()}</p>
-                                        <p style="font-size:0.875rem;color:#64748b;">FCFA</p>
+                                        <p style="font-size:1.75rem;font-weight:700;color:var(--danger,#ef4444);">-${parseFloat(t.amount).toLocaleString()}</p>
+                                        <p style="font-size:0.875rem;color:var(--muted,#64748b);">FCFA</p>
                                     </div>
                                     <button class="btn btn-danger" style="padding:0.5rem 1rem;font-size:0.875rem;" onclick="deleteTransaction('${t.id}')">
                                         🗑️
@@ -188,22 +188,22 @@ function renderTransactions() {
                     const isPlusiersMois = t.moisPayes && t.moisPayes.length > 1;
                     
                     return `
-                        <div style="padding:1rem;background:#f8fafc;border-left:4px solid #10b981;border-radius:10px;margin-bottom:0.75rem;">
+                        <div style="padding:1rem;background:var(--surface-2,#f8fafc);border-left:4px solid #10b981;border-radius:10px;margin-bottom:0.75rem;">
                             <div style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
                                 <div style="flex:1;">
                                     <p style="font-weight:600;">${t.studentName || '-'}</p>
-                                    <p style="margin:0.25rem 0;color:#1B6BFF;">Mois: ${moisList}</p>
-                                    <p style="margin:0.25rem 0;color:#475569;">${t.description}</p>
-                                    ${isPlusiersMois ? '<p style="font-size:0.875rem;color:#3b82f6;font-weight:600;">📅 Paiement sur plusieurs mois</p>' : ''}
-                                    ${t.isEcheance ? '<p style="font-size:0.875rem;color:#f59e0b;font-weight:600;">⚡ Paiement par echeance</p>' : ''}
-                                    <p style="font-size:0.875rem;color:#94a3b8;margin-top:0.5rem;">
+                                    <p style="margin:0.25rem 0;color:var(--brand,#1B6BFF);">Mois: ${moisList}</p>
+                                    <p style="margin:0.25rem 0;color:var(--muted,#475569);">${t.description}</p>
+                                    ${isPlusiersMois ? '<p style="font-size:0.875rem;color:var(--brand,#3b82f6);font-weight:600;">📅 Paiement sur plusieurs mois</p>' : ''}
+                                    ${t.isEcheance ? '<p style="font-size:0.875rem;color:var(--warn,#f59e0b);font-weight:600;">⚡ Paiement par echeance</p>' : ''}
+                                    <p style="font-size:0.875rem;color:var(--muted-2,#94a3b8);margin-top:0.5rem;">
                                         📅 ${new Date(t.date).toLocaleDateString('fr-FR')} ${t.time}
                                     </p>
                                 </div>
                                 <div style="text-align:right;display:flex;flex-direction:column;gap:0.5rem;align-items:flex-end;">
                                     <div>
-                                        <p style="font-size:1.75rem;font-weight:700;color:#10b981;">+${parseFloat(t.amount).toLocaleString()}</p>
-                                        <p style="font-size:0.875rem;color:#64748b;">FCFA</p>
+                                        <p style="font-size:1.75rem;font-weight:700;color:var(--ok,#10b981);">+${parseFloat(t.amount).toLocaleString()}</p>
+                                        <p style="font-size:0.875rem;color:var(--muted,#64748b);">FCFA</p>
                                     </div>
                                     <div style="display:flex;gap:0.5rem;">
                                         <button class="btn btn-primary" style="padding:0.5rem 1rem;font-size:0.875rem;" onclick='showReceipt(${JSON.stringify(t).replace(/'/g, "\\'")})'> 

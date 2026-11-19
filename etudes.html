@@ -7,23 +7,25 @@
     <meta http-equiv="Expires" content="0">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Direction des études</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link href="vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
     <script src="js/etablissement.js"></script>
     <script src="js/auth.js"></script>
+    <link href="css/theme.css" rel="stylesheet">
+    <script src="js/theme.js"></script>
 </head>
 <body>
     <div class="container" style="max-width:1200px;">
         <div class="header">
             <div style="display:flex;align-items:center;gap:0.85rem;">
-                <div style="width:38px;height:38px;border-radius:0.6rem;background:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#fff;"><i class="bi bi-mortarboard"></i></div>
+                <div class="tb-logo"><i class="bi bi-mortarboard"></i></div>
                 <div>
                     <h1 style="font-size:1.4rem;font-weight:700;color:#fff;margin:0;">Direction des études</h1>
                     <p style="color:rgba(255,255,255,0.9);font-size:0.8rem;margin:0;">Matières, enseignants, notes, bulletins et emplois du temps</p>
                 </div>
             </div>
-            <div class="ms-auto" style="display:flex;align-items:center;gap:0.75rem;"><div class="date-selector"><span>📅</span><input type="date" id="headerDate" onchange="if(window.onHeaderDate)onHeaderDate(this.value)"></div><button class="btn btn-light btn-sm" onclick="logout()"><i class="bi bi-arrow-left"></i> Portail</button></div>
+            <div class="ms-auto" style="display:flex;align-items:center;gap:0.75rem;"><div class="date-selector"><i class="bi bi-calendar3"></i><input type="date" id="headerDate" onchange="if(window.onHeaderDate)onHeaderDate(this.value)"></div><button class="btn btn-light btn-sm" onclick="logout()"><i class="bi bi-arrow-left"></i> Portail</button></div>
         </div>
 
         <div class="layout">
@@ -56,7 +58,7 @@
                 <div id="sec-heures" class="section hidden">
                     <div class="card">
                         <h3 style="font-size:1.15rem;font-weight:700;margin-bottom:0.25rem;">Validation des heures de cours</h3>
-                        <p style="color:#64748b;margin:0 0 1rem;">Déclarations confirmées par le Surveillant et le Chef de scolarité. Votre validation est <strong>définitive</strong> : les heures deviennent payables et l'enseignant reçoit la notification.</p>
+                        <p style="color:var(--muted,#64748b);margin:0 0 1rem;">Déclarations confirmées par le Surveillant et le Chef de scolarité. Votre validation est <strong>définitive</strong> : les heures deviennent payables et l'enseignant reçoit la notification.</p>
                         <div id="valHeuresBox"></div>
                     </div>
                 </div>
@@ -64,10 +66,10 @@
                 <!-- Tableau de bord -->
                 <div id="sec-dashboard" class="section">
                     <div class="grid-2" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:1.5rem;">
-                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">🏫 Classes</p><h2 style="font-size:1.75rem;font-weight:700;color:#1B6BFF;margin:0;" id="etuClasses">0</h2></div>
-                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">📚 Matières</p><h2 style="font-size:1.75rem;font-weight:700;color:#10b981;margin:0;" id="etuMatieres">0</h2></div>
-                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">👨‍🏫 Enseignants</p><h2 style="font-size:1.75rem;font-weight:700;color:#0ea5e9;margin:0;" id="etuEnseignants">0</h2></div>
-                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">👨‍🎓 Élèves</p><h2 style="font-size:1.75rem;font-weight:700;color:#8b5cf6;margin:0;" id="etuEleves">0</h2></div>
+                        <div class="card"><p style="color:var(--muted,#64748b);font-size:0.85rem;margin-bottom:0.4rem;">🏫 Classes</p><h2 style="font-size:1.75rem;font-weight:700;color:var(--brand,#1B6BFF);margin:0;" id="etuClasses">0</h2></div>
+                        <div class="card"><p style="color:var(--muted,#64748b);font-size:0.85rem;margin-bottom:0.4rem;">📚 Matières</p><h2 style="font-size:1.75rem;font-weight:700;color:var(--ok,#10b981);margin:0;" id="etuMatieres">0</h2></div>
+                        <div class="card"><p style="color:var(--muted,#64748b);font-size:0.85rem;margin-bottom:0.4rem;">👨‍🏫 Enseignants</p><h2 style="font-size:1.75rem;font-weight:700;color:var(--info,#0ea5e9);margin:0;" id="etuEnseignants">0</h2></div>
+                        <div class="card"><p style="color:var(--muted,#64748b);font-size:0.85rem;margin-bottom:0.4rem;">👨‍🎓 Élèves</p><h2 style="font-size:1.75rem;font-weight:700;color:var(--violet,#8b5cf6);margin:0;" id="etuEleves">0</h2></div>
                     </div>
                     <div class="card">
                         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1rem;">
@@ -95,7 +97,7 @@
                             <button class="btn btn-secondary" onclick="chargerMatieresLyceeTechInd()"><i class="bi bi-tools"></i> Lycée technique industriel (F)</button>
                             <button class="btn btn-secondary" onclick="chargerMatieresLyceeTechCom()"><i class="bi bi-briefcase"></i> Lycée technique commercial (G)</button>
                         </div>
-                        <p style="color:#64748b;font-size:0.82rem;margin:0.6rem 0 0;">Chargez d'un clic les disciplines <strong>avec leurs coefficients</strong> selon la filière (général ou technique). Le bulletin de chaque classe n'affiche que les matières de <strong>son type</strong> (défini dans « Scolarité → Classes »). Coefficients modifiables avec ✏️ — au lycée ils varient selon la série.</p>
+                        <p style="color:var(--muted,#64748b);font-size:0.82rem;margin:0.6rem 0 0;">Chargez d'un clic les disciplines <strong>avec leurs coefficients</strong> selon la filière (général ou technique). Le bulletin de chaque classe n'affiche que les matières de <strong>son type</strong> (défini dans « Scolarité → Classes »). Coefficients modifiables avec ✏️ — au lycée ils varient selon la série.</p>
                     </div>
                     <div class="card" style="overflow-x:auto;">
                         <table><thead><tr><th>Matière</th><th style="text-align:center;">Coefficient</th><th>Cycle</th><th style="text-align:right;">Actions</th></tr></thead>
@@ -169,7 +171,7 @@
                 <div id="sec-passage" class="section hidden">
                     <div class="card">
                         <h3 style="font-size:1.2rem;font-weight:700;margin:0 0 0.25rem;">Passage de classe / Clôture d'année</h3>
-                        <p style="color:#64748b;font-size:0.85rem;margin:0 0 1rem;">La décision (Admis / Redouble) est proposée selon la <strong>moyenne annuelle</strong> (seuil 10/20 au secondaire, 5/10 au primaire). Vérifiez, ajustez si besoin, puis appliquez : les admis passent dans la classe supérieure, les redoublants conservent leur classe.</p>
+                        <p style="color:var(--muted,#64748b);font-size:0.85rem;margin:0 0 1rem;">La décision (Admis / Redouble) est proposée selon la <strong>moyenne annuelle</strong> (seuil 10/20 au secondaire, 5/10 au primaire). Vérifiez, ajustez si besoin, puis appliquez : les admis passent dans la classe supérieure, les redoublants conservent leur classe.</p>
                         <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-end;">
                             <div><label class="form-label" style="font-weight:600;">Classe</label><select id="passClasse" onchange="renderPassage()" style="margin:0;"></select></div>
                             <button class="btn btn-primary" onclick="appliquerPassage()"><i class="bi bi-arrow-up-circle"></i> Appliquer le passage</button>
@@ -182,7 +184,7 @@
                 <div id="sec-archives" class="section hidden">
                     <div class="card">
                         <h3 style="font-size:1.2rem;font-weight:700;margin:0 0 0.25rem;">Archives des années scolaires</h3>
-                        <p style="color:#64748b;font-size:0.85rem;margin:0 0 1rem;">Avant de faire le <strong>passage de classe</strong>, archivez l'année en cours : élèves, classes, notes, bulletins et effectifs sont figés et conservés. Vous pourrez toujours les consulter et les imprimer plus tard.</p>
+                        <p style="color:var(--muted,#64748b);font-size:0.85rem;margin:0 0 1rem;">Avant de faire le <strong>passage de classe</strong>, archivez l'année en cours : élèves, classes, notes, bulletins et effectifs sont figés et conservés. Vous pourrez toujours les consulter et les imprimer plus tard.</p>
                         <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-end;">
                             <div><label class="form-label" style="font-weight:600;">Année à archiver</label><input type="text" id="arAnnee" placeholder="ex: 2025-2026" style="margin:0;width:160px;"></div>
                             <button class="btn btn-primary" onclick="archiverAnnee()"><i class="bi bi-archive"></i> Archiver l'année</button>
@@ -195,7 +197,7 @@
                 <div id="sec-examens" class="section hidden">
                     <div class="card">
                         <h3 style="font-size:1.2rem;font-weight:700;margin:0 0 0.25rem;">Examens officiels</h3>
-                        <p style="color:#64748b;font-size:0.85rem;margin:0 0 1rem;">Saisissez les résultats au CEPE, BEPC ou BAC, et obtenez le <strong>taux de réussite</strong> par classe. Choisissez l'examen, la session et la classe, puis renseignez le résultat de chaque candidat.</p>
+                        <p style="color:var(--muted,#64748b);font-size:0.85rem;margin:0 0 1rem;">Saisissez les résultats au CEPE, BEPC ou BAC, et obtenez le <strong>taux de réussite</strong> par classe. Choisissez l'examen, la session et la classe, puis renseignez le résultat de chaque candidat.</p>
                         <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-end;">
                             <div><label class="form-label" style="font-weight:600;">Examen</label>
                                 <select id="exExam" onchange="renderExamens()" style="margin:0;">
@@ -217,7 +219,7 @@
                 <div id="sec-cahier" class="section hidden">
                     <div class="card">
                         <h3 style="font-size:1.2rem;font-weight:700;margin:0 0 0.25rem;">Cahier de textes</h3>
-                        <p style="color:#64748b;font-size:0.85rem;margin:0 0 1rem;">Journal des leçons : enregistrez ce qui a été fait en classe, par date / classe / matière, ainsi que les devoirs donnés.</p>
+                        <p style="color:var(--muted,#64748b);font-size:0.85rem;margin:0 0 1rem;">Journal des leçons : enregistrez ce qui a été fait en classe, par date / classe / matière, ainsi que les devoirs donnés.</p>
                         <div class="grid-2">
                             <div>
                                 <label class="form-label" style="font-weight:600;">Date</label>
@@ -258,7 +260,7 @@
                 <div id="sec-assiduite" class="section hidden">
                     <div class="card">
                         <h3 style="font-size:1.2rem;font-weight:700;margin:0 0 0.25rem;">Assiduité du personnel — saisie du jour</h3>
-                        <p style="color:#64748b;font-size:0.85rem;margin:0 0 1rem;">Pointez la présence des enseignants et agents. Le statut de chaque personne est enregistré automatiquement.</p>
+                        <p style="color:var(--muted,#64748b);font-size:0.85rem;margin:0 0 1rem;">Pointez la présence des enseignants et agents. Le statut de chaque personne est enregistré automatiquement.</p>
                         <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:0.5rem;">
                             <div><label class="form-label" style="font-weight:600;">Date</label><input type="date" id="asDate" onchange="renderAssiduite()" style="margin:0;"></div>
                             <button class="btn btn-secondary" onclick="asTousPresents()">✓ Tous présents</button>
@@ -291,10 +293,10 @@
                         </div>
                     </div>
                     <div class="grid-2" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:1.5rem;">
-                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">📊 Moyenne de l'école</p><h2 style="font-size:1.6rem;font-weight:700;color:#10b981;margin:0;" id="repEtuMoyenne">-</h2></div>
-                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">✅ Taux de réussite</p><h2 style="font-size:1.6rem;font-weight:700;color:#16a34a;margin:0;" id="repEtuReussite">-</h2></div>
-                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">🏆 Meilleure classe</p><h2 style="font-size:1.4rem;font-weight:700;color:#1B6BFF;margin:0;" id="repEtuMeilleureClasse">-</h2></div>
-                        <div class="card"><p style="color:#64748b;font-size:0.85rem;margin-bottom:0.4rem;">📝 Élèves notés</p><h2 style="font-size:1.6rem;font-weight:700;color:#8b5cf6;margin:0;" id="repEtuNotes">0</h2></div>
+                        <div class="card"><p style="color:var(--muted,#64748b);font-size:0.85rem;margin-bottom:0.4rem;">📊 Moyenne de l'école</p><h2 style="font-size:1.6rem;font-weight:700;color:var(--ok,#10b981);margin:0;" id="repEtuMoyenne">-</h2></div>
+                        <div class="card"><p style="color:var(--muted,#64748b);font-size:0.85rem;margin-bottom:0.4rem;">✅ Taux de réussite</p><h2 style="font-size:1.6rem;font-weight:700;color:var(--ok,#16a34a);margin:0;" id="repEtuReussite">-</h2></div>
+                        <div class="card"><p style="color:var(--muted,#64748b);font-size:0.85rem;margin-bottom:0.4rem;">🏆 Meilleure classe</p><h2 style="font-size:1.4rem;font-weight:700;color:var(--brand,#1B6BFF);margin:0;" id="repEtuMeilleureClasse">-</h2></div>
+                        <div class="card"><p style="color:var(--muted,#64748b);font-size:0.85rem;margin-bottom:0.4rem;">📝 Élèves notés</p><h2 style="font-size:1.6rem;font-weight:700;color:var(--violet,#8b5cf6);margin:0;" id="repEtuNotes">0</h2></div>
                     </div>
                     <div class="card" style="margin-bottom:1.5rem;"><h4 style="font-weight:700;margin-bottom:1rem;">Moyennes par classe</h4><div style="overflow-x:auto;" id="repEtuTableClasse"></div></div>
                     <div class="grid-2" style="margin-bottom:1.5rem;">
@@ -325,7 +327,7 @@
                 <h3 style="font-size:1.25rem;font-weight:700;margin:0;">Appréciation du conseil de classe</h3>
                 <button onclick="hideApprModal()" style="background:none;border:none;cursor:pointer;font-size:1.4rem;">✖</button>
             </div>
-            <p style="font-weight:600;color:#475569;margin-bottom:1rem;" id="apprEleveNom"></p>
+            <p style="font-weight:600;color:var(--muted,#475569);margin-bottom:1rem;" id="apprEleveNom"></p>
             <div class="row g-2">
                 <div class="col-md-6"><label class="form-label" style="font-weight:600;">Conduite</label><select id="apprConduite" style="margin:0;"></select></div>
                 <div class="col-md-6"><label class="form-label" style="font-weight:600;">Décision du conseil</label><select id="apprDecision" style="margin:0;"></select></div>
@@ -338,9 +340,10 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="vendor/xlsx/xlsx.full.min.js"></script>
+    <script src="vendor/chartjs/chart.umd.min.js"></script>
+    <script src="js/theme-charts.js"></script>
     <script src="js/etudes.js"></script>
     <script src="js/heures.js"></script>
     <script src="js/headerdate.js"></script>

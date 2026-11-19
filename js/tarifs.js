@@ -38,7 +38,7 @@ function renderTarifs() {
     if (!box) return;
     const classes = tfClasses();
     if (classes.length === 0) {
-        box.innerHTML = '<p style="color:#64748b;padding:0.5rem;">Aucune classe. Créez les classes en Scolarité, puis définissez leurs tarifs ici.</p>';
+        box.innerHTML = '<p style="color:var(--muted,#64748b);padding:0.5rem;">Aucune classe. Créez les classes en Scolarité, puis définissez leurs tarifs ici.</p>';
         return;
     }
     const nbMois = tfNbMois();
@@ -50,18 +50,18 @@ function renderTarifs() {
         const insc = t.inscription || '', rein = t.reinscription || '', mens = t.mensualite || '';
         const annuel = (parseFloat(mens) || 0) * nbMois;
         return `<tr>
-            <td style="font-weight:600;white-space:nowrap;">${tfEsc(c.nom)} ${estPrimaire(c) ? '<span style="background:#ecfeff;color:#0e7490;border-radius:999px;padding:0.05rem 0.45rem;font-size:0.72rem;">primaire</span>' : ''}</td>
+            <td style="font-weight:600;white-space:nowrap;">${tfEsc(c.nom)} ${estPrimaire(c) ? '<span style="background:var(--brand-bg,#ecfeff);color:var(--info,#0e7490);border-radius:999px;padding:0.05rem 0.45rem;font-size:0.72rem;">primaire</span>' : ''}</td>
             <td style="text-align:right;"><input type="number" min="0" step="500" value="${insc}" placeholder="0" onchange="tfSet('${tfAttr(c.nom)}','inscription',this.value)" style="width:110px;margin:0;padding:0.25rem;text-align:right;"></td>
             <td style="text-align:right;"><input type="number" min="0" step="500" value="${rein}" placeholder="0" onchange="tfSet('${tfAttr(c.nom)}','reinscription',this.value)" style="width:110px;margin:0;padding:0.25rem;text-align:right;"></td>
             <td style="text-align:right;"><input type="number" min="0" step="500" value="${mens}" placeholder="0" onchange="tfSet('${tfAttr(c.nom)}','mensualite',this.value)" style="width:110px;margin:0;padding:0.25rem;text-align:right;"></td>
-            <td style="text-align:right;white-space:nowrap;color:#4338ca;font-weight:600;" id="tf_total_${cssId(c.nom)}">${tfFCFA(annuel)} FCFA</td>
+            <td style="text-align:right;white-space:nowrap;color:var(--brand-strong,#4338ca);font-weight:600;" id="tf_total_${cssId(c.nom)}">${tfFCFA(annuel)} FCFA</td>
         </tr>`;
     };
     box.innerHTML = `
-        <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.85rem;padding:0.75rem;background:#f8fafc;border-radius:8px;">
+        <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.85rem;padding:0.75rem;background:var(--surface-2,#f8fafc);border-radius:8px;">
             <label style="font-weight:600;margin:0;">Nombre de mois de scolarité dans l'année :</label>
             <input type="number" min="1" max="12" value="${nbMois}" onchange="tfSetNbMois(this.value)" style="width:80px;margin:0;padding:0.25rem;text-align:center;">
-            <span style="color:#64748b;font-size:0.85rem;">(au Congo, l'année scolaire va d'octobre à juin ≈ 9 mois)</span>
+            <span style="color:var(--muted,#64748b);font-size:0.85rem;">(au Congo, l'année scolaire va d'octobre à juin ≈ 9 mois)</span>
         </div>
         <table>
             <thead><tr>
@@ -73,5 +73,5 @@ function renderTarifs() {
             </tr></thead>
             <tbody>${ordered.map(ligne).join('')}</tbody>
         </table>
-        <p style="color:#64748b;font-size:0.82rem;margin:0.75rem 0 0;">💡 Montants en FCFA. La mensualité × ${nbMois} mois donne le total de scolarité dû par an, utilisé pour le « reste à payer » de chaque élève.</p>`;
+        <p style="color:var(--muted,#64748b);font-size:0.82rem;margin:0.75rem 0 0;">💡 Montants en FCFA. La mensualité × ${nbMois} mois donne le total de scolarité dû par an, utilisé pour le « reste à payer » de chaque élève.</p>`;
 }

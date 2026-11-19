@@ -34,7 +34,7 @@ function hProgress(h) {
     };
     if (h.statut === 'rejete') {
         const nivLbl = ({ surveillant: 'Surveillant', scolarite: 'Chef de scolarité', etudes: 'Directeur des études' })[h.rejet ? h.rejet.niveau : ''] || '';
-        return `<span style="color:#dc3545;font-weight:600;">Rejeté${nivLbl ? ' au niveau ' + nivLbl : ''} par ${hEsc(h.rejet ? h.rejet.par : '')}${h.rejet && h.rejet.motif ? '<br><span style="font-weight:500;">Motif : ' + hEsc(h.rejet.motif) + '</span>' : ''}</span>`;
+        return `<span style="color:var(--danger,#dc3545);font-weight:600;">Rejeté${nivLbl ? ' au niveau ' + nivLbl : ''} par ${hEsc(h.rejet ? h.rejet.par : '')}${h.rejet && h.rejet.motif ? '<br><span style="font-weight:500;">Motif : ' + hEsc(h.rejet.motif) + '</span>' : ''}</span>`;
     }
     return `<div style="display:flex;gap:0.3rem;flex-wrap:wrap;">${etape('Surveillant', h.surveillant)} → ${etape('Scolarité', h.scolarite)} → ${etape('Études', h.etudes)}</div>`;
 }
@@ -48,11 +48,11 @@ function renderValidationHeures(niveau, containerId) {
     const pending = arr.filter(h => h.statut === H_STATUT_NIVEAU[niveau]).sort((a, b) => (a.date || '').localeCompare(b.date || ''));
     const recents = arr.filter(h => h.statut === 'valide' || h.statut === 'rejete').slice(-10).reverse();
     box.innerHTML = `
-        <p style="color:#64748b;margin:0 0 0.75rem;">À valider à votre niveau (${hEsc(H_NIVEAU_LABEL[niveau])}) : <strong>${pending.length}</strong></p>
+        <p style="color:var(--muted,#64748b);margin:0 0 0.75rem;">À valider à votre niveau (${hEsc(H_NIVEAU_LABEL[niveau])}) : <strong>${pending.length}</strong></p>
         <div style="overflow-x:auto;"><table>
             <thead><tr><th>Enseignant</th><th>Date</th><th>Classe</th><th>Matière</th><th style="text-align:center;">Heures</th><th>Sujet</th><th>Étapes précédentes</th><th style="text-align:right;">Action</th></tr></thead>
             <tbody>${pending.length === 0
-                ? '<tr><td colspan="8" style="text-align:center;padding:1.25rem;color:#64748b;">Aucune déclaration en attente.</td></tr>'
+                ? '<tr><td colspan="8" style="text-align:center;padding:1.25rem;color:var(--muted,#64748b);">Aucune déclaration en attente.</td></tr>'
                 : pending.map(h => `<tr>
                     <td style="font-weight:600;">${hEsc(h.enseignantNom)}</td>
                     <td>${h.date ? new Date(h.date).toLocaleDateString('fr-FR') : '-'}</td>
@@ -60,7 +60,7 @@ function renderValidationHeures(niveau, containerId) {
                     <td>${hEsc(h.matiere)}</td>
                     <td style="text-align:center;font-weight:700;">${hEsc(String(h.heures))}</td>
                     <td>${hEsc(h.sujet)}</td>
-                    <td style="font-size:0.78rem;color:#475569;">${h.surveillant ? 'Surv. ✓ (' + hEsc(h.surveillant.par) + ')' : ''}${h.scolarite ? '<br>Scol. ✓ (' + hEsc(h.scolarite.par) + ')' : ''}</td>
+                    <td style="font-size:0.78rem;color:var(--muted,#475569);">${h.surveillant ? 'Surv. ✓ (' + hEsc(h.surveillant.par) + ')' : ''}${h.scolarite ? '<br>Scol. ✓ (' + hEsc(h.scolarite.par) + ')' : ''}</td>
                     <td style="text-align:right;white-space:nowrap;">
                         <button class="btn btn-primary" style="padding:0.3rem 0.6rem;font-size:0.82rem;" onclick="validerHeure('${h.id}','${niveau}')"><i class="bi bi-check2"></i> Valider</button>
                         <button class="btn btn-danger" style="padding:0.3rem 0.6rem;font-size:0.82rem;" onclick="rejeterHeure('${h.id}','${niveau}')"><i class="bi bi-x"></i> Rejeter</button>
@@ -69,7 +69,7 @@ function renderValidationHeures(niveau, containerId) {
         ${recents.length ? `<h4 style="font-size:0.95rem;font-weight:700;margin:1.25rem 0 0.5rem;">Dernières déclarations traitées</h4>
         <div style="overflow-x:auto;"><table>
             <thead><tr><th>Enseignant</th><th>Date</th><th>Classe</th><th style="text-align:center;">Heures</th><th>Statut</th></tr></thead>
-            <tbody>${recents.map(h => `<tr><td>${hEsc(h.enseignantNom)}</td><td>${h.date ? new Date(h.date).toLocaleDateString('fr-FR') : '-'}</td><td>${hEsc(h.classe)}</td><td style="text-align:center;">${hEsc(String(h.heures))}</td><td style="color:${hStatutColor(h.statut)};font-weight:600;">${hStatutLabel(h.statut)}${h.statut === 'rejete' && h.rejet ? `<br><span style="font-weight:500;color:#991b1b;font-size:0.8rem;">Motif : ${hEsc(h.rejet.motif || '')}${h.rejet.par ? ' (' + hEsc(h.rejet.par) + ')' : ''}</span>` : ''}</td></tr>`).join('')}</tbody>
+            <tbody>${recents.map(h => `<tr><td>${hEsc(h.enseignantNom)}</td><td>${h.date ? new Date(h.date).toLocaleDateString('fr-FR') : '-'}</td><td>${hEsc(h.classe)}</td><td style="text-align:center;">${hEsc(String(h.heures))}</td><td style="color:${hStatutColor(h.statut)};font-weight:600;">${hStatutLabel(h.statut)}${h.statut === 'rejete' && h.rejet ? `<br><span style="font-weight:500;color:var(--danger-strong,#991b1b);font-size:0.8rem;">Motif : ${hEsc(h.rejet.motif || '')}${h.rejet.par ? ' (' + hEsc(h.rejet.par) + ')' : ''}</span>` : ''}</td></tr>`).join('')}</tbody>
         </table></div>` : ''}`;
 }
 function validerHeure(id, niveau) {

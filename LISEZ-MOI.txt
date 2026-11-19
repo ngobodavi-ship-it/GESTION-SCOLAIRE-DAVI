@@ -7,7 +7,8 @@ les sous-dossiers css/ et js/. Ouvrez ensuite portail.html (ou app.html).
   portail.html        Page d'accueil du portail (connexion + directions + espace admin)
   app.html            Application de gestion financiere (DigiGesPro)
   css/
-    style.css         Tout le style de l'application
+    style.css         Mise en page de base de l'application
+    theme.css         Design system : couleurs, typographie, composants, mode sombre
   js/
     config.js         Constantes et etat global
     data.js           Chargement des donnees et calculs
@@ -31,3 +32,14 @@ theme. Le comportement de l'application est identique.
   direction.html    Direction generale (tableau de bord global agrege, personnel, decisions, conseil de gestion)
   calendrier.html   Calendrier scolaire partage (rentree, conges, examens, conseils, reunions)
   Donnees partagees : eleves et classes saisis dans la Scolarite sont reutilises par les Etudes.
+
+--- DESIGN (refonte premium) ---
+  css/theme.css      Toutes les couleurs sont des variables dans :root (thème clair)
+                     et html[data-bs-theme="dark"] (thème sombre). Pour changer
+                     l'identité visuelle, modifier uniquement ces variables.
+  js/theme.js        Mode clair/sombre, menu coulissant sur téléphone,
+                     icônes à la place des emojis, notifications.
+  js/theme-charts.js Style commun des graphiques + message « Aucune donnée ».
+  vendor/            Bootstrap, Bootstrap Icons, Chart.js, SheetJS et la police
+                     Inter copiés dans le projet : le portail fonctionne SANS internet.
+  Les données (localStorage) et les calculs ne sont pas modifiés.

@@ -63,7 +63,7 @@ function renderEcheancier() {
     const box = document.getElementById('echBox');
     if (!box) return;
     const id = sel ? sel.value : '';
-    if (!id) { box.innerHTML = '<p style="color:#64748b;padding:0.5rem;">Choisissez un élève pour créer ou consulter son échéancier.</p>'; return; }
+    if (!id) { box.innerHTML = '<p style="color:var(--muted,#64748b);padding:0.5rem;">Choisissez un élève pour créer ou consulter son échéancier.</p>'; return; }
     const s = students.find(x => x.id === id); if (!s) { box.innerHTML = ''; return; }
     const ech = echGet(id);
     const statuts = echStatuts(id);
@@ -80,21 +80,21 @@ function renderEcheancier() {
             <td><input type="text" value="${echAttr(t.label || '')}" placeholder="ex: 1er versement" oninput="echSetTranche(${realIdx},'label',this.value)" style="min-width:150px;margin:0;padding:0.3rem;"></td>
             <td><input type="number" min="0" step="500" value="${echAttr(t.montant || '')}" placeholder="0" oninput="echSetTranche(${realIdx},'montant',this.value)" style="width:120px;margin:0;padding:0.3rem;text-align:right;"></td>
             <td><input type="date" value="${echAttr(t.date || '')}" onchange="echSetTranche(${realIdx},'date',this.value)" style="width:160px;margin:0;padding:0.3rem;"></td>
-            <td>${echBadge(st.statut)}${st.statut === 'partielle' ? `<br><span style="font-size:0.72rem;color:#c2410c;">reste ${echFCFA(st.restant)}</span>` : ''}</td>
+            <td>${echBadge(st.statut)}${st.statut === 'partielle' ? `<br><span style="font-size:0.72rem;color:var(--warn-strong,#c2410c);">reste ${echFCFA(st.restant)}</span>` : ''}</td>
             <td style="text-align:right;"><button class="btn btn-danger" style="padding:0.25rem 0.5rem;font-size:0.78rem;" onclick="echDelTranche(${realIdx})">🗑️</button></td>
         </tr>`;
     }).join('');
 
     const coherence = totalPlan === 0 ? '' :
         (Math.abs(totalPlan - du) <= 1
-            ? `<span style="color:#166534;font-weight:600;">✓ Le plan correspond au montant dû (${echFCFA(du)}).</span>`
-            : `<span style="color:#c2410c;font-weight:600;">⚠️ Plan : ${echFCFA(totalPlan)} — Scolarité due : ${echFCFA(du)} (écart de ${echFCFA(Math.abs(totalPlan - du))}).</span>`);
+            ? `<span style="color:var(--ok-strong,#166534);font-weight:600;">✓ Le plan correspond au montant dû (${echFCFA(du)}).</span>`
+            : `<span style="color:var(--warn-strong,#c2410c);font-weight:600;">⚠️ Plan : ${echFCFA(totalPlan)} — Scolarité due : ${echFCFA(du)} (écart de ${echFCFA(Math.abs(totalPlan - du))}).</span>`);
 
     box.innerHTML = `
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;margin-bottom:0.75rem;">
             <div>
                 <h4 style="margin:0;font-weight:700;">${echEsc(s.nom)} ${echEsc(s.prenom)} — ${echEsc(s.classe || '')}</h4>
-                <div style="font-size:0.85rem;color:#64748b;margin-top:0.2rem;">Scolarité due : <strong>${echFCFA(du)}</strong> · Déjà payé : <strong style="color:#16a34a;">${echFCFA(paye)}</strong></div>
+                <div style="font-size:0.85rem;color:var(--muted,#64748b);margin-top:0.2rem;">Scolarité due : <strong>${echFCFA(du)}</strong> · Déjà payé : <strong style="color:var(--ok,#16a34a);">${echFCFA(paye)}</strong></div>
             </div>
             <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
                 <button class="btn btn-secondary" onclick="echGenererAuto()">✨ Générer automatiquement</button>
@@ -103,7 +103,7 @@ function renderEcheancier() {
         </div>
         <table>
             <thead><tr><th>Libellé</th><th style="text-align:right;">Montant</th><th>Date d'échéance</th><th>Statut</th><th></th></tr></thead>
-            <tbody>${lignes || '<tr><td colspan="5" style="color:#64748b;padding:0.5rem;">Aucune tranche. Ajoutez-en une ci-dessous ou cliquez « Générer automatiquement ».</td></tr>'}</tbody>
+            <tbody>${lignes || '<tr><td colspan="5" style="color:var(--muted,#64748b);padding:0.5rem;">Aucune tranche. Ajoutez-en une ci-dessous ou cliquez « Générer automatiquement ».</td></tr>'}</tbody>
         </table>
         <div style="margin-top:0.75rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;">
             <button class="btn btn-secondary" onclick="echAddTranche()">➕ Ajouter une tranche</button>
@@ -162,7 +162,7 @@ function echImprimerEngagement() {
     }).join('');
     const w = window.open('', '_blank');
     w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Engagement de paiement - ${echEsc(s.nom)} ${echEsc(s.prenom)}</title></head>
-        <body style="font-family:'Times New Roman',serif;padding:2.4rem;color:#111;max-width:780px;margin:0 auto;">
+        <body style="font-family:'Times New Roman',serif;padding:2.4rem;color:var(--ink,#111);max-width:780px;margin:0 auto;">
         <div style="text-align:center;border-bottom:2px solid #333;padding-bottom:.7rem;margin-bottom:1.2rem;">
             <p style="margin:0;font-size:.85rem;">RÉPUBLIQUE DU CONGO — Unité · Travail · Progrès</p>
             <h2 style="margin:.4rem 0 0;text-transform:uppercase;">${echEsc(ecole)}</h2>
@@ -175,8 +175,8 @@ function echImprimerEngagement() {
             selon l'échéancier suivant :
         </p>
         <table style="width:100%;border-collapse:collapse;margin:1rem 0;font-size:1rem;">
-            <thead><tr style="background:#eee;"><th style="border:1px solid #999;padding:5px 9px;text-align:left;">Versement</th><th style="border:1px solid #999;padding:5px 9px;">Montant</th><th style="border:1px solid #999;padding:5px 9px;text-align:left;">Date limite</th></tr></thead>
-            <tbody>${rows}<tr style="font-weight:700;background:#f5f5f5;"><td style="border:1px solid #999;padding:5px 9px;text-align:right;">TOTAL</td><td style="border:1px solid #999;padding:5px 9px;text-align:right;">${echFCFA(total)}</td><td style="border:1px solid #999;padding:5px 9px;"></td></tr></tbody>
+            <thead><tr style="background:var(--surface-2,#eee);"><th style="border:1px solid #999;padding:5px 9px;text-align:left;">Versement</th><th style="border:1px solid #999;padding:5px 9px;">Montant</th><th style="border:1px solid #999;padding:5px 9px;text-align:left;">Date limite</th></tr></thead>
+            <tbody>${rows}<tr style="font-weight:700;background:var(--surface-2,#f5f5f5);"><td style="border:1px solid #999;padding:5px 9px;text-align:right;">TOTAL</td><td style="border:1px solid #999;padding:5px 9px;text-align:right;">${echFCFA(total)}</td><td style="border:1px solid #999;padding:5px 9px;"></td></tr></tbody>
         </table>
         <p style="line-height:1.9;font-size:1.05rem;text-align:justify;">En cas de non-respect des échéances, l'établissement se réserve le droit d'appliquer son règlement intérieur.</p>
         <div style="display:flex;justify-content:space-between;margin-top:2.6rem;font-size:1rem;">
@@ -217,7 +217,7 @@ function echApercuRetards() {
     }).join('');
     const w = window.open('', '_blank');
     w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Échéances en retard</title></head>
-        <body style="font-family:Arial,sans-serif;padding:1.6rem;color:#111;">
+        <body style="font-family:Arial,sans-serif;padding:1.6rem;color:var(--ink,#111);">
         <div style="text-align:center;border-bottom:2px solid #333;padding-bottom:.6rem;margin-bottom:1rem;">
             <p style="margin:0;font-size:.8rem;">RÉPUBLIQUE DU CONGO — Unité · Travail · Progrès</p>
             <h2 style="margin:.3rem 0;">${echEsc(ecole)}</h2>
@@ -225,8 +225,8 @@ function echApercuRetards() {
             <p style="margin:.2rem 0;font-size:.85rem;">Édité le ${new Date().toLocaleDateString('fr-FR')}</p>
         </div>
         <table style="width:100%;border-collapse:collapse;font-size:.86rem;">
-            <thead><tr style="background:#eee;"><th style="border:1px solid #999;padding:3px 8px;">N°</th><th style="border:1px solid #999;padding:3px 8px;text-align:left;">Élève</th><th style="border:1px solid #999;padding:3px 8px;">Classe</th><th style="border:1px solid #999;padding:3px 8px;">Versement</th><th style="border:1px solid #999;padding:3px 8px;">Échéance</th><th style="border:1px solid #999;padding:3px 8px;">Tél.</th><th style="border:1px solid #999;padding:3px 8px;">Reste dû</th></tr></thead>
-            <tbody>${rows}<tr style="font-weight:700;background:#f5f5f5;"><td colspan="6" style="border:1px solid #999;padding:3px 8px;text-align:right;">TOTAL EN RETARD</td><td style="border:1px solid #999;padding:3px 8px;text-align:right;">${echFCFA(totalRetard)}</td></tr></tbody>
+            <thead><tr style="background:var(--surface-2,#eee);"><th style="border:1px solid #999;padding:3px 8px;">N°</th><th style="border:1px solid #999;padding:3px 8px;text-align:left;">Élève</th><th style="border:1px solid #999;padding:3px 8px;">Classe</th><th style="border:1px solid #999;padding:3px 8px;">Versement</th><th style="border:1px solid #999;padding:3px 8px;">Échéance</th><th style="border:1px solid #999;padding:3px 8px;">Tél.</th><th style="border:1px solid #999;padding:3px 8px;">Reste dû</th></tr></thead>
+            <tbody>${rows}<tr style="font-weight:700;background:var(--surface-2,#f5f5f5);"><td colspan="6" style="border:1px solid #999;padding:3px 8px;text-align:right;">TOTAL EN RETARD</td><td style="border:1px solid #999;padding:3px 8px;text-align:right;">${echFCFA(totalRetard)}</td></tr></tbody>
         </table>
         </body></html>`);
     w.document.close();

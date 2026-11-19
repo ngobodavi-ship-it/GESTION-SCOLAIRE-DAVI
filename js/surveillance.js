@@ -57,7 +57,7 @@ function renderConvocations() {
     const tbody = document.getElementById('convTable');
     const list = convocations.slice().sort((a, b) => (b.dateRdv || '').localeCompare(a.dateRdv || ''));
     tbody.innerHTML = list.length === 0
-        ? '<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:#64748b;">Aucune convocation enregistrée.</td></tr>'
+        ? '<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:var(--muted,#64748b);">Aucune convocation enregistrée.</td></tr>'
         : list.map(c => `<tr>
             <td style="font-weight:600;">${sEsc(eleveNom(c.eleveId))}</td>
             <td>${sEsc(eleveClasse(c.eleveId))}</td>
@@ -96,7 +96,7 @@ function genererConvocation(id) {
     const e = eleves.find(x => x.id === c.eleveId) || {};
     const ecole = getEcoleName();
     const html = `
-        <div style="font-family:Arial,sans-serif;max-width:760px;margin:0 auto;padding:2.5rem;color:#111;">
+        <div style="font-family:Arial,sans-serif;max-width:760px;margin:0 auto;padding:2.5rem;color:var(--ink,#111);">
             <div style="text-align:center;border-bottom:2px solid #333;padding-bottom:0.75rem;margin-bottom:0.5rem;">
                 <p style="margin:0;font-size:0.8rem;">RÉPUBLIQUE DU CONGO &ndash; Unité, Travail, Progrès</p>
                 <p style="margin:0.1rem 0;font-size:0.75rem;">Ministère de l'Enseignement Préscolaire, Primaire, Secondaire et de l'Alphabétisation</p>
@@ -200,12 +200,12 @@ function renderDashboard() {
 
     const keys = Object.keys(absParClasse);
     document.getElementById('survAbsParClasse').innerHTML = keys.length === 0
-        ? '<p style="color:#64748b;padding:1rem;">Aucune absence enregistrée à cette date.</p>'
-        : `<table><thead><tr><th>Classe</th><th style="text-align:right;">Absents</th></tr></thead><tbody>${keys.map(k => `<tr><td style="font-weight:600;">${sEsc(k)}</td><td style="text-align:right;color:#dc3545;font-weight:600;">${absParClasse[k]}</td></tr>`).join('')}</tbody></table>`;
+        ? '<p style="color:var(--muted,#64748b);padding:1rem;">Aucune absence enregistrée à cette date.</p>'
+        : `<table><thead><tr><th>Classe</th><th style="text-align:right;">Absents</th></tr></thead><tbody>${keys.map(k => `<tr><td style="font-weight:600;">${sEsc(k)}</td><td style="text-align:right;color:var(--danger,#dc3545);font-weight:600;">${absParClasse[k]}</td></tr>`).join('')}</tbody></table>`;
 
     const derniers = sanctions.slice().sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 5);
     document.getElementById('survDernieresSanctions').innerHTML = derniers.length === 0
-        ? '<p style="color:#64748b;padding:1rem;">Aucune sanction enregistrée.</p>'
+        ? '<p style="color:var(--muted,#64748b);padding:1rem;">Aucune sanction enregistrée.</p>'
         : `<table><thead><tr><th>Date</th><th>Élève</th><th>Type</th></tr></thead><tbody>${derniers.map(s => `<tr><td>${s.date ? new Date(s.date).toLocaleDateString('fr-FR') : '-'}</td><td style="font-weight:600;">${sEsc(eleveNom(s.eleveId))}</td><td>${sEsc(s.type)}</td></tr>`).join('')}</tbody></table>`;
 }
 
@@ -215,15 +215,15 @@ function renderAppelControls() {
     if (!c.dataset.init) { c.innerHTML = classeOptions(''); c.dataset.init = '1'; }
     const d = document.getElementById('appelDate');
     if (!d.value) d.value = todayStr();
-    document.getElementById('appelContent').innerHTML = '<p style="color:#64748b;padding:1rem;">Choisissez une classe et une date, puis cliquez sur « Faire l\'appel ».</p>';
+    document.getElementById('appelContent').innerHTML = '<p style="color:var(--muted,#64748b);padding:1rem;">Choisissez une classe et une date, puis cliquez sur « Faire l\'appel ».</p>';
 }
 function chargerAppel() {
     const classe = document.getElementById('appelClasse').value;
     const date = document.getElementById('appelDate').value;
     const box = document.getElementById('appelContent');
-    if (!classe) { box.innerHTML = '<p style="color:#dc3545;padding:1rem;">Sélectionnez une classe.</p>'; return; }
+    if (!classe) { box.innerHTML = '<p style="color:var(--danger,#dc3545);padding:1rem;">Sélectionnez une classe.</p>'; return; }
     const list = eleves.filter(e => e.classe === classe);
-    if (!list.length) { box.innerHTML = '<p style="color:#dc3545;padding:1rem;">Aucun élève dans cette classe.</p>'; return; }
+    if (!list.length) { box.innerHTML = '<p style="color:var(--danger,#dc3545);padding:1rem;">Aucun élève dans cette classe.</p>'; return; }
     const rec = presences[`${date}|${classe}`] || {};
     box.innerHTML = `
         <div style="overflow-x:auto;"><table>
@@ -262,7 +262,7 @@ function renderRetards() {
     const tbody = document.getElementById('retardsTable');
     const list = retards.slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
     tbody.innerHTML = list.length === 0
-        ? '<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:#64748b;">Aucun retard enregistré.</td></tr>'
+        ? '<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:var(--muted,#64748b);">Aucun retard enregistré.</td></tr>'
         : list.map(r => `<tr>
             <td>${r.date ? new Date(r.date).toLocaleDateString('fr-FR') : '-'}</td>
             <td style="font-weight:600;">${sEsc(eleveNom(r.eleveId))}</td>
@@ -302,13 +302,13 @@ function renderSanctions() {
     const tbody = document.getElementById('sanctionsTable');
     const list = sanctions.slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
     tbody.innerHTML = list.length === 0
-        ? '<tr><td colspan="6" style="text-align:center;padding:1.5rem;color:#64748b;">Aucune sanction enregistrée.</td></tr>'
+        ? '<tr><td colspan="6" style="text-align:center;padding:1.5rem;color:var(--muted,#64748b);">Aucune sanction enregistrée.</td></tr>'
         : list.map(s => `<tr>
             <td>${s.date ? new Date(s.date).toLocaleDateString('fr-FR') : '-'}</td>
             <td style="font-weight:600;">${sEsc(eleveNom(s.eleveId))}</td>
             <td>${sEsc(eleveClasse(s.eleveId))}</td>
-            <td><span style="color:#dc3545;font-weight:600;">${sEsc(s.type)}</span></td>
-            <td>${sEsc(s.motif)}${s.decisionPar ? '<br><span style="color:#64748b;font-size:0.85rem;">par ' + sEsc(s.decisionPar) + '</span>' : ''}</td>
+            <td><span style="color:var(--danger,#dc3545);font-weight:600;">${sEsc(s.type)}</span></td>
+            <td>${sEsc(s.motif)}${s.decisionPar ? '<br><span style="color:var(--muted,#64748b);font-size:0.85rem;">par ' + sEsc(s.decisionPar) + '</span>' : ''}</td>
             <td style="text-align:right;"><button class="btn btn-danger" style="padding:0.3rem 0.6rem;font-size:0.85rem;" onclick="deleteSanction('${s.id}')">🗑️</button></td>
         </tr>`).join('');
 }
@@ -342,13 +342,13 @@ function renderPermissions() {
     const tbody = document.getElementById('permissionsTable');
     const list = permissions.slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
     tbody.innerHTML = list.length === 0
-        ? '<tr><td colspan="6" style="text-align:center;padding:1.5rem;color:#64748b;">Aucune permission enregistrée.</td></tr>'
+        ? '<tr><td colspan="6" style="text-align:center;padding:1.5rem;color:var(--muted,#64748b);">Aucune permission enregistrée.</td></tr>'
         : list.map(p => `<tr>
             <td>${p.date ? new Date(p.date).toLocaleDateString('fr-FR') : '-'}</td>
             <td style="font-weight:600;">${sEsc(eleveNom(p.eleveId))}</td>
             <td>${sEsc(eleveClasse(p.eleveId))}</td>
             <td>${sEsc(p.motif)}</td>
-            <td>${sEsc(p.autorisePar)}${p.dateRetour ? '<br><span style="color:#64748b;font-size:0.85rem;">retour : ' + sEsc(p.dateRetour) + '</span>' : ''}</td>
+            <td>${sEsc(p.autorisePar)}${p.dateRetour ? '<br><span style="color:var(--muted,#64748b);font-size:0.85rem;">retour : ' + sEsc(p.dateRetour) + '</span>' : ''}</td>
             <td style="text-align:right;"><button class="btn btn-danger" style="padding:0.3rem 0.6rem;font-size:0.85rem;" onclick="deletePermission('${p.id}')">🗑️</button></td>
         </tr>`).join('');
 }
@@ -414,16 +414,16 @@ function renderSurvReporting() {
     const classesNoms = classes.map(c => c.nom);
     document.getElementById('repSurvAbsClasse').innerHTML = `
         <table><thead><tr><th>Classe</th><th style="text-align:center;">Absences</th><th style="text-align:center;">Retards</th></tr></thead><tbody>
-        ${classesNoms.map(c => `<tr><td style="font-weight:600;">${sEsc(c)}</td><td style="text-align:center;color:#dc3545;font-weight:600;">${absParClasse[c] || 0}</td><td style="text-align:center;color:#f59e0b;font-weight:600;">${retParClasse[c] || 0}</td></tr>`).join('')}
+        ${classesNoms.map(c => `<tr><td style="font-weight:600;">${sEsc(c)}</td><td style="text-align:center;color:var(--danger,#dc3545);font-weight:600;">${absParClasse[c] || 0}</td><td style="text-align:center;color:var(--warn,#f59e0b);font-weight:600;">${retParClasse[c] || 0}</td></tr>`).join('')}
         <tr style="font-weight:700;border-top:2px solid #1B6BFF;"><td>TOTAL</td><td style="text-align:center;">${absent}</td><td style="text-align:center;">${retMois.length}</td></tr>
         </tbody></table>`;
 
     // Top élèves absentéistes
     const topAbs = Object.keys(absParEleve).map(id => ({ id, n: absParEleve[id] })).sort((a, b) => b.n - a.n).slice(0, 10);
     document.getElementById('repSurvTopAbs').innerHTML = topAbs.length === 0
-        ? '<p style="color:#64748b;padding:1rem;">Aucune absence sur ce mois.</p>'
+        ? '<p style="color:var(--muted,#64748b);padding:1rem;">Aucune absence sur ce mois.</p>'
         : `<table><thead><tr><th>Élève</th><th>Classe</th><th style="text-align:right;">Absences</th></tr></thead><tbody>
-        ${topAbs.map(x => `<tr><td style="font-weight:600;">${sEsc(eleveNom(x.id))}</td><td>${sEsc(eleveClasse(x.id))}</td><td style="text-align:right;color:#dc3545;font-weight:600;">${x.n}</td></tr>`).join('')}
+        ${topAbs.map(x => `<tr><td style="font-weight:600;">${sEsc(eleveNom(x.id))}</td><td>${sEsc(eleveClasse(x.id))}</td><td style="text-align:right;color:var(--danger,#dc3545);font-weight:600;">${x.n}</td></tr>`).join('')}
         </tbody></table>`;
 
     if (typeof Chart === 'undefined') return;

@@ -18,7 +18,7 @@ function renderStudents() {
             if (typeof syncStudentsFromScolarite === 'function') syncStudentsFromScolarite();
             if (typeof gxInit === 'function') gxInit();
             if (students.length === 0) {
-                document.getElementById('studentsTableBody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2rem;color:#64748b;">Aucun eleve</td></tr>';
+                document.getElementById('studentsTableBody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--muted,#64748b);">Aucun eleve</td></tr>';
                 return;
             }
 
@@ -67,23 +67,23 @@ function showStudentHistory() {
                 <div class="card">
                     <div style="border-bottom:2px solid #e2e8f0;padding-bottom:1.5rem;margin-bottom:1.5rem;">
                         <h3 style="font-size:1.5rem;font-weight:700;">${student.nom} ${student.prenom}</h3>
-                        <p style="color:#64748b;">📋 ${student.matricule} • 🎓 ${student.classe}</p>
+                        <p style="color:var(--muted,#64748b);">📋 ${student.matricule} • 🎓 ${student.classe}</p>
                     </div>
 
-                    <div style="background:#f8fafc;padding:1.5rem;border-radius:12px;margin-bottom:1.5rem;">
+                    <div style="background:var(--surface-2,#f8fafc);padding:1.5rem;border-radius:12px;margin-bottom:1.5rem;">
                         <h4 style="font-size:1.25rem;font-weight:700;margin-bottom:1rem;">💰 Resume financier</h4>
                         <div class="grid-2">
                             <div>
-                                <p style="font-size:0.875rem;color:#64748b;">Total paye</p>
-                                <p style="font-size:1.75rem;font-weight:700;color:#10b981;">${totalPaye.toLocaleString()} FCFA</p>
+                                <p style="font-size:0.875rem;color:var(--muted,#64748b);">Total paye</p>
+                                <p style="font-size:1.75rem;font-weight:700;color:var(--ok,#10b981);">${totalPaye.toLocaleString()} FCFA</p>
                             </div>
                             <div>
-                                <p style="font-size:0.875rem;color:#64748b;">Prix fixe total (12 mois)</p>
+                                <p style="font-size:0.875rem;color:var(--muted,#64748b);">Prix fixe total (12 mois)</p>
                                 <p style="font-size:1.75rem;font-weight:700;">${totalPrixFixe.toLocaleString()} FCFA</p>
                             </div>
                         </div>
                         <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid #e2e8f0;">
-                            <p style="font-size:0.875rem;color:#64748b;">Reste a payer</p>
+                            <p style="font-size:0.875rem;color:var(--muted,#64748b);">Reste a payer</p>
                             <p style="font-size:2rem;font-weight:700;" class="${totalReste <= 0 ? 'solde-positif' : 'solde-negatif'}">
                                 ${totalReste.toLocaleString()} FCFA
                             </p>
@@ -109,18 +109,18 @@ function showStudentHistory() {
                                     let badge = '';
                                     
                                     if (b.status === 'complet') {
-                                        badge = '<span style="background:#d1fae5;color:#065f46;padding:0.25rem 0.75rem;border-radius:12px;font-size:0.875rem;font-weight:600;">✓ Complet</span>';
+                                        badge = '<span style="background:var(--ok-bg,#d1fae5);color:var(--ok-strong,#065f46);padding:0.25rem 0.75rem;border-radius:12px;font-size:0.875rem;font-weight:600;">✓ Complet</span>';
                                     } else if (b.status === 'partiel') {
-                                        badge = '<span style="background:#fef3c7;color:#92400e;padding:0.25rem 0.75rem;border-radius:12px;font-size:0.875rem;font-weight:600;">⚡ Partiel</span>';
+                                        badge = '<span style="background:var(--warn-bg,#fef3c7);color:var(--warn-strong,#92400e);padding:0.25rem 0.75rem;border-radius:12px;font-size:0.875rem;font-weight:600;">⚡ Partiel</span>';
                                     } else {
-                                        badge = '<span style="background:#fee2e2;color:#991b1b;padding:0.25rem 0.75rem;border-radius:12px;font-size:0.875rem;font-weight:600;">✗ Impaye</span>';
+                                        badge = '<span style="background:var(--danger-bg,#fee2e2);color:var(--danger-strong,#991b1b);padding:0.25rem 0.75rem;border-radius:12px;font-size:0.875rem;font-weight:600;">✗ Impaye</span>';
                                     }
                                     
                                     return `
                                         <tr>
                                             <td style="font-weight:600;">${mois}</td>
                                             <td style="font-weight:600;">${b.prixFixe.toLocaleString()} FCFA</td>
-                                            <td style="color:#10b981;font-weight:600;">${b.paye.toLocaleString()} FCFA</td>
+                                            <td style="color:var(--ok,#10b981);font-weight:600;">${b.paye.toLocaleString()} FCFA</td>
                                             <td class="${b.reste <= 0 ? 'solde-positif' : 'solde-negatif'}">
                                                 ${b.reste.toLocaleString()} FCFA
                                             </td>
@@ -135,10 +135,10 @@ function showStudentHistory() {
                                         </tr>
                                     `;
                                 }).join('')}
-                                <tr style="background:#f8fafc;border-top:3px solid #1B6BFF;font-weight:700;font-size:1.125rem;">
+                                <tr style="background:var(--surface-2,#f8fafc);border-top:3px solid #1B6BFF;font-weight:700;font-size:1.125rem;">
                                     <td style="padding:1rem;">TOTAL</td>
                                     <td style="padding:1rem;">${totalPrixFixe.toLocaleString()} FCFA</td>
-                                    <td style="color:#10b981;padding:1rem;">${totalPaye.toLocaleString()} FCFA</td>
+                                    <td style="color:var(--ok,#10b981);padding:1rem;">${totalPaye.toLocaleString()} FCFA</td>
                                     <td class="${totalReste <= 0 ? 'solde-positif' : 'solde-negatif'}" style="padding:1rem;">
                                         ${totalReste.toLocaleString()} FCFA
                                     </td>
@@ -154,20 +154,20 @@ function showStudentHistory() {
                     </div>
 
                     <h4 style="font-size:1.25rem;font-weight:700;margin:2rem 0 1rem 0;">📜 Historique des paiements</h4>
-                    ${payments.length === 0 ? '<p style="color:#64748b;text-align:center;padding:2rem;">Aucun paiement</p>' :
+                    ${payments.length === 0 ? '<p style="color:var(--muted,#64748b);text-align:center;padding:2rem;">Aucun paiement</p>' :
                         payments.map(p => `
-                            <div style="padding:1rem;background:#f8fafc;border-radius:10px;margin-bottom:0.75rem;border-left:4px solid #10b981;">
+                            <div style="padding:1rem;background:var(--surface-2,#f8fafc);border-radius:10px;margin-bottom:0.75rem;border-left:4px solid #10b981;">
                                 <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
                                     <div style="flex:1;">
                                         <p style="font-weight:600;margin-bottom:0.5rem;">${p.description}</p>
-                                        <p style="font-size:0.875rem;color:#64748b;">📅 ${new Date(p.date).toLocaleDateString('fr-FR')} ${p.time}</p>
-                                        <p style="margin-top:0.5rem;color:#1B6BFF;font-weight:600;">Mois: ${p.moisPayes.join(', ')}</p>
-                                        ${p.isEcheance ? '<p style="font-size:0.875rem;color:#f59e0b;font-weight:600;">⚡ Paiement par echeance</p>' : ''}
+                                        <p style="font-size:0.875rem;color:var(--muted,#64748b);">📅 ${new Date(p.date).toLocaleDateString('fr-FR')} ${p.time}</p>
+                                        <p style="margin-top:0.5rem;color:var(--brand,#1B6BFF);font-weight:600;">Mois: ${p.moisPayes.join(', ')}</p>
+                                        ${p.isEcheance ? '<p style="font-size:0.875rem;color:var(--warn,#f59e0b);font-weight:600;">⚡ Paiement par echeance</p>' : ''}
                                     </div>
                                     <div style="text-align:right;display:flex;flex-direction:column;gap:0.5rem;">
                                         <div>
-                                            <p style="font-size:1.5rem;font-weight:700;color:#10b981;">+${parseFloat(p.amount).toLocaleString()}</p>
-                                            <p style="font-size:0.875rem;color:#64748b;">FCFA</p>
+                                            <p style="font-size:1.5rem;font-weight:700;color:var(--ok,#10b981);">+${parseFloat(p.amount).toLocaleString()}</p>
+                                            <p style="font-size:0.875rem;color:var(--muted,#64748b);">FCFA</p>
                                         </div>
                                         <button class="btn btn-danger" style="padding:0.35rem 0.75rem;font-size:0.75rem;" onclick="deleteTransaction('${p.id}')">
                                             🗑️ Supprimer

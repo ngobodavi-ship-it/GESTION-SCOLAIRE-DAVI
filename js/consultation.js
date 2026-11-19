@@ -109,13 +109,13 @@ function fraisEleve(e) {
 function rechercher() {
     const q = (document.getElementById('cSearch').value || '').trim().toLowerCase();
     const box = document.getElementById('cResult');
-    if (!q) { box.innerHTML = '<p style="color:#64748b;padding:1rem;">Saisissez un matricule ou un nom.</p>'; return; }
+    if (!q) { box.innerHTML = '<p style="color:var(--muted,#64748b);padding:1rem;">Saisissez un matricule ou un nom.</p>'; return; }
     const found = cEleves.filter(e =>
         (e.matricule || '').toLowerCase() === q ||
         (`${e.nom} ${e.prenom}`).toLowerCase().includes(q) ||
         (`${e.prenom} ${e.nom}`).toLowerCase().includes(q)
     );
-    if (!found.length) { box.innerHTML = '<div class="card"><p style="color:#dc3545;margin:0;">Aucun élève trouvé pour « ' + cEsc(q) + ' ».</p></div>'; return; }
+    if (!found.length) { box.innerHTML = '<div class="card"><p style="color:var(--danger,#dc3545);margin:0;">Aucun élève trouvé pour « ' + cEsc(q) + ' ».</p></div>'; return; }
     if (found.length > 1) {
         box.innerHTML = '<div class="card"><p style="font-weight:600;margin-bottom:0.75rem;">Plusieurs élèves correspondent :</p>' +
             found.map(e => `<button class="btn btn-secondary" style="margin:0.25rem;" onclick="afficherEleve('${e.id}')">${cEsc(e.nom)} ${cEsc(e.prenom)} — ${cEsc(e.classe)} (${cEsc(e.matricule || '')})</button>`).join('') + '</div>';
@@ -149,7 +149,7 @@ function renderEleve() {
                     ${e.photo ? `<img src="${e.photo}" alt="" style="width:54px;height:68px;object-fit:cover;border-radius:6px;border:1px solid #cbd5e1;">` : ''}
                     <div>
                         <h2 style="font-size:1.3rem;font-weight:700;margin:0;">${cEsc(e.nom)} ${cEsc(e.prenom)}</h2>
-                        <p style="color:#64748b;margin:0.25rem 0 0;">Classe ${cEsc(e.classe)} · Matricule ${cEsc(e.matricule || '-')} · ${cEsc(e.anneeScolaire || '')}</p>
+                        <p style="color:var(--muted,#64748b);margin:0.25rem 0 0;">Classe ${cEsc(e.classe)} · Matricule ${cEsc(e.matricule || '-')} · ${cEsc(e.anneeScolaire || '')}</p>
                     </div>
                 </div>
                 <div style="display:flex;align-items:center;gap:0.5rem;">
@@ -162,7 +162,7 @@ function renderEleve() {
             <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:0.75rem;">Résultats — ${cEsc(trim)}</h3>
             <div style="overflow-x:auto;"><table>
                 <thead><tr><th>Matière</th><th style="text-align:center;">Coef</th><th style="text-align:center;">Note /${scale}</th><th>Mention</th></tr></thead>
-                <tbody>${lignes || '<tr><td colspan="4" style="text-align:center;color:#64748b;">Aucune matière</td></tr>'}</tbody>
+                <tbody>${lignes || '<tr><td colspan="4" style="text-align:center;color:var(--muted,#64748b);">Aucune matière</td></tr>'}</tbody>
             </table></div>
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.75rem;margin-top:1rem;">
                 ${kpi('Moyenne', fmtMoy(moy, scale))}
@@ -170,7 +170,7 @@ function renderEleve() {
                 ${kpi('Mention', mentionFor(moy, scale))}
                 ${kpi('Moyenne annuelle', fmtMoy(moyenneAnnuelle(e.id), scale))}
             </div>
-            ${appr.decision || appr.appreciation ? `<div style="margin-top:1rem;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:0.75rem;">
+            ${appr.decision || appr.appreciation ? `<div style="margin-top:1rem;background:var(--surface-2,#f8fafc);border:1px solid #e2e8f0;border-radius:8px;padding:0.75rem;">
                 ${appr.decision ? `<div><strong>Décision du conseil :</strong> ${cEsc(appr.decision)}</div>` : ''}
                 ${appr.conduite ? `<div><strong>Conduite :</strong> ${cEsc(appr.conduite)}</div>` : ''}
                 ${appr.appreciation ? `<div><strong>Appréciation :</strong> ${cEsc(appr.appreciation)}</div>` : ''}
@@ -194,13 +194,13 @@ function renderEleve() {
             ${frais.tx.length ? `<div style="overflow-x:auto;"><table>
                 <thead><tr><th>Date</th><th>Type</th><th style="text-align:right;">Montant</th></tr></thead>
                 <tbody>${frais.tx.slice(0, 20).map(t => `<tr><td>${t.date ? new Date(t.date).toLocaleDateString('fr-FR') : '-'}</td><td>${cEsc(t.type || '')}</td><td style="text-align:right;">${fmtFCFA(parseFloat(t.amount) || 0)}</td></tr>`).join('')}</tbody>
-            </table></div>` : '<p style="color:#64748b;margin:0;">Aucun paiement enregistré.</p>'}
+            </table></div>` : '<p style="color:var(--muted,#64748b);margin:0;">Aucun paiement enregistré.</p>'}
         </div>`;
 }
 function kpi(label, value, color) {
-    return `<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:0.85rem;text-align:center;">
+    return `<div style="background:var(--surface-2,#f8fafc);border:1px solid #e2e8f0;border-radius:10px;padding:0.85rem;text-align:center;">
         <div style="font-size:1.35rem;font-weight:700;color:${color || '#2E2769'};">${value}</div>
-        <div style="font-size:0.8rem;color:#64748b;">${label}</div></div>`;
+        <div style="font-size:0.8rem;color:var(--muted,#64748b);">${label}</div></div>`;
 }
 
 document.addEventListener('DOMContentLoaded', () => {

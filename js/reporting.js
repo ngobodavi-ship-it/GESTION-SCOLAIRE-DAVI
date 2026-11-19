@@ -142,7 +142,7 @@ function renderReporting() {
     const caisseBox = document.getElementById('repCaisseTable');
     if (caisseBox) {
         if (cle.length === 0) {
-            caisseBox.innerHTML = '<p style="color:#64748b;padding:0.5rem;">Aucun mouvement de caisse sur la période.</p>';
+            caisseBox.innerHTML = '<p style="color:var(--muted,#64748b);padding:0.5rem;">Aucun mouvement de caisse sur la période.</p>';
         } else {
             const lignes = cle.map(ym => {
                 const m = parMois[ym];
@@ -150,8 +150,8 @@ function renderReporting() {
                 cumul += soldeMois;
                 return `<tr>
                     <td style="font-weight:600;">${moisLbl(ym)}</td>
-                    <td style="text-align:right;color:#198754;">${repFmt(m.rec)}</td>
-                    <td style="text-align:right;color:#dc3545;">${repFmt(m.dep)}</td>
+                    <td style="text-align:right;color:var(--ok,#198754);">${repFmt(m.rec)}</td>
+                    <td style="text-align:right;color:var(--danger,#dc3545);">${repFmt(m.dep)}</td>
                     <td style="text-align:right;font-weight:600;color:${soldeMois >= 0 ? '#198754' : '#dc3545'};">${repFmt(soldeMois)}</td>
                     <td style="text-align:right;font-weight:700;color:${cumul >= 0 ? '#4338ca' : '#dc3545'};">${repFmt(cumul)}</td>
                 </tr>`;
@@ -162,9 +162,9 @@ function renderReporting() {
                 <table>
                     <thead><tr><th>Mois</th><th style="text-align:right;">Recettes</th><th style="text-align:right;">Dépenses</th><th style="text-align:right;">Solde du mois</th><th style="text-align:right;">Solde cumulé</th></tr></thead>
                     <tbody>
-                        ${soldeInitial !== 0 ? `<tr style="color:#64748b;"><td>Solde au début de période</td><td></td><td></td><td></td><td style="text-align:right;font-weight:600;">${repFmt(soldeInitial)}</td></tr>` : ''}
+                        ${soldeInitial !== 0 ? `<tr style="color:var(--muted,#64748b);"><td>Solde au début de période</td><td></td><td></td><td></td><td style="text-align:right;font-weight:600;">${repFmt(soldeInitial)}</td></tr>` : ''}
                         ${lignes}
-                        <tr style="font-weight:700;border-top:2px solid #198754;background:#f8fafc;"><td>TOTAL période</td><td style="text-align:right;color:#198754;">${repFmt(totRec)}</td><td style="text-align:right;color:#dc3545;">${repFmt(totDep)}</td><td style="text-align:right;">${repFmt(totRec - totDep)}</td><td style="text-align:right;">${repFmt(cumul)}</td></tr>
+                        <tr style="font-weight:700;border-top:2px solid #198754;background:var(--surface-2,#f8fafc);"><td>TOTAL période</td><td style="text-align:right;color:var(--ok,#198754);">${repFmt(totRec)}</td><td style="text-align:right;color:var(--danger,#dc3545);">${repFmt(totDep)}</td><td style="text-align:right;">${repFmt(totRec - totDep)}</td><td style="text-align:right;">${repFmt(cumul)}</td></tr>
                     </tbody>
                 </table>`;
         }
@@ -179,7 +179,7 @@ function renderReporting() {
                 <tr><td>📝 Inscriptions</td><td style="text-align:right;">${cntType('inscription')}</td><td style="text-align:right;">${repFmt(insc)}</td><td style="text-align:right;">${pct(insc)} %</td></tr>
                 <tr><td>🔄 Réinscriptions</td><td style="text-align:right;">${cntType('reinscription')}</td><td style="text-align:right;">${repFmt(reinsc)}</td><td style="text-align:right;">${pct(reinsc)} %</td></tr>
                 <tr><td>📚 Frais scolaires</td><td style="text-align:right;">${cntType('scolarite')}</td><td style="text-align:right;">${repFmt(scol)}</td><td style="text-align:right;">${pct(scol)} %</td></tr>
-                <tr style="font-weight:700;border-top:2px solid #1B6BFF;"><td>TOTAL RECETTES</td><td style="text-align:right;">${cntType('inscription') + cntType('reinscription') + cntType('scolarite')}</td><td style="text-align:right;color:#198754;">${repFmt(recettes)}</td><td style="text-align:right;">100 %</td></tr>
+                <tr style="font-weight:700;border-top:2px solid #1B6BFF;"><td>TOTAL RECETTES</td><td style="text-align:right;">${cntType('inscription') + cntType('reinscription') + cntType('scolarite')}</td><td style="text-align:right;color:var(--ok,#198754);">${repFmt(recettes)}</td><td style="text-align:right;">100 %</td></tr>
             </tbody>
         </table>`;
 
@@ -203,31 +203,31 @@ function renderReporting() {
     document.getElementById('repReste').textContent = repFmt(totalReste);
     document.getElementById('repTaux2').textContent = tauxRecouv + ' %';
     document.getElementById('repDebiteurs').innerHTML = debiteurs.length === 0
-        ? '<p style="color:#64748b;text-align:center;padding:1rem;">Aucun reste à recouvrer 🎉</p>'
+        ? '<p style="color:var(--muted,#64748b);text-align:center;padding:1rem;">Aucun reste à recouvrer 🎉</p>'
         : `<table>
             <thead><tr><th>Élève</th><th>Classe</th><th style="text-align:right;">Reste à payer</th></tr></thead>
             <tbody>${debiteurs.slice(0, 10).map(d => `
-                <tr><td style="font-weight:600;">${d.nom}</td><td>${d.classe}</td><td style="text-align:right;color:#dc3545;font-weight:600;">${repFmt(d.reste)}</td></tr>
+                <tr><td style="font-weight:600;">${d.nom}</td><td>${d.classe}</td><td style="text-align:right;color:var(--danger,#dc3545);font-weight:600;">${repFmt(d.reste)}</td></tr>
             `).join('')}</tbody>
            </table>`;
 
     // ================= Dépenses par nature =================
     const natArr = Object.entries(natures).sort((a, b) => b[1] - a[1]);
     document.getElementById('repDepensesNature').innerHTML = natArr.length === 0
-        ? '<p style="color:#64748b;text-align:center;padding:1rem;">Aucune dépense sur la période.</p>'
+        ? '<p style="color:var(--muted,#64748b);text-align:center;padding:1rem;">Aucune dépense sur la période.</p>'
         : `<table>
             <thead><tr><th>Nature</th><th style="text-align:right;">Montant</th><th style="text-align:right;">%</th></tr></thead>
             <tbody>${natArr.map(([n, v]) => `
-                <tr><td>${n}</td><td style="text-align:right;color:#dc3545;">${repFmt(v)}</td><td style="text-align:right;">${dep > 0 ? Math.round(v / dep * 100) : 0} %</td></tr>
+                <tr><td>${n}</td><td style="text-align:right;color:var(--danger,#dc3545);">${repFmt(v)}</td><td style="text-align:right;">${dep > 0 ? Math.round(v / dep * 100) : 0} %</td></tr>
             `).join('')}
-            <tr style="font-weight:700;border-top:2px solid #1B6BFF;"><td>TOTAL DÉPENSES</td><td style="text-align:right;color:#dc3545;">${repFmt(dep)}</td><td style="text-align:right;">100 %</td></tr>
+            <tr style="font-weight:700;border-top:2px solid #1B6BFF;"><td>TOTAL DÉPENSES</td><td style="text-align:right;color:var(--danger,#dc3545);">${repFmt(dep)}</td><td style="text-align:right;">100 %</td></tr>
             </tbody></table>`;
 
     // ================= Détail des transactions =================
     const typeLabel = { inscription: 'Inscription', reinscription: 'Réinscription', scolarite: 'Frais scolaires', depense: 'Dépense' };
     const txSorted = [...tx].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
     document.getElementById('repTxTable').innerHTML = txSorted.length === 0
-        ? '<p style="color:#64748b;text-align:center;padding:2rem;">Aucune transaction sur cette période.</p>'
+        ? '<p style="color:var(--muted,#64748b);text-align:center;padding:2rem;">Aucune transaction sur cette période.</p>'
         : `<table>
             <thead><tr><th>Date</th><th>Réf.</th><th>Type</th><th>Élève / Nature</th><th>Mode</th><th style="text-align:right;">Montant</th></tr></thead>
             <tbody>${txSorted.map(t => `

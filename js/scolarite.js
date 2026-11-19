@@ -138,7 +138,7 @@ function renderEleves() {
         (`${e.nom} ${e.prenom} ${e.matricule} ${e.classe}`).toLowerCase().includes(search));
     const tbody = document.getElementById('elevesTableBody');
     if (!list.length) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:#64748b;">Aucun élève. Cliquez sur « Nouvel élève » pour commencer.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--muted,#64748b);">Aucun élève. Cliquez sur « Nouvel élève » pour commencer.</td></tr>';
         return;
     }
     tbody.innerHTML = list.map(e => `
@@ -148,7 +148,7 @@ function renderEleves() {
             <td>${e.sexe === 'M' ? 'M' : e.sexe === 'F' ? 'F' : '-'}</td>
             <td>${scEsc(e.classe)}</td>
             <td>${scEsc(e.statut)}</td>
-            <td>${scEsc(e.tuteur)} ${e.telephone ? '<br><span style="color:#64748b;font-size:0.85rem;">' + scEsc(e.telephone) + '</span>' : ''}</td>
+            <td>${scEsc(e.tuteur)} ${e.telephone ? '<br><span style="color:var(--muted,#64748b);font-size:0.85rem;">' + scEsc(e.telephone) + '</span>' : ''}</td>
             <td style="white-space:nowrap;">
                 <button class="btn btn-primary" style="padding:0.3rem 0.6rem;font-size:0.85rem;" onclick="ficheEleve('${e.id}')">👁️</button>
                 <button class="btn btn-secondary" style="padding:0.3rem 0.6rem;font-size:0.85rem;" onclick="editEleve('${e.id}')">✏️</button>
@@ -276,13 +276,13 @@ function renderInscriptions() {
     const reinscrits = list.filter(e => e.statut === 'Réinscrit').length;
     document.getElementById('inscContent').innerHTML = `
         <div class="grid-2" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:1.5rem;">
-            <div style="background:#d1fae5;padding:1rem;border-radius:8px;border-left:4px solid #10b981;"><p style="color:#64748b;font-size:0.8rem;margin-bottom:0.25rem;">Nouvelles inscriptions</p><h3 style="margin:0;font-weight:700;">${nouveaux}</h3></div>
-            <div style="background:#ede9fe;padding:1rem;border-radius:8px;border-left:4px solid #8b5cf6;"><p style="color:#64748b;font-size:0.8rem;margin-bottom:0.25rem;">Réinscriptions</p><h3 style="margin:0;font-weight:700;">${reinscrits}</h3></div>
-            <div style="background:#f0f9ff;padding:1rem;border-radius:8px;border-left:4px solid #0ea5e9;"><p style="color:#64748b;font-size:0.8rem;margin-bottom:0.25rem;">Total inscrits</p><h3 style="margin:0;font-weight:700;">${list.length}</h3></div>
+            <div style="background:var(--ok-bg,#d1fae5);padding:1rem;border-radius:8px;border-left:4px solid #10b981;"><p style="color:var(--muted,#64748b);font-size:0.8rem;margin-bottom:0.25rem;">Nouvelles inscriptions</p><h3 style="margin:0;font-weight:700;">${nouveaux}</h3></div>
+            <div style="background:var(--violet-bg,#ede9fe);padding:1rem;border-radius:8px;border-left:4px solid #8b5cf6;"><p style="color:var(--muted,#64748b);font-size:0.8rem;margin-bottom:0.25rem;">Réinscriptions</p><h3 style="margin:0;font-weight:700;">${reinscrits}</h3></div>
+            <div style="background:var(--brand-bg,#f0f9ff);padding:1rem;border-radius:8px;border-left:4px solid #0ea5e9;"><p style="color:var(--muted,#64748b);font-size:0.8rem;margin-bottom:0.25rem;">Total inscrits</p><h3 style="margin:0;font-weight:700;">${list.length}</h3></div>
         </div>
         <div style="overflow-x:auto;"><table>
             <thead><tr><th>Matricule</th><th>Nom et prénom</th><th>Classe</th><th>Statut</th><th>Date</th></tr></thead>
-            <tbody>${list.length === 0 ? '<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:#64748b;">Aucune inscription pour cette année.</td></tr>' :
+            <tbody>${list.length === 0 ? '<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:var(--muted,#64748b);">Aucune inscription pour cette année.</td></tr>' :
                 list.map(e => `<tr><td style="font-family:monospace;">${scEsc(e.matricule)}</td><td style="font-weight:600;">${scEsc(e.nom)} ${scEsc(e.prenom)}</td><td>${scEsc(e.classe)}</td><td>${scEsc(e.statut)}</td><td>${scEsc(e.dateInscription || '-')}</td></tr>`).join('')}
             </tbody></table></div>`;
 }
@@ -378,7 +378,7 @@ function genererCertificat() {
                 <p style="margin:0;font-size:0.78rem;letter-spacing:1px;">Unité &ndash; Travail &ndash; Progrès</p>
                 <p style="margin:0.25rem 0;font-size:0.85rem;">Ministère de l'Enseignement Préscolaire, Primaire, Secondaire et de l'Alphabétisation</p>
                 <h2 style="margin:0.75rem 0 0;text-transform:uppercase;">${scEsc(ecole)}</h2>
-                ${(typeof getEtab === 'function' && [getEtab().ville, getEtab().bp ? 'BP ' + getEtab().bp : '', getEtab().telephone ? 'Tél : ' + getEtab().telephone : ''].filter(Boolean).length) ? `<p style="margin:0.2rem 0 0;font-size:0.72rem;color:#444;">${[getEtab().ville, getEtab().bp ? 'BP ' + scEsc(getEtab().bp) : '', getEtab().telephone ? 'Tél : ' + scEsc(getEtab().telephone) : '', getEtab().email ? scEsc(getEtab().email) : ''].filter(Boolean).join(' · ')}</p>` : ''}
+                ${(typeof getEtab === 'function' && [getEtab().ville, getEtab().bp ? 'BP ' + getEtab().bp : '', getEtab().telephone ? 'Tél : ' + getEtab().telephone : ''].filter(Boolean).length) ? `<p style="margin:0.2rem 0 0;font-size:0.72rem;color:var(--muted,#444);">${[getEtab().ville, getEtab().bp ? 'BP ' + scEsc(getEtab().bp) : '', getEtab().telephone ? 'Tél : ' + scEsc(getEtab().telephone) : '', getEtab().email ? scEsc(getEtab().email) : ''].filter(Boolean).join(' · ')}</p>` : ''}
             </div>
             <h1 style="text-align:center;text-transform:uppercase;letter-spacing:2px;margin:2rem 0;font-size:1.6rem;">Certificat de scolarité</h1>
             <p style="line-height:2;font-size:1.05rem;text-align:justify;">
@@ -396,7 +396,7 @@ function genererCertificat() {
                 <p style="margin:0;">Fait à ........................., le ${aujourd}</p>
                 <div style="height:80px;"></div>
                 <p style="margin:0;font-weight:bold;">Le Chef d'établissement</p>
-                <p style="margin:0;color:#666;">(Signature et cachet)</p>
+                <p style="margin:0;color:var(--muted,#666);">(Signature et cachet)</p>
             </div>
         </div>`;
     const w = window.open('', '_blank');
@@ -424,7 +424,7 @@ function genererAttestation() {
                 <p style="margin:0;font-size:0.78rem;letter-spacing:1px;">Unité &ndash; Travail &ndash; Progrès</p>
                 <p style="margin:0.25rem 0;font-size:0.85rem;">Ministère de l\'Enseignement Préscolaire, Primaire, Secondaire et de l\'Alphabétisation</p>
                 <h2 style="margin:0.75rem 0 0;text-transform:uppercase;">${scEsc(ecole)}</h2>
-                ${(typeof getEtab === 'function' && [getEtab().ville, getEtab().bp, getEtab().telephone].filter(Boolean).length) ? `<p style="margin:0.2rem 0 0;font-size:0.72rem;color:#444;">${[getEtab().ville, getEtab().bp ? 'BP ' + scEsc(getEtab().bp) : '', getEtab().telephone ? 'Tél : ' + scEsc(getEtab().telephone) : '', getEtab().email ? scEsc(getEtab().email) : ''].filter(Boolean).join(' · ')}</p>` : ''}
+                ${(typeof getEtab === 'function' && [getEtab().ville, getEtab().bp, getEtab().telephone].filter(Boolean).length) ? `<p style="margin:0.2rem 0 0;font-size:0.72rem;color:var(--muted,#444);">${[getEtab().ville, getEtab().bp ? 'BP ' + scEsc(getEtab().bp) : '', getEtab().telephone ? 'Tél : ' + scEsc(getEtab().telephone) : '', getEtab().email ? scEsc(getEtab().email) : ''].filter(Boolean).join(' · ')}</p>` : ''}
             </div>
             ${photo}
             <h1 style="text-align:center;text-transform:uppercase;letter-spacing:2px;margin:1.5rem 0;font-size:1.5rem;">Attestation de fréquentation scolaire</h1>
@@ -443,7 +443,7 @@ function genererAttestation() {
                 <p style="margin:0;">Fait à ........................., le ${aujourd}</p>
                 <div style="height:80px;"></div>
                 <p style="margin:0;font-weight:bold;">Le Chef d\'établissement</p>
-                <p style="margin:0;color:#666;">(Signature et cachet)</p>
+                <p style="margin:0;color:var(--muted,#666);">(Signature et cachet)</p>
             </div>
         </div>`;
     const w = window.open('', '_blank');
@@ -457,18 +457,18 @@ function carteScolaireCSS() {
     return `
     .cs-wrap{display:flex;flex-wrap:wrap;gap:10px;}
     .cs{width:340px;height:212px;border:1px solid #1450C8;border-radius:14px;overflow:hidden;
-        font-family:Arial,sans-serif;color:#0E1E3A;display:flex;flex-direction:column;
-        box-shadow:0 2px 6px rgba(0,0,0,.15);page-break-inside:avoid;background:#fff;}
+        font-family:Arial,sans-serif;color:var(--ink,#0E1E3A);display:flex;flex-direction:column;
+        box-shadow:0 2px 6px rgba(0,0,0,.15);page-break-inside:avoid;background:var(--surface,#fff);}
     .cs-band{background:linear-gradient(135deg,#1B6BFF,#28C6F5);color:#fff;padding:8px 12px;
         font-weight:800;font-size:.82rem;text-transform:uppercase;letter-spacing:.3px;line-height:1.2;}
     .cs-band small{display:block;font-weight:600;font-size:.6rem;opacity:.9;letter-spacing:1px;}
     .cs-body{display:flex;gap:10px;padding:10px 12px;flex:1;}
-    .cs-photo{width:78px;height:96px;border:1px solid #cbd5e1;border-radius:8px;object-fit:cover;flex-shrink:0;background:#eef4fc;display:flex;align-items:center;justify-content:center;font-size:1.6rem;color:#94a3b8;}
+    .cs-photo{width:78px;height:96px;border:1px solid #cbd5e1;border-radius:8px;object-fit:cover;flex-shrink:0;background:var(--surface-2,#eef4fc);display:flex;align-items:center;justify-content:center;font-size:1.6rem;color:var(--muted-2,#94a3b8);}
     .cs-info{flex:1;min-width:0;font-size:.74rem;line-height:1.5;}
-    .cs-titre{font-weight:800;color:#1450C8;font-size:.7rem;letter-spacing:1px;margin-bottom:2px;}
+    .cs-titre{font-weight:800;color:var(--brand,#1450C8);font-size:.7rem;letter-spacing:1px;margin-bottom:2px;}
     .cs-nom{font-weight:800;font-size:.92rem;margin-bottom:4px;text-transform:uppercase;}
-    .cs-info b{color:#475569;font-weight:700;}
-    .cs-foot{display:flex;justify-content:space-between;align-items:center;background:#F1F6FF;padding:5px 12px;font-size:.66rem;color:#1450C8;font-weight:700;}
+    .cs-info b{color:var(--muted,#475569);font-weight:700;}
+    .cs-foot{display:flex;justify-content:space-between;align-items:center;background:var(--brand-bg,#F1F6FF);padding:5px 12px;font-size:.66rem;color:var(--brand,#1450C8);font-weight:700;}
     @media print{ body{margin:0;} }
     `;
 }
@@ -539,13 +539,13 @@ function imprimerTrombinoscope() {
     const w = window.open('', '_blank');
     w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Trombinoscope ${scEsc(classe)}</title>
         <style>
-        body{font-family:Arial,sans-serif;color:#111;padding:1.2rem;margin:0;}
+        body{font-family:Arial,sans-serif;color:var(--ink,#111);padding:1.2rem;margin:0;}
         .hd{text-align:center;border-bottom:2px solid #333;padding-bottom:.5rem;margin-bottom:1rem;}
         .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
         .tb-cell{border:1px solid #cbd5e1;border-radius:10px;padding:8px;text-align:center;page-break-inside:avoid;}
-        .tb-cell img,.tb-cell .ph{width:100%;height:120px;object-fit:cover;border-radius:8px;background:#eef4fc;display:flex;align-items:center;justify-content:center;font-size:2rem;color:#94a3b8;}
+        .tb-cell img,.tb-cell .ph{width:100%;height:120px;object-fit:cover;border-radius:8px;background:var(--surface-2,#eef4fc);display:flex;align-items:center;justify-content:center;font-size:2rem;color:var(--muted-2,#94a3b8);}
         .tb-nom{font-weight:700;font-size:.78rem;margin-top:5px;line-height:1.2;}
-        .tb-mat{font-size:.68rem;color:#64748b;font-family:monospace;}
+        .tb-mat{font-size:.68rem;color:var(--muted,#64748b);font-family:monospace;}
         @media print{ body{margin:0;} .grid{grid-template-columns:repeat(5,1fr);} }
         </style></head>
         <body>
@@ -576,7 +576,7 @@ function imprimerFeuilleAppel() {
     }).join('');
     const w = window.open('', '_blank');
     w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Feuille d'appel ${scEsc(classe)}</title></head>
-        <body style="font-family:Arial,sans-serif;color:#111;padding:1.2rem;">
+        <body style="font-family:Arial,sans-serif;color:var(--ink,#111);padding:1.2rem;">
         <div style="text-align:center;border-bottom:2px solid #333;padding-bottom:.5rem;margin-bottom:1rem;">
             <p style="margin:0;font-size:.8rem;">RÉPUBLIQUE DU CONGO — Unité · Travail · Progrès</p>
             <h2 style="margin:.3rem 0;">${scEsc(ecole)}</h2>
@@ -584,10 +584,10 @@ function imprimerFeuilleAppel() {
             <p style="margin:.2rem 0;font-size:.85rem;">Année ${scEsc(annee)} — ${liste.length} élève(s)</p>
         </div>
         <table style="width:100%;border-collapse:collapse;font-size:.82rem;">
-            <thead><tr style="background:#eee;"><th style="border:1px solid #999;padding:3px 6px;">N°</th><th style="border:1px solid #999;padding:3px 8px;text-align:left;">Nom et prénom</th>${cols}</tr></thead>
+            <thead><tr style="background:var(--surface-2,#eee);"><th style="border:1px solid #999;padding:3px 6px;">N°</th><th style="border:1px solid #999;padding:3px 8px;text-align:left;">Nom et prénom</th>${cols}</tr></thead>
             <tbody>${rows}</tbody>
         </table>
-        <p style="font-size:.75rem;color:#555;margin-top:.5rem;">Cochez la présence dans les colonnes (une colonne par jour ou par séance).</p>
+        <p style="font-size:.75rem;color:var(--muted,#555);margin-top:.5rem;">Cochez la présence dans les colonnes (une colonne par jour ou par séance).</p>
         </body></html>`);
     w.document.close();
     setTimeout(() => w.print(), 500);
@@ -612,7 +612,7 @@ function dosSet(id, piece, ok) {
     dosMajResume();
     // mettre à jour la cellule "complet" de la ligne
     const cell = document.getElementById('dos_stat_' + id);
-    if (cell) cell.innerHTML = dosComplet(id) ? '<span style="background:#dcfce7;color:#166534;border-radius:999px;padding:1px 9px;font-size:.76rem;font-weight:700;">Complet</span>' : `<span style="background:#fee2e2;color:#991b1b;border-radius:999px;padding:1px 9px;font-size:.76rem;font-weight:700;">${dosManquantes(id).length} manquante(s)</span>`;
+    if (cell) cell.innerHTML = dosComplet(id) ? '<span style="background:var(--ok-bg,#dcfce7);color:var(--ok-strong,#166534);border-radius:999px;padding:1px 9px;font-size:.76rem;font-weight:700;">Complet</span>' : `<span style="background:var(--danger-bg,#fee2e2);color:var(--danger-strong,#991b1b);border-radius:999px;padding:1px 9px;font-size:.76rem;font-weight:700;">${dosManquantes(id).length} manquante(s)</span>`;
 }
 
 function dosGererPieces() {
@@ -633,9 +633,9 @@ function dosMajResume() {
     const complets = liste.filter(e => dosComplet(e.id)).length;
     const incomplets = liste.length - complets;
     box.innerHTML = `
-        <span style="background:#dcfce7;color:#166534;border-radius:999px;padding:.25rem .8rem;font-weight:600;">Complets : ${complets}</span>
-        <span style="background:#fee2e2;color:#991b1b;border-radius:999px;padding:.25rem .8rem;font-weight:600;">Incomplets : ${incomplets}</span>
-        <span style="background:#f1f5f9;color:#475569;border-radius:999px;padding:.25rem .8rem;font-weight:600;">Total : ${liste.length}</span>`;
+        <span style="background:var(--ok-bg,#dcfce7);color:var(--ok-strong,#166534);border-radius:999px;padding:.25rem .8rem;font-weight:600;">Complets : ${complets}</span>
+        <span style="background:var(--danger-bg,#fee2e2);color:var(--danger-strong,#991b1b);border-radius:999px;padding:.25rem .8rem;font-weight:600;">Incomplets : ${incomplets}</span>
+        <span style="background:var(--surface-2,#f1f5f9);color:var(--muted,#475569);border-radius:999px;padding:.25rem .8rem;font-weight:600;">Total : ${liste.length}</span>`;
 }
 
 function renderDossiers() {
@@ -648,20 +648,20 @@ function renderDossiers() {
     const classe = sel ? sel.value : '';
     const pieces = dosPieces();
     const liste = eleves.filter(e => !classe || e.classe === classe).slice().sort((a, b) => (a.nom + a.prenom).localeCompare(b.nom + b.prenom));
-    if (!liste.length) { box.innerHTML = '<p style="color:#64748b;padding:.5rem;">Aucun élève sur cette sélection.</p>'; dosMajResume(); return; }
+    if (!liste.length) { box.innerHTML = '<p style="color:var(--muted,#64748b);padding:.5rem;">Aucun élève sur cette sélection.</p>'; dosMajResume(); return; }
     const th = pieces.map(p => `<th style="font-size:.72rem;text-align:center;writing-mode:initial;">${scEsc(p)}</th>`).join('');
     const lignes = liste.map(e => {
         const d = dosGet(e.id);
         const cases = pieces.map(p => `<td style="text-align:center;"><input type="checkbox" ${d[p] ? 'checked' : ''} onchange="dosSet('${e.id}','${scAttr(p)}',this.checked)" style="width:18px;height:18px;margin:0;cursor:pointer;"></td>`).join('');
         const complet = pieces.every(p => d[p]);
-        const stat = complet ? '<span style="background:#dcfce7;color:#166534;border-radius:999px;padding:1px 9px;font-size:.76rem;font-weight:700;">Complet</span>' : `<span style="background:#fee2e2;color:#991b1b;border-radius:999px;padding:1px 9px;font-size:.76rem;font-weight:700;">${pieces.filter(p => !d[p]).length} manquante(s)</span>`;
-        return `<tr><td style="font-weight:600;white-space:nowrap;">${scEsc(e.nom)} ${scEsc(e.prenom)}<br><span style="color:#64748b;font-size:.72rem;">${scEsc(e.classe || '')}</span></td>${cases}<td id="dos_stat_${e.id}">${stat}</td></tr>`;
+        const stat = complet ? '<span style="background:var(--ok-bg,#dcfce7);color:var(--ok-strong,#166534);border-radius:999px;padding:1px 9px;font-size:.76rem;font-weight:700;">Complet</span>' : `<span style="background:var(--danger-bg,#fee2e2);color:var(--danger-strong,#991b1b);border-radius:999px;padding:1px 9px;font-size:.76rem;font-weight:700;">${pieces.filter(p => !d[p]).length} manquante(s)</span>`;
+        return `<tr><td style="font-weight:600;white-space:nowrap;">${scEsc(e.nom)} ${scEsc(e.prenom)}<br><span style="color:var(--muted,#64748b);font-size:.72rem;">${scEsc(e.classe || '')}</span></td>${cases}<td id="dos_stat_${e.id}">${stat}</td></tr>`;
     }).join('');
     box.innerHTML = `<table>
         <thead><tr><th style="text-align:left;">Élève</th>${th}<th>Statut</th></tr></thead>
         <tbody>${lignes}</tbody>
     </table>
-    <p style="color:#64748b;font-size:.8rem;margin:.6rem 0 0;">Cochez les pièces fournies. « ⚙️ Pièces requises » permet de modifier la liste des documents demandés.</p>`;
+    <p style="color:var(--muted,#64748b);font-size:.8rem;margin:.6rem 0 0;">Cochez les pièces fournies. « ⚙️ Pièces requises » permet de modifier la liste des documents demandés.</p>`;
     dosMajResume();
 }
 
@@ -672,10 +672,10 @@ function dosImprimerIncomplets() {
     if (!liste.length) { alert('Aucun dossier incomplet sur cette sélection. 👍'); return; }
     const ecole = getEcoleName();
     let i = 0;
-    const rows = liste.map(e => { i++; const manq = dosManquantes(e.id); return `<tr><td style="border:1px solid #999;padding:4px 8px;text-align:center;">${i}</td><td style="border:1px solid #999;padding:4px 8px;">${scEsc(e.nom)} ${scEsc(e.prenom)}</td><td style="border:1px solid #999;padding:4px 8px;">${scEsc(e.classe || '')}</td><td style="border:1px solid #999;padding:4px 8px;color:#b91c1c;">${manq.map(scEsc).join(', ')}</td></tr>`; }).join('');
+    const rows = liste.map(e => { i++; const manq = dosManquantes(e.id); return `<tr><td style="border:1px solid #999;padding:4px 8px;text-align:center;">${i}</td><td style="border:1px solid #999;padding:4px 8px;">${scEsc(e.nom)} ${scEsc(e.prenom)}</td><td style="border:1px solid #999;padding:4px 8px;">${scEsc(e.classe || '')}</td><td style="border:1px solid #999;padding:4px 8px;color:var(--danger-strong,#b91c1c);">${manq.map(scEsc).join(', ')}</td></tr>`; }).join('');
     const w = window.open('', '_blank');
     w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Dossiers incomplets</title></head>
-        <body style="font-family:Arial,sans-serif;padding:1.6rem;color:#111;">
+        <body style="font-family:Arial,sans-serif;padding:1.6rem;color:var(--ink,#111);">
         <div style="text-align:center;border-bottom:2px solid #333;padding-bottom:.6rem;margin-bottom:1rem;">
             <p style="margin:0;font-size:.8rem;">RÉPUBLIQUE DU CONGO — Unité · Travail · Progrès</p>
             <h2 style="margin:.3rem 0;">${scEsc(ecole)}</h2>
@@ -683,7 +683,7 @@ function dosImprimerIncomplets() {
             <p style="margin:.2rem 0;font-size:.85rem;">${liste.length} dossier(s) — édité le ${new Date().toLocaleDateString('fr-FR')}</p>
         </div>
         <table style="width:100%;border-collapse:collapse;font-size:.88rem;">
-            <thead><tr style="background:#eee;"><th style="border:1px solid #999;padding:4px 8px;">N°</th><th style="border:1px solid #999;padding:4px 8px;text-align:left;">Élève</th><th style="border:1px solid #999;padding:4px 8px;">Classe</th><th style="border:1px solid #999;padding:4px 8px;text-align:left;">Pièces manquantes</th></tr></thead>
+            <thead><tr style="background:var(--surface-2,#eee);"><th style="border:1px solid #999;padding:4px 8px;">N°</th><th style="border:1px solid #999;padding:4px 8px;text-align:left;">Élève</th><th style="border:1px solid #999;padding:4px 8px;">Classe</th><th style="border:1px solid #999;padding:4px 8px;text-align:left;">Pièces manquantes</th></tr></thead>
             <tbody>${rows}</tbody>
         </table>
         </body></html>`);
@@ -704,7 +704,7 @@ function renderDoublons() {
     });
     const doublons = Object.values(groupes).filter(g => g.length > 1);
     if (!doublons.length) {
-        box.innerHTML = '<p style="color:#16a34a;font-weight:600;padding:.5rem;">✓ Aucun doublon détecté (aucun élève avec le même nom et prénom).</p>';
+        box.innerHTML = '<p style="color:var(--ok,#16a34a);font-weight:600;padding:.5rem;">✓ Aucun doublon détecté (aucun élève avec le même nom et prénom).</p>';
         return;
     }
     const blocs = doublons.map(g => {
@@ -716,13 +716,13 @@ function renderDoublons() {
             <td>${e.dateInscription ? new Date(e.dateInscription).toLocaleDateString('fr-FR') : '—'}</td>
             <td style="text-align:right;"><button class="btn btn-danger" style="padding:.2rem .5rem;font-size:.78rem;" onclick="dblSupprimer('${e.id}')">🗑️ Supprimer</button></td>
         </tr>`).join('');
-        return `<div style="border:1px solid #fecaca;border-radius:10px;padding:.75rem;margin-bottom:.75rem;background:#fff7f7;">
-            <p style="margin:0 0 .5rem;font-weight:700;color:#b91c1c;">⚠️ ${g.length} fiches : ${scEsc(g[0].nom)} ${scEsc(g[0].prenom)}</p>
+        return `<div style="border:1px solid #fecaca;border-radius:10px;padding:.75rem;margin-bottom:.75rem;background:var(--danger-bg,#fff7f7);">
+            <p style="margin:0 0 .5rem;font-weight:700;color:var(--danger-strong,#b91c1c);">⚠️ ${g.length} fiches : ${scEsc(g[0].nom)} ${scEsc(g[0].prenom)}</p>
             <table style="width:100%;"><thead><tr><th>Nom</th><th>Matricule</th><th>Classe</th><th>Naissance</th><th>Inscrit le</th><th></th></tr></thead><tbody>${lignes}</tbody></table>
         </div>`;
     }).join('');
-    box.innerHTML = `<p style="font-weight:600;color:#b91c1c;margin:0 0 .75rem;">${doublons.length} cas de doublon détecté(s) :</p>${blocs}
-        <p style="color:#64748b;font-size:.8rem;margin:.25rem 0 0;">Vérifiez chaque cas (un homonyme peut être un vrai cas différent). Supprimez uniquement les fiches réellement en double — la suppression retire aussi l'élève de la caisse.</p>`;
+    box.innerHTML = `<p style="font-weight:600;color:var(--danger-strong,#b91c1c);margin:0 0 .75rem;">${doublons.length} cas de doublon détecté(s) :</p>${blocs}
+        <p style="color:var(--muted,#64748b);font-size:.8rem;margin:.25rem 0 0;">Vérifiez chaque cas (un homonyme peut être un vrai cas différent). Supprimez uniquement les fiches réellement en double — la suppression retire aussi l'élève de la caisse.</p>`;
 }
 
 function dblSupprimer(id) {
@@ -767,14 +767,14 @@ function ficheEleve(id) {
     const fmt = n => (Math.round(n) || 0).toLocaleString('fr-FR') + ' FCFA';
     const complet = (typeof dosComplet === 'function') ? dosComplet(id) : true;
     const manq = (typeof dosManquantes === 'function') ? dosManquantes(id) : [];
-    const photo = e.photo ? `<img src="${e.photo}" alt="" style="width:96px;height:120px;object-fit:cover;border:1px solid #cbd5e1;border-radius:10px;">` : `<div style="width:96px;height:120px;border:1px solid #cbd5e1;border-radius:10px;background:#eef4fc;display:flex;align-items:center;justify-content:center;font-size:2rem;color:#94a3b8;">${scEsc(((e.nom||' ')[0]||'')+((e.prenom||' ')[0]||'')).toUpperCase()}</div>`;
-    const info = (lbl, val) => `<div style="margin-bottom:.4rem;"><span style="color:#64748b;font-size:.8rem;">${lbl}</span><br><strong>${val || '—'}</strong></div>`;
+    const photo = e.photo ? `<img src="${e.photo}" alt="" style="width:96px;height:120px;object-fit:cover;border:1px solid #cbd5e1;border-radius:10px;">` : `<div style="width:96px;height:120px;border:1px solid #cbd5e1;border-radius:10px;background:var(--surface-2,#eef4fc);display:flex;align-items:center;justify-content:center;font-size:2rem;color:var(--muted-2,#94a3b8);">${scEsc(((e.nom||' ')[0]||'')+((e.prenom||' ')[0]||'')).toUpperCase()}</div>`;
+    const info = (lbl, val) => `<div style="margin-bottom:.4rem;"><span style="color:var(--muted,#64748b);font-size:.8rem;">${lbl}</span><br><strong>${val || '—'}</strong></div>`;
     document.getElementById('ficheContent').innerHTML = `
         <div style="display:flex;gap:1.2rem;flex-wrap:wrap;">
             ${photo}
             <div style="flex:1;min-width:220px;">
                 <h2 style="margin:0 0 .2rem;font-size:1.3rem;">${scEsc(e.nom)} ${scEsc(e.prenom)}</h2>
-                <div style="font-family:monospace;color:#64748b;margin-bottom:.6rem;">${scEsc(e.matricule || '')}</div>
+                <div style="font-family:monospace;color:var(--muted,#64748b);margin-bottom:.6rem;">${scEsc(e.matricule || '')}</div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:.3rem 1rem;">
                     ${info('Classe', scEsc(e.classe))}
                     ${info('Statut', scEsc(e.statut))}
@@ -793,13 +793,13 @@ function ficheEleve(id) {
         </div>
         <div style="border-top:1px solid #e2e8f0;margin:1rem 0;padding-top:1rem;">
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin-bottom:1rem;">
-                <div style="background:#eef2ff;border-radius:10px;padding:.6rem .8rem;"><div style="color:#64748b;font-size:.78rem;">Scolarité due</div><strong style="font-size:1.05rem;">${fmt(fc.du)}</strong></div>
-                <div style="background:#dcfce7;border-radius:10px;padding:.6rem .8rem;"><div style="color:#166534;font-size:.78rem;">Payé</div><strong style="font-size:1.05rem;color:#166534;">${fmt(fc.paye)}</strong></div>
+                <div style="background:var(--brand-bg,#eef2ff);border-radius:10px;padding:.6rem .8rem;"><div style="color:var(--muted,#64748b);font-size:.78rem;">Scolarité due</div><strong style="font-size:1.05rem;">${fmt(fc.du)}</strong></div>
+                <div style="background:var(--ok-bg,#dcfce7);border-radius:10px;padding:.6rem .8rem;"><div style="color:var(--ok-strong,#166534);font-size:.78rem;">Payé</div><strong style="font-size:1.05rem;color:var(--ok-strong,#166534);">${fmt(fc.paye)}</strong></div>
                 <div style="background:${fc.reste > 0 ? '#fee2e2' : '#dcfce7'};border-radius:10px;padding:.6rem .8rem;"><div style="color:${fc.reste > 0 ? '#991b1b' : '#166534'};font-size:.78rem;">Reste à payer</div><strong style="font-size:1.05rem;color:${fc.reste > 0 ? '#b91c1c' : '#166534'};">${fmt(fc.reste)}</strong></div>
             </div>
             <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
-                <span style="color:#64748b;font-size:.85rem;">Dossier d'inscription :</span>
-                ${complet ? '<span style="background:#dcfce7;color:#166534;border-radius:999px;padding:2px 10px;font-weight:700;font-size:.8rem;">Complet</span>' : `<span style="background:#fee2e2;color:#991b1b;border-radius:999px;padding:2px 10px;font-weight:700;font-size:.8rem;">Incomplet</span> <span style="color:#b91c1c;font-size:.82rem;">manque : ${manq.map(scEsc).join(', ')}</span>`}
+                <span style="color:var(--muted,#64748b);font-size:.85rem;">Dossier d'inscription :</span>
+                ${complet ? '<span style="background:var(--ok-bg,#dcfce7);color:var(--ok-strong,#166534);border-radius:999px;padding:2px 10px;font-weight:700;font-size:.8rem;">Complet</span>' : `<span style="background:var(--danger-bg,#fee2e2);color:var(--danger-strong,#991b1b);border-radius:999px;padding:2px 10px;font-weight:700;font-size:.8rem;">Incomplet</span> <span style="color:var(--danger-strong,#b91c1c);font-size:.82rem;">manque : ${manq.map(scEsc).join(', ')}</span>`}
             </div>
         </div>
         <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.5rem;">
@@ -936,14 +936,14 @@ function renderPlan() {
     if (filtre) list = list.filter(a => a.periode === filtre);
     const tbody = document.getElementById('planTable');
     tbody.innerHTML = list.length === 0
-        ? '<tr><td colspan="6" style="text-align:center;padding:1.5rem;color:#64748b;">Aucune action. Définissez votre plan d\'action ci-dessus.</td></tr>'
+        ? '<tr><td colspan="6" style="text-align:center;padding:1.5rem;color:var(--muted,#64748b);">Aucune action. Définissez votre plan d\'action ci-dessus.</td></tr>'
         : list.map(a => {
             const col = a.statut === 'Réalisé' ? '#16a34a' : (a.statut === 'En cours' ? '#0ea5e9' : '#f59e0b');
             return `<tr>
                 <td>${scEsc(a.axe)}</td>
                 <td style="font-weight:600;">${scEsc(a.action)}</td>
                 <td>${scEsc(a.responsable)}</td>
-                <td>${scEsc(a.periode)}${a.echeance ? '<br><span style="color:#64748b;font-size:0.8rem;">' + new Date(a.echeance).toLocaleDateString('fr-FR') + '</span>' : ''}</td>
+                <td>${scEsc(a.periode)}${a.echeance ? '<br><span style="color:var(--muted,#64748b);font-size:0.8rem;">' + new Date(a.echeance).toLocaleDateString('fr-FR') + '</span>' : ''}</td>
                 <td><button class="btn" style="padding:0.25rem 0.6rem;font-size:0.8rem;background:${col};color:#fff;" onclick="togglePlanStatut('${a.id}')">${scEsc(a.statut)}</button></td>
                 <td style="text-align:right;white-space:nowrap;">
                     <button class="btn btn-secondary" style="padding:0.3rem 0.6rem;font-size:0.85rem;" onclick="editPlan('${a.id}')">✏️</button>
@@ -1007,7 +1007,7 @@ function renderConseilsM() {
     const tbody = document.getElementById('cmTable');
     const list = conseilsMaitres.slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
     tbody.innerHTML = list.length === 0
-        ? '<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:#64748b;">Aucun conseil de maîtres enregistré.</td></tr>'
+        ? '<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--muted,#64748b);">Aucun conseil de maîtres enregistré.</td></tr>'
         : list.map(c => `<tr>
             <td>${c.date ? new Date(c.date).toLocaleDateString('fr-FR') : '-'}</td>
             <td style="font-weight:600;">${scEsc(c.objet)}</td>
@@ -1041,7 +1041,7 @@ function genererPVMaitres(id) {
     const c = conseilsMaitres.find(x => x.id === id); if (!c) return;
     const ecole = getEcoleName();
     const html = `
-        <div style="font-family:Arial,sans-serif;max-width:780px;margin:0 auto;padding:2.5rem;color:#111;">
+        <div style="font-family:Arial,sans-serif;max-width:780px;margin:0 auto;padding:2.5rem;color:var(--ink,#111);">
             <div style="text-align:center;border-bottom:2px solid #333;padding-bottom:0.75rem;margin-bottom:1.5rem;"><h2 style="margin:0;text-transform:uppercase;">${scEsc(ecole)}</h2></div>
             <h1 style="text-align:center;font-size:1.3rem;letter-spacing:1px;margin:1rem 0;">PROCÈS-VERBAL — CONSEIL DES MAÎTRES</h1>
             <p style="margin:0.5rem 0;"><strong>Date :</strong> ${c.date ? new Date(c.date).toLocaleDateString('fr-FR') : ''}</p>
@@ -1070,7 +1070,7 @@ function renderExamens() {
     const tbody = document.getElementById('exTable');
     const list = examens.slice().sort((a, b) => (b.debut || '').localeCompare(a.debut || ''));
     tbody.innerHTML = list.length === 0
-        ? '<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:#64748b;">Aucune session d\'examen planifiée.</td></tr>'
+        ? '<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:var(--muted,#64748b);">Aucune session d\'examen planifiée.</td></tr>'
         : list.map(x => `<tr>
             <td style="font-weight:600;">${scEsc(x.intitule)}</td>
             <td>${scEsc(x.type)}</td>
@@ -1108,10 +1108,10 @@ function genererPlanningExamen(id) {
     const x = examens.find(e => e.id === id); if (!x) return;
     const ecole = getEcoleName();
     const html = `
-        <div style="font-family:Arial,sans-serif;max-width:780px;margin:0 auto;padding:2.5rem;color:#111;">
+        <div style="font-family:Arial,sans-serif;max-width:780px;margin:0 auto;padding:2.5rem;color:var(--ink,#111);">
             <div style="text-align:center;border-bottom:2px solid #333;padding-bottom:0.75rem;margin-bottom:1.5rem;"><h2 style="margin:0;text-transform:uppercase;">${scEsc(ecole)}</h2></div>
             <h1 style="text-align:center;font-size:1.3rem;letter-spacing:1px;margin:1rem 0 0.25rem;">${scEsc(x.intitule).toUpperCase()}</h1>
-            <p style="text-align:center;margin:0 0 1.5rem;color:#444;">${scEsc(x.type)} — ${scEsc(x.trimestre)}</p>
+            <p style="text-align:center;margin:0 0 1.5rem;color:var(--muted,#444);">${scEsc(x.type)} — ${scEsc(x.trimestre)}</p>
             <p style="margin:0.5rem 0;"><strong>Période :</strong> ${x.debut ? new Date(x.debut).toLocaleDateString('fr-FR') : '...'}${x.fin ? ' au ' + new Date(x.fin).toLocaleDateString('fr-FR') : ''}</p>
             <p style="margin:0.5rem 0;"><strong>Classes concernées :</strong> ${scEsc(x.classes) || '-'}</p>
             <p style="margin:0.5rem 0;"><strong>Responsable / Surveillance :</strong> ${scEsc(x.responsable) || '-'}</p>
@@ -1135,7 +1135,7 @@ function renderPreinscriptions() {
     const list = preinscriptions.slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
     document.getElementById('preCount').textContent = preinscriptions.length + ' demande(s) en attente';
     tbody.innerHTML = list.length === 0
-        ? '<tr><td colspan="6" style="text-align:center;padding:1.5rem;color:#64748b;">Aucune demande de pré-inscription.</td></tr>'
+        ? '<tr><td colspan="6" style="text-align:center;padding:1.5rem;color:var(--muted,#64748b);">Aucune demande de pré-inscription.</td></tr>'
         : list.map(p => `<tr>
             <td style="font-weight:600;">${scEsc(p.nom)} ${scEsc(p.prenom)}</td>
             <td>${scEsc(p.sexe || '-')}</td>
@@ -1234,7 +1234,7 @@ function renderCartes() {
         .sort((a, b) => (a.classe + a.nom).localeCompare(b.classe + b.nom));
     const tbody = document.getElementById('cartesTable');
     tbody.innerHTML = list.length === 0
-        ? '<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:#64748b;">Aucun élève. Enregistrez des élèves dans la section « Élèves ».</td></tr>'
+        ? '<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--muted,#64748b);">Aucun élève. Enregistrez des élèves dans la section « Élèves ».</td></tr>'
         : list.map(e => `<tr>
             <td style="font-weight:600;">${scEsc(e.nom)} ${scEsc(e.prenom)}</td>
             <td>${scEsc(e.matricule || '-')}</td>
@@ -1246,14 +1246,14 @@ function carteEleveHTML(e) {
     const ecole = getEcoleName();
     const annee = e.anneeScolaire || anneeScolaireCourante();
     return `
-    <div style="width:340px;height:215px;border:2px solid #2E2769;border-radius:12px;font-family:Arial,sans-serif;color:#111;display:inline-block;margin:8px;overflow:hidden;vertical-align:top;">
+    <div style="width:340px;height:215px;border:2px solid #2E2769;border-radius:12px;font-family:Arial,sans-serif;color:var(--ink,#111);display:inline-block;margin:8px;overflow:hidden;vertical-align:top;">
         <div style="background:#2E2769;color:#fff;padding:6px 10px;text-align:center;">
             <div style="font-size:0.62rem;letter-spacing:0.5px;">RÉPUBLIQUE DU CONGO &ndash; Unité, Travail, Progrès</div>
             <div style="font-weight:bold;font-size:0.82rem;text-transform:uppercase;line-height:1.1;">${scEsc(ecole)}</div>
             <div style="font-size:0.68rem;letter-spacing:2px;">CARTE SCOLAIRE</div>
         </div>
         <div style="display:flex;padding:8px 10px;gap:10px;">
-            <div style="width:74px;height:92px;border:1px solid #999;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#aaa;font-size:0.6rem;text-align:center;flex-shrink:0;overflow:hidden;">${e.photo ? `<img src="${e.photo}" alt="" style="width:100%;height:100%;object-fit:cover;">` : 'PHOTO'}</div>
+            <div style="width:74px;height:92px;border:1px solid #999;border-radius:4px;display:flex;align-items:center;justify-content:center;color:var(--muted-2,#aaa);font-size:0.6rem;text-align:center;flex-shrink:0;overflow:hidden;">${e.photo ? `<img src="${e.photo}" alt="" style="width:100%;height:100%;object-fit:cover;">` : 'PHOTO'}</div>
             <div style="font-size:0.74rem;line-height:1.5;">
                 <div><strong>${scEsc(e.nom)} ${scEsc(e.prenom)}</strong></div>
                 <div>Matricule : ${scEsc(e.matricule || '-')}</div>
@@ -1262,7 +1262,7 @@ function carteEleveHTML(e) {
                 <div>Année : ${scEsc(annee)}</div>
             </div>
         </div>
-        <div style="text-align:right;padding:0 10px;font-size:0.6rem;color:#555;">Le Directeur ____________</div>
+        <div style="text-align:right;padding:0 10px;font-size:0.6rem;color:var(--muted,#555);">Le Directeur ____________</div>
     </div>`;
 }
 function genererCarteEleve(id) {
@@ -1348,7 +1348,7 @@ function imprimerRapportEffectifs() {
         i++;
         return `<tr>
             <td style="border:1px solid #999;padding:4px 8px;text-align:center;">${i}</td>
-            <td style="border:1px solid #999;padding:4px 8px;">${scEsc(c.nom)}${estPrim(c) ? ' <span style=\'font-size:0.7rem;color:#0e7490;\'>(primaire)</span>' : ''}</td>
+            <td style="border:1px solid #999;padding:4px 8px;">${scEsc(c.nom)}${estPrim(c) ? ' <span style=\'font-size:0.7rem;color:var(--info,#0e7490);\'>(primaire)</span>' : ''}</td>
             <td style="border:1px solid #999;padding:4px 8px;text-align:center;">${cg}</td>
             <td style="border:1px solid #999;padding:4px 8px;text-align:center;">${cf}</td>
             <td style="border:1px solid #999;padding:4px 8px;text-align:center;font-weight:700;">${cg + cf}</td></tr>`;
@@ -1356,7 +1356,7 @@ function imprimerRapportEffectifs() {
     const annee = (eleves[0] && eleves[0].anneeScolaire) || (typeof anneeScolaireCourante === 'function' ? anneeScolaireCourante() : '');
     const w = window.open('', '_blank');
     w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Rapport des effectifs</title></head>
-        <body style="font-family:Arial,sans-serif;padding:1.8rem;color:#111;">
+        <body style="font-family:Arial,sans-serif;padding:1.8rem;color:var(--ink,#111);">
         <div style="text-align:center;border-bottom:2px solid #333;padding-bottom:0.8rem;margin-bottom:1rem;">
             <p style="margin:0;font-size:0.82rem;">RÉPUBLIQUE DU CONGO</p>
             <p style="margin:0;font-size:0.74rem;letter-spacing:1px;">Unité &ndash; Travail &ndash; Progrès</p>
@@ -1366,7 +1366,7 @@ function imprimerRapportEffectifs() {
         <h1 style="text-align:center;font-size:1.25rem;letter-spacing:1px;margin:0.6rem 0 0.2rem;">RAPPORT DES EFFECTIFS</h1>
         <p style="text-align:center;margin:0 0 1rem;font-size:0.9rem;">Année scolaire ${scEsc(annee)} &mdash; Édité le ${new Date().toLocaleDateString('fr-FR')}</p>
         <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
-            <thead><tr style="background:#eee;">
+            <thead><tr style="background:var(--surface-2,#eee);">
                 <th style="border:1px solid #999;padding:5px 8px;">N°</th>
                 <th style="border:1px solid #999;padding:5px 8px;text-align:left;">Classe</th>
                 <th style="border:1px solid #999;padding:5px 8px;">Garçons</th>
@@ -1375,7 +1375,7 @@ function imprimerRapportEffectifs() {
             </tr></thead>
             <tbody>
                 ${lignes || '<tr><td colspan="5" style="border:1px solid #999;padding:8px;text-align:center;">Aucun élève</td></tr>'}
-                <tr style="font-weight:700;background:#f3f4f6;">
+                <tr style="font-weight:700;background:var(--surface-2,#f3f4f6);">
                     <td colspan="2" style="border:1px solid #999;padding:5px 8px;text-align:right;">TOTAL GÉNÉRAL</td>
                     <td style="border:1px solid #999;padding:5px 8px;text-align:center;">${g}</td>
                     <td style="border:1px solid #999;padding:5px 8px;text-align:center;">${f}</td>

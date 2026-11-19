@@ -286,13 +286,13 @@ function renderDashboard() {
 function renderMatieres() {
     const tbody = document.getElementById('matieresTable');
     tbody.innerHTML = matieres.length === 0
-        ? '<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:#64748b;">Aucune matière. Ajoutez-en ci-dessus.</td></tr>'
+        ? '<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--muted,#64748b);">Aucune matière. Ajoutez-en ci-dessus.</td></tr>'
         : matieres.map(m => {
             const lbl = matiereNiveauLabel(m);
             const couleurs = { 'Primaire': ['#ecfeff', '#0e7490'], 'Collège': ['#eef2ff', '#4338ca'], 'Lycée': ['#f5f3ff', '#6d28d9'], 'Secondaire': ['#f1f5f9', '#475569'] };
             const cc = couleurs[lbl] || couleurs['Secondaire'];
             return `<tr>
-            <td style="font-weight:600;">${eEsc(m.nom)}${m.optionnel ? ' <span style="color:#94a3b8;font-size:0.78rem;">(option)</span>' : ''}${m.groupe ? `<br><span style="color:#94a3b8;font-size:0.74rem;">${eEsc(m.groupe)}</span>` : ''}</td>
+            <td style="font-weight:600;">${eEsc(m.nom)}${m.optionnel ? ' <span style="color:var(--muted-2,#94a3b8);font-size:0.78rem;">(option)</span>' : ''}${m.groupe ? `<br><span style="color:var(--muted-2,#94a3b8);font-size:0.74rem;">${eEsc(m.groupe)}</span>` : ''}</td>
             <td style="text-align:center;">${eEsc(m.coefficient)}</td>
             <td><span style="background:${cc[0]};color:${cc[1]};border-radius:999px;padding:0.15rem 0.6rem;font-size:0.78rem;">${lbl}</span></td>
             <td style="text-align:right;white-space:nowrap;">
@@ -436,13 +436,13 @@ function deleteMatiere(id) {
 function renderEnseignants() {
     const tbody = document.getElementById('enseignantsTable');
     tbody.innerHTML = enseignants.length === 0
-        ? '<tr><td colspan="8" style="text-align:center;padding:1.5rem;color:#64748b;">Aucun enseignant enregistré.</td></tr>'
+        ? '<tr><td colspan="8" style="text-align:center;padding:1.5rem;color:var(--muted,#64748b);">Aucun enseignant enregistré.</td></tr>'
         : enseignants.map(p => {
             const niv = p.niveau || 'Collège';
             const prim = niv === 'Primaire';
             const cls = p.classe || ((p.classes && p.classes.length) ? p.classes.join(', ') : '');
             return `<tr>
-            <td style="font-weight:600;"><span style="display:inline-flex;align-items:center;gap:0.5rem;">${p.photo ? `<img src="${p.photo}" alt="" style="width:32px;height:40px;object-fit:cover;border-radius:4px;border:1px solid #cbd5e1;">` : ''}<span>${eEsc(p.nom)} ${eEsc(p.prenom)}${p.adresse ? `<br><span style="font-weight:400;color:#64748b;font-size:0.78rem;">${eEsc(p.adresse)}</span>` : ''}</span></span></td>
+            <td style="font-weight:600;"><span style="display:inline-flex;align-items:center;gap:0.5rem;">${p.photo ? `<img src="${p.photo}" alt="" style="width:32px;height:40px;object-fit:cover;border-radius:4px;border:1px solid #cbd5e1;">` : ''}<span>${eEsc(p.nom)} ${eEsc(p.prenom)}${p.adresse ? `<br><span style="font-weight:400;color:var(--muted,#64748b);font-size:0.78rem;">${eEsc(p.adresse)}</span>` : ''}</span></span></td>
             <td><span style="background:${prim ? '#ecfeff' : '#eef2ff'};color:${prim ? '#0e7490' : '#4338ca'};border-radius:999px;padding:0.15rem 0.6rem;font-size:0.78rem;">${eEsc(niv)}</span></td>
             <td>${eEsc(cls) || '-'}</td>
             <td>${eEsc(p.matiere)}</td>
@@ -559,25 +559,25 @@ function renderNotesControls() {
     if (!c.dataset.init) { c.innerHTML = classeOptions(''); c.dataset.init = '1'; }
     const t = document.getElementById('notesTrimestre');
     if (!t.innerHTML) t.innerHTML = trimestreOptions(TRIMESTRES[0]);
-    document.getElementById('notesGrid').innerHTML = '<p style="color:#64748b;padding:1rem;">Choisissez une classe et un trimestre, puis cliquez sur « Charger ».</p>';
+    document.getElementById('notesGrid').innerHTML = '<p style="color:var(--muted,#64748b);padding:1rem;">Choisissez une classe et un trimestre, puis cliquez sur « Charger ».</p>';
 }
 function chargerNotes() {
     const classe = document.getElementById('notesClasse').value;
     const trim = document.getElementById('notesTrimestre').value;
     const grid = document.getElementById('notesGrid');
-    if (!classe) { grid.innerHTML = '<p style="color:#dc3545;padding:1rem;">Sélectionnez une classe.</p>'; return; }
+    if (!classe) { grid.innerHTML = '<p style="color:var(--danger,#dc3545);padding:1rem;">Sélectionnez une classe.</p>'; return; }
     const cy = classeCycleNom(classe);
     const mats = matieresPourClasse(classe);
-    if (!mats.length) { grid.innerHTML = `<p style="color:#dc3545;padding:1rem;">${cy === 'primaire' ? 'Aucune matière du primaire. Allez dans l\'onglet « Matières » et cliquez sur « Charger les matières du primaire ».' : 'Ajoutez d\'abord des matières (onglet Matières).'}</p>`; return; }
+    if (!mats.length) { grid.innerHTML = `<p style="color:var(--danger,#dc3545);padding:1rem;">${cy === 'primaire' ? 'Aucune matière du primaire. Allez dans l\'onglet « Matières » et cliquez sur « Charger les matières du primaire ».' : 'Ajoutez d\'abord des matières (onglet Matières).'}</p>`; return; }
     const list = eleves.filter(e => e.classe === classe);
-    if (!list.length) { grid.innerHTML = '<p style="color:#dc3545;padding:1rem;">Aucun élève dans cette classe.</p>'; return; }
+    if (!list.length) { grid.innerHTML = '<p style="color:var(--danger,#dc3545);padding:1rem;">Aucun élève dans cette classe.</p>'; return; }
     if (cy === 'primaire') {
         grid.innerHTML = `
-            <p style="color:#64748b;font-size:0.82rem;margin:0 0 0.5rem;">Classe du <strong>primaire</strong> : une note <strong>sur 10</strong> par discipline.</p>
+            <p style="color:var(--muted,#64748b);font-size:0.82rem;margin:0 0 0.5rem;">Classe du <strong>primaire</strong> : une note <strong>sur 10</strong> par discipline.</p>
             <div style="overflow-x:auto;"><table>
-                <thead><tr><th style="position:sticky;left:0;background:#f8fafc;">Élève</th>${mats.map(m => `<th style="text-align:center;min-width:74px;">${eEsc(m.nom)}<br><span style="font-weight:400;color:#94a3b8;font-size:0.72rem;">coef ${eEsc(m.coefficient)} · /10</span></th>`).join('')}</tr></thead>
+                <thead><tr><th style="position:sticky;left:0;background:var(--surface-2,#f8fafc);">Élève</th>${mats.map(m => `<th style="text-align:center;min-width:74px;">${eEsc(m.nom)}<br><span style="font-weight:400;color:var(--muted-2,#94a3b8);font-size:0.72rem;">coef ${eEsc(m.coefficient)} · /10</span></th>`).join('')}</tr></thead>
                 <tbody>${list.map(e => `<tr>
-                    <td style="font-weight:600;position:sticky;left:0;background:#fff;white-space:nowrap;">${eEsc(e.nom)} ${eEsc(e.prenom)}</td>
+                    <td style="font-weight:600;position:sticky;left:0;background:var(--surface,#fff);white-space:nowrap;">${eEsc(e.nom)} ${eEsc(e.prenom)}</td>
                     ${mats.map(m => {
                         const v = noteVal(notes[`${e.id}|${m.id}|${trim}`]);
                         return `<td style="text-align:center;"><input type="number" min="0" max="10" step="0.25" value="${v === null ? '' : v}" id="note_p_${e.id}_${m.id}" style="width:58px;margin:0;padding:0.3rem 0.15rem;text-align:center;"></td>`;
@@ -587,11 +587,11 @@ function chargerNotes() {
         return;
     }
     grid.innerHTML = `
-        <p style="color:#64748b;font-size:0.82rem;margin:0 0 0.5rem;">Chaque matière : <strong>D</strong> = devoir, <strong>C</strong> = composition. La note du trimestre est la moyenne des deux (ou la seule saisie).</p>
+        <p style="color:var(--muted,#64748b);font-size:0.82rem;margin:0 0 0.5rem;">Chaque matière : <strong>D</strong> = devoir, <strong>C</strong> = composition. La note du trimestre est la moyenne des deux (ou la seule saisie).</p>
         <div style="overflow-x:auto;"><table>
-            <thead><tr><th style="position:sticky;left:0;background:#f8fafc;">Élève</th>${mats.map(m => `<th style="text-align:center;min-width:96px;" title="Coef ${eAttr(m.coefficient)}">${eEsc(m.nom)}<br><span style="font-weight:400;color:#94a3b8;font-size:0.72rem;">coef ${eEsc(m.coefficient)} · D | C</span></th>`).join('')}</tr></thead>
+            <thead><tr><th style="position:sticky;left:0;background:var(--surface-2,#f8fafc);">Élève</th>${mats.map(m => `<th style="text-align:center;min-width:96px;" title="Coef ${eAttr(m.coefficient)}">${eEsc(m.nom)}<br><span style="font-weight:400;color:var(--muted-2,#94a3b8);font-size:0.72rem;">coef ${eEsc(m.coefficient)} · D | C</span></th>`).join('')}</tr></thead>
             <tbody>${list.map(e => `<tr>
-                <td style="font-weight:600;position:sticky;left:0;background:#fff;white-space:nowrap;">${eEsc(e.nom)} ${eEsc(e.prenom)}</td>
+                <td style="font-weight:600;position:sticky;left:0;background:var(--surface,#fff);white-space:nowrap;">${eEsc(e.nom)} ${eEsc(e.prenom)}</td>
                 ${mats.map(m => {
                     const raw = notes[`${e.id}|${m.id}|${trim}`];
                     let dv = '', cv = '';
@@ -624,7 +624,7 @@ function afficherHistoriqueNotes() {
     if (box.style.display === 'block') { box.style.display = 'none'; return; }
     box.style.display = 'block';
     box.innerHTML = notesHisto.length === 0
-        ? '<p style="color:#64748b;padding:0.75rem;">Aucune modification de note enregistrée pour le moment.</p>'
+        ? '<p style="color:var(--muted,#64748b);padding:0.75rem;">Aucune modification de note enregistrée pour le moment.</p>'
         : `<div style="overflow:auto;max-height:340px;"><table>
             <thead><tr><th>Date</th><th>Élève</th><th>Matière</th><th>Trim.</th><th style="text-align:center;">Ancienne</th><th style="text-align:center;">Nouvelle</th><th>Saisi par</th></tr></thead>
             <tbody>${notesHisto.slice(0, 200).map(h => `<tr>
@@ -632,7 +632,7 @@ function afficherHistoriqueNotes() {
                 <td>${eEsc(h.eleve)}</td><td>${eEsc(h.matiere)}</td><td>${eEsc(h.trimestre)}</td>
                 <td style="text-align:center;">${eEsc(String(h.ancienne))}</td>
                 <td style="text-align:center;font-weight:700;">${eEsc(String(h.nouvelle))}</td>
-                <td style="font-size:0.82rem;color:#475569;">${eEsc(h.par || 'Direction')}</td>
+                <td style="font-size:0.82rem;color:var(--muted,#475569);">${eEsc(h.par || 'Direction')}</td>
             </tr>`).join('')}</tbody></table></div>`;
 }
 function saveNotes() {
@@ -686,9 +686,9 @@ function renderBulletinsList() {
     const classe = document.getElementById('bulClasse').value;
     const trim = document.getElementById('bulTrimestre').value;
     const box = document.getElementById('bulletinsContent');
-    if (!classe) { box.innerHTML = '<p style="color:#64748b;padding:1rem;">Choisissez une classe.</p>'; return; }
+    if (!classe) { box.innerHTML = '<p style="color:var(--muted,#64748b);padding:1rem;">Choisissez une classe.</p>'; return; }
     const list = eleves.filter(e => e.classe === classe);
-    if (!list.length) { box.innerHTML = '<p style="color:#64748b;padding:1rem;">Aucun élève dans cette classe.</p>'; return; }
+    if (!list.length) { box.innerHTML = '<p style="color:var(--muted,#64748b);padding:1rem;">Aucun élève dans cette classe.</p>'; return; }
     const { rang, effectif } = classementClasse(classe, trim);
     const scale = scaleForClasse(classe);
     const rows = list.map(e => ({ e, moy: moyenneEleve(e.id, trim) }))
@@ -736,7 +736,7 @@ function bulletinHTML(eleveId, trim) {
         </tr>`;
     }).join('');
     return `
-        <div style="font-family:Arial,sans-serif;max-width:820px;margin:0 auto;padding:1.5rem;color:#111;">
+        <div style="font-family:Arial,sans-serif;max-width:820px;margin:0 auto;padding:1.5rem;color:var(--ink,#111);">
             <div style="text-align:center;border-bottom:2px solid #333;padding-bottom:0.6rem;margin-bottom:0.8rem;">
                 <p style="margin:0;font-size:0.8rem;">RÉPUBLIQUE DU CONGO</p>
                 <p style="margin:0;font-size:0.72rem;letter-spacing:1px;">Unité &ndash; Travail &ndash; Progrès</p>
@@ -749,7 +749,7 @@ function bulletinHTML(eleveId, trim) {
                 <tr><td><strong>Matricule :</strong> ${eEsc(e.matricule || '-')}</td><td><strong>Année scolaire :</strong> ${eEsc(e.anneeScolaire || anneeScolaireCourante())}</td></tr>
             </table>
             <table style="width:100%;border-collapse:collapse;font-size:0.88rem;">
-                <thead><tr style="background:#eee;">
+                <thead><tr style="background:var(--surface-2,#eee);">
                     <th style="border:1px solid #999;padding:4px 6px;text-align:left;">Matière</th>
                     <th style="border:1px solid #999;padding:4px 6px;">Note /20</th>
                     <th style="border:1px solid #999;padding:4px 6px;">Coef</th>
@@ -757,7 +757,7 @@ function bulletinHTML(eleveId, trim) {
                     <th style="border:1px solid #999;padding:4px 6px;text-align:left;">Appréciation</th>
                 </tr></thead>
                 <tbody>${lignes || '<tr><td colspan="5" style="border:1px solid #999;padding:8px;text-align:center;">Aucune matière</td></tr>'}</tbody>
-                <tfoot><tr style="background:#f5f5f5;font-weight:bold;">
+                <tfoot><tr style="background:var(--surface-2,#f5f5f5);font-weight:bold;">
                     <td style="border:1px solid #999;padding:4px 6px;">TOTAUX</td>
                     <td style="border:1px solid #999;"></td>
                     <td style="border:1px solid #999;padding:4px 6px;text-align:center;">${totalCoef}</td>
@@ -806,13 +806,13 @@ function bulletinPrimaireHTML(eleveId, trim) {
     PRIM_GROUPES.forEach(g => {
         const ms = mats.filter(m => (m.groupe || '') === g);
         if (!ms.length) return;
-        corps += `<tr><td colspan="5" style="border:1px solid #999;padding:3px 6px;font-weight:bold;background:#eef2f7;">${eEsc(g)}</td></tr>`;
+        corps += `<tr><td colspan="5" style="border:1px solid #999;padding:3px 6px;font-weight:bold;background:var(--surface-2,#eef2f7);">${eEsc(g)}</td></tr>`;
         ms.forEach(m => {
             const c = parseFloat(m.coefficient) || 1;
             const note = noteMatiere(eleveId, m.id, trim);
             if (note !== null) { totalPoints += note * c; totalCoef += c; }
             corps += `<tr>
-                <td style="border:1px solid #999;padding:3px 6px;">${eEsc(m.nom)}${m.optionnel ? ' <span style="color:#777;font-size:0.85em;">(option)</span>' : ''}</td>
+                <td style="border:1px solid #999;padding:3px 6px;">${eEsc(m.nom)}${m.optionnel ? ' <span style="color:var(--muted,#777);font-size:0.85em;">(option)</span>' : ''}</td>
                 <td style="border:1px solid #999;padding:3px 6px;text-align:center;">${note !== null ? note.toFixed(2) : '-'}</td>
                 <td style="border:1px solid #999;padding:3px 6px;text-align:center;">${c}</td>
                 <td style="border:1px solid #999;padding:3px 6px;text-align:center;">${note !== null ? (note * c).toFixed(2) : '-'}</td>
@@ -839,7 +839,7 @@ function bulletinPrimaireHTML(eleveId, trim) {
     const estCM2 = (e.classe || '').toUpperCase().indexOf('CM2') >= 0;
     const decision = appr.decision || '';
     return `
-        <div style="font-family:Arial,sans-serif;max-width:820px;margin:0 auto;padding:1.4rem;color:#111;">
+        <div style="font-family:Arial,sans-serif;max-width:820px;margin:0 auto;padding:1.4rem;color:var(--ink,#111);">
             <div style="text-align:center;border-bottom:2px solid #333;padding-bottom:0.5rem;margin-bottom:0.7rem;">
                 <p style="margin:0;font-size:0.8rem;">RÉPUBLIQUE DU CONGO</p>
                 <p style="margin:0;font-size:0.72rem;letter-spacing:1px;">Unité &ndash; Travail &ndash; Progrès</p>
@@ -853,7 +853,7 @@ function bulletinPrimaireHTML(eleveId, trim) {
                 <tr><td><strong>Matricule :</strong> ${eEsc(e.matricule || '-')}</td><td><strong>Année scolaire :</strong> ${eEsc(e.anneeScolaire || anneeScolaireCourante())}</td></tr>
             </table>
             <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
-                <thead><tr style="background:#eee;">
+                <thead><tr style="background:var(--surface-2,#eee);">
                     <th style="border:1px solid #999;padding:3px 6px;text-align:left;">Disciplines</th>
                     <th style="border:1px solid #999;padding:3px 6px;">Note /10</th>
                     <th style="border:1px solid #999;padding:3px 6px;">Coef.</th>
@@ -861,7 +861,7 @@ function bulletinPrimaireHTML(eleveId, trim) {
                     <th style="border:1px solid #999;padding:3px 6px;text-align:left;">Appréciation</th>
                 </tr></thead>
                 <tbody>${corps || '<tr><td colspan="5" style="border:1px solid #999;padding:8px;text-align:center;">Aucune discipline</td></tr>'}</tbody>
-                <tfoot><tr style="background:#f5f5f5;font-weight:bold;">
+                <tfoot><tr style="background:var(--surface-2,#f5f5f5);font-weight:bold;">
                     <td style="border:1px solid #999;padding:3px 6px;">TOTAUX</td>
                     <td style="border:1px solid #999;"></td>
                     <td style="border:1px solid #999;padding:3px 6px;text-align:center;">${totalCoef}</td>
@@ -887,7 +887,7 @@ function bulletinPrimaireHTML(eleveId, trim) {
             <div style="margin-top:0.7rem;border:1px solid #999;padding:6px;min-height:42px;font-size:0.88rem;">
                 <strong>Observation du maître :</strong> ${eEsc(appr.appreciation) || ''}
             </div>
-            ${estCM2 ? '<p style="margin:0.5rem 0 0;font-size:0.8rem;color:#444;"><strong>Fin du cycle primaire :</strong> Certificat d\'Études Primaires Élémentaires (CEPE) et concours d\'entrée en 6e.</p>' : ''}
+            ${estCM2 ? '<p style="margin:0.5rem 0 0;font-size:0.8rem;color:var(--muted,#444);"><strong>Fin du cycle primaire :</strong> Certificat d\'Études Primaires Élémentaires (CEPE) et concours d\'entrée en 6e.</p>' : ''}
             <div style="margin-top:1.2rem;display:flex;justify-content:space-between;font-size:0.85rem;text-align:center;">
                 <div><strong>Le Maître / La Maîtresse</strong><div style="height:46px;"></div></div>
                 <div><strong>Le Directeur (visa)</strong><div style="height:46px;"></div></div>
@@ -936,16 +936,16 @@ function genererTableauHonneur() {
         <td style="border:1px solid #999;padding:5px;text-align:center;font-weight:bold;">${r.moy.toFixed(2)}/20</td>
         <td style="border:1px solid #999;padding:5px;">${mentionFor(r.moy).label}</td>
     </tr>`).join('');
-    const html = `<div style="font-family:Arial,sans-serif;max-width:760px;margin:0 auto;padding:2rem;color:#111;">
+    const html = `<div style="font-family:Arial,sans-serif;max-width:760px;margin:0 auto;padding:2rem;color:var(--ink,#111);">
         <div style="text-align:center;border-bottom:2px solid #333;padding-bottom:0.6rem;margin-bottom:1rem;">
             <p style="margin:0;font-size:0.78rem;">RÉPUBLIQUE DU CONGO &ndash; Unité, Travail, Progrès</p>
             <h2 style="margin:0.3rem 0 0;text-transform:uppercase;">${eEsc(ecole)}</h2>
         </div>
         <h1 style="text-align:center;font-size:1.4rem;letter-spacing:2px;margin:1rem 0 0.25rem;">TABLEAU D'HONNEUR</h1>
-        <p style="text-align:center;margin:0 0 1.5rem;color:#444;">Classe de ${eEsc(classe)} &mdash; ${eEsc(trim)}</p>
+        <p style="text-align:center;margin:0 0 1.5rem;color:var(--muted,#444);">Classe de ${eEsc(classe)} &mdash; ${eEsc(trim)}</p>
         ${list.length ? `<table style="width:100%;border-collapse:collapse;font-size:0.95rem;">
-            <thead><tr style="background:#eee;"><th style="border:1px solid #999;padding:5px;">Rang</th><th style="border:1px solid #999;padding:5px;text-align:left;">Nom et prénom</th><th style="border:1px solid #999;padding:5px;">Moyenne</th><th style="border:1px solid #999;padding:5px;text-align:left;">Mention</th></tr></thead>
-            <tbody>${lignes}</tbody></table>` : '<p style="text-align:center;color:#666;">Aucun élève admis (moyenne &ge; 10) pour ce trimestre.</p>'}
+            <thead><tr style="background:var(--surface-2,#eee);"><th style="border:1px solid #999;padding:5px;">Rang</th><th style="border:1px solid #999;padding:5px;text-align:left;">Nom et prénom</th><th style="border:1px solid #999;padding:5px;">Moyenne</th><th style="border:1px solid #999;padding:5px;text-align:left;">Mention</th></tr></thead>
+            <tbody>${lignes}</tbody></table>` : '<p style="text-align:center;color:var(--muted,#666);">Aucun élève admis (moyenne &ge; 10) pour ce trimestre.</p>'}
         <div style="margin-top:2.5rem;text-align:right;"><strong>Le Directeur des études</strong><div style="height:55px;"></div>(Signature et cachet)</div>
     </div>`;
     const w = window.open('', '_blank');
@@ -982,7 +982,7 @@ function bulletinAnnuelHTML(eleveId) {
         </tr>`;
     }).join('');
     return `
-        <div style="font-family:Arial,sans-serif;max-width:820px;margin:0 auto;padding:1.5rem;color:#111;">
+        <div style="font-family:Arial,sans-serif;max-width:820px;margin:0 auto;padding:1.5rem;color:var(--ink,#111);">
             <div style="text-align:center;border-bottom:2px solid #333;padding-bottom:0.6rem;margin-bottom:0.8rem;">
                 <p style="margin:0;font-size:0.8rem;">RÉPUBLIQUE DU CONGO</p>
                 <p style="margin:0;font-size:0.72rem;letter-spacing:1px;">Unité &ndash; Travail &ndash; Progrès</p>
@@ -995,7 +995,7 @@ function bulletinAnnuelHTML(eleveId) {
                 <tr><td><strong>Matricule :</strong> ${eEsc(e.matricule || '-')}</td><td><strong>Effectif :</strong> ${effectif}</td></tr>
             </table>
             <table style="width:100%;border-collapse:collapse;font-size:0.88rem;">
-                <thead><tr style="background:#eee;">
+                <thead><tr style="background:var(--surface-2,#eee);">
                     <th style="border:1px solid #999;padding:4px 6px;text-align:left;">Matière</th>
                     <th style="border:1px solid #999;padding:4px 6px;">1er Trim.</th>
                     <th style="border:1px solid #999;padding:4px 6px;">2e Trim.</th>
@@ -1004,7 +1004,7 @@ function bulletinAnnuelHTML(eleveId) {
                     <th style="border:1px solid #999;padding:4px 6px;">Coef</th>
                 </tr></thead>
                 <tbody>${lignes || '<tr><td colspan="6" style="border:1px solid #999;padding:8px;text-align:center;">Aucune matière</td></tr>'}</tbody>
-                <tfoot><tr style="background:#f5f5f5;font-weight:bold;">
+                <tfoot><tr style="background:var(--surface-2,#f5f5f5);font-weight:bold;">
                     <td style="border:1px solid #999;padding:4px 6px;" colspan="4">TOTAUX</td>
                     <td style="border:1px solid #999;padding:4px 6px;text-align:center;">${totalPoints.toFixed(2)} pts</td>
                     <td style="border:1px solid #999;padding:4px 6px;text-align:center;">${totalCoef}</td>
@@ -1081,12 +1081,12 @@ function saveAppreciation() {
 function renderEdtControls() {
     const c = document.getElementById('edtClasse');
     if (!c.dataset.init) { c.innerHTML = classeOptions(''); c.dataset.init = '1'; }
-    document.getElementById('edtGrid').innerHTML = '<p style="color:#64748b;padding:1rem;">Choisissez une classe puis cliquez sur « Charger ».</p>';
+    document.getElementById('edtGrid').innerHTML = '<p style="color:var(--muted,#64748b);padding:1rem;">Choisissez une classe puis cliquez sur « Charger ».</p>';
 }
 function chargerEdt() {
     const classe = document.getElementById('edtClasse').value;
     const grid = document.getElementById('edtGrid');
-    if (!classe) { grid.innerHTML = '<p style="color:#dc3545;padding:1rem;">Sélectionnez une classe.</p>'; return; }
+    if (!classe) { grid.innerHTML = '<p style="color:var(--danger,#dc3545);padding:1rem;">Sélectionnez une classe.</p>'; return; }
     const data = edt[classe] || {};
     const matOpts = sel => '<option value="">—</option>' + matieres.map(m => `<option value="${eAttr(m.nom)}" ${sel === m.nom ? 'selected' : ''}>${eEsc(m.nom)}</option>`).join('');
     grid.innerHTML = `
@@ -1141,7 +1141,7 @@ function renderEtuReporting() {
 
     const top = elevesMoy.slice().sort((a, b) => b.moy - a.moy).slice(0, 10);
     document.getElementById('repEtuTop').innerHTML = top.length === 0
-        ? '<p style="color:#64748b;padding:1rem;">Aucune note saisie pour ce trimestre.</p>'
+        ? '<p style="color:var(--muted,#64748b);padding:1rem;">Aucune note saisie pour ce trimestre.</p>'
         : `<table><thead><tr><th>Rang</th><th>Nom et prénom</th><th>Classe</th><th style="text-align:right;">Moyenne</th></tr></thead><tbody>
         ${top.map((x, i) => `<tr><td style="text-align:center;font-weight:600;">${i + 1}</td><td style="font-weight:600;">${eEsc(x.e.nom)} ${eEsc(x.e.prenom)}</td><td>${eEsc(x.e.classe)}</td><td style="text-align:right;font-weight:600;color:${mentionFor(x.moy).color};">${fmtMoy(x.moy)}</td></tr>`).join('')}
         </tbody></table>`;
@@ -1204,9 +1204,9 @@ function renderPassage() {
     const box = document.getElementById('passageBox');
     if (!box) return;
     const classe = sel ? sel.value : '';
-    if (!classe) { box.innerHTML = '<p style="color:#64748b;padding:0.5rem;">Choisissez une classe pour voir les décisions de passage.</p>'; return; }
+    if (!classe) { box.innerHTML = '<p style="color:var(--muted,#64748b);padding:0.5rem;">Choisissez une classe pour voir les décisions de passage.</p>'; return; }
     const liste = eleves.filter(e => e.classe === classe).slice().sort((a, b) => (`${a.nom} ${a.prenom}`).localeCompare(`${b.nom} ${b.prenom}`));
-    if (!liste.length) { box.innerHTML = '<p style="color:#64748b;padding:0.5rem;">Aucun élève dans cette classe.</p>'; return; }
+    if (!liste.length) { box.innerHTML = '<p style="color:var(--muted,#64748b);padding:0.5rem;">Aucun élève dans cette classe.</p>'; return; }
     const suiv = prochaineClasse(classe);
     const optClasses = (selVal) => '<option value="">— (rester / non défini) —</option>' + classes.map(c => `<option value="${eAttr(c.nom)}" ${c.nom === selVal ? 'selected' : ''}>${eEsc(c.nom)}</option>`).join('');
     const decisionsSel = ['Admis(e) en classe supérieure', 'Redouble la classe', 'Exclu(e)', 'Réorienté(e)'];
@@ -1218,8 +1218,8 @@ function renderPassage() {
         const cibleDefaut = estAdmis ? (suiv || '') : classe; // admis → classe sup ; sinon même classe
         return `<tr>
             <td style="font-weight:600;">${eEsc(e.nom)} ${eEsc(e.prenom)}</td>
-            <td style="text-align:center;font-weight:700;">${d.moy !== null ? d.moy.toFixed(2) : '<span style="color:#94a3b8;">—</span>'}</td>
-            <td style="text-align:center;color:#64748b;font-size:0.82rem;">≥ ${d.seuil}</td>
+            <td style="text-align:center;font-weight:700;">${d.moy !== null ? d.moy.toFixed(2) : '<span style="color:var(--muted-2,#94a3b8);">—</span>'}</td>
+            <td style="text-align:center;color:var(--muted,#64748b);font-size:0.82rem;">≥ ${d.seuil}</td>
             <td>
                 <select id="pass_dec_${e.id}" onchange="passSyncCible('${e.id}','${eAttr(suiv)}','${eAttr(classe)}')" style="margin:0;min-width:210px;">
                     ${decisionsSel.map(x => `<option value="${eAttr(x)}" ${x === d.decision ? 'selected' : ''}>${eEsc(x)}</option>`).join('')}
@@ -1230,15 +1230,15 @@ function renderPassage() {
     }).join('');
     box.innerHTML = `
         <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:0.75rem;">
-            <span style="background:#dcfce7;color:#166534;border-radius:999px;padding:0.2rem 0.7rem;font-size:0.85rem;">Admis proposés : <strong>${nbAdmis}</strong></span>
-            <span style="background:#fee2e2;color:#991b1b;border-radius:999px;padding:0.2rem 0.7rem;font-size:0.85rem;">Redoublants proposés : <strong>${nbRed}</strong></span>
-            <span style="background:#eef2ff;color:#4338ca;border-radius:999px;padding:0.2rem 0.7rem;font-size:0.85rem;">Classe supérieure suggérée : <strong>${suiv ? eEsc(suiv) : 'à définir'}</strong></span>
+            <span style="background:var(--ok-bg,#dcfce7);color:var(--ok-strong,#166534);border-radius:999px;padding:0.2rem 0.7rem;font-size:0.85rem;">Admis proposés : <strong>${nbAdmis}</strong></span>
+            <span style="background:var(--danger-bg,#fee2e2);color:var(--danger-strong,#991b1b);border-radius:999px;padding:0.2rem 0.7rem;font-size:0.85rem;">Redoublants proposés : <strong>${nbRed}</strong></span>
+            <span style="background:var(--brand-bg,#eef2ff);color:var(--brand-strong,#4338ca);border-radius:999px;padding:0.2rem 0.7rem;font-size:0.85rem;">Classe supérieure suggérée : <strong>${suiv ? eEsc(suiv) : 'à définir'}</strong></span>
         </div>
         <table>
             <thead><tr><th>Élève</th><th style="text-align:center;">Moy. annuelle</th><th style="text-align:center;">Seuil</th><th>Décision</th><th>Classe d'arrivée</th></tr></thead>
             <tbody>${lignes}</tbody>
         </table>
-        <p style="color:#64748b;font-size:0.8rem;margin:0.75rem 0 0;">💡 « Classe d'arrivée » s'applique aux admis. Pour un redoublant, laissez sa classe actuelle. Vérifiez bien avant d'appliquer (action sur le registre des élèves).</p>`;
+        <p style="color:var(--muted,#64748b);font-size:0.8rem;margin:0.75rem 0 0;">💡 « Classe d'arrivée » s'applique aux admis. Pour un redoublant, laissez sa classe actuelle. Vérifiez bien avant d'appliquer (action sur le registre des élèves).</p>`;
 }
 
 function passSyncCible(id, suiv, classe) {
@@ -1332,7 +1332,7 @@ function renderArchives() {
     const arch = arRead();
     const annees = Object.keys(arch).sort().reverse();
     if (annees.length === 0) {
-        box.innerHTML = '<p style="color:#64748b;padding:0.5rem;">Aucune année archivée pour le moment. Archivez l\'année en cours avant le passage de classe.</p>';
+        box.innerHTML = '<p style="color:var(--muted,#64748b);padding:0.5rem;">Aucune année archivée pour le moment. Archivez l\'année en cours avant le passage de classe.</p>';
         return;
     }
     const lignes = annees.map(an => {
@@ -1357,7 +1357,7 @@ function renderArchives() {
             <thead><tr><th>Année scolaire</th><th>Archivée le</th><th style="text-align:center;">Élèves</th><th style="text-align:center;">Classes</th><th style="text-align:right;">Actions</th></tr></thead>
             <tbody>${lignes}</tbody>
         </table>
-        <p style="color:#64748b;font-size:0.8rem;margin:0.75rem 0 0;">📄 Rapport = effectifs + résultats de fin d'année (imprimable). ⬇️ JSON = fichier de sauvegarde à conserver hors de l'ordinateur.</p>`;
+        <p style="color:var(--muted,#64748b);font-size:0.8rem;margin:0.75rem 0 0;">📄 Rapport = effectifs + résultats de fin d'année (imprimable). ⬇️ JSON = fichier de sauvegarde à conserver hors de l'ordinateur.</p>`;
 }
 
 function telechargerArchive(annee) {
@@ -1411,7 +1411,7 @@ function rapportArchive(annee) {
                 return `<tr><td style="border:1px solid #999;padding:3px 7px;">${eEsc(e.nom)} ${eEsc(e.prenom)}</td><td style="border:1px solid #999;padding:3px 7px;text-align:center;">${d.moy !== null ? d.moy.toFixed(2) : '—'}</td><td style="border:1px solid #999;padding:3px 7px;">${eEsc(decision)}</td></tr>`;
             }).join('');
             resBlocks += `<h3 style="margin:1rem 0 0.3rem;font-size:1rem;">Classe : ${eEsc(c.nom)}</h3>
-                <table style="width:100%;border-collapse:collapse;font-size:0.85rem;"><thead><tr style="background:#eee;"><th style="border:1px solid #999;padding:3px 7px;text-align:left;">Élève</th><th style="border:1px solid #999;padding:3px 7px;">Moy. annuelle</th><th style="border:1px solid #999;padding:3px 7px;text-align:left;">Décision</th></tr></thead><tbody>${rows}</tbody></table>`;
+                <table style="width:100%;border-collapse:collapse;font-size:0.85rem;"><thead><tr style="background:var(--surface-2,#eee);"><th style="border:1px solid #999;padding:3px 7px;text-align:left;">Élève</th><th style="border:1px solid #999;padding:3px 7px;">Moy. annuelle</th><th style="border:1px solid #999;padding:3px 7px;text-align:left;">Décision</th></tr></thead><tbody>${rows}</tbody></table>`;
         });
         html = `<div style="text-align:center;border-bottom:2px solid #333;padding-bottom:0.6rem;margin-bottom:1rem;">
                 <p style="margin:0;font-size:0.8rem;">RÉPUBLIQUE DU CONGO — Unité · Travail · Progrès</p>
@@ -1420,8 +1420,8 @@ function rapportArchive(annee) {
                 <p style="margin:0.2rem 0;font-size:0.82rem;">Document d'archive — édité le ${new Date().toLocaleDateString('fr-FR')}</p></div>
             <h3 style="margin:0 0 0.3rem;font-size:1.05rem;">Effectifs</h3>
             <table style="width:100%;border-collapse:collapse;font-size:0.88rem;">
-                <thead><tr style="background:#eee;"><th style="border:1px solid #999;padding:3px 7px;">N°</th><th style="border:1px solid #999;padding:3px 7px;text-align:left;">Classe</th><th style="border:1px solid #999;padding:3px 7px;">Garçons</th><th style="border:1px solid #999;padding:3px 7px;">Filles</th><th style="border:1px solid #999;padding:3px 7px;">Total</th></tr></thead>
-                <tbody>${effRows}<tr style="font-weight:700;background:#f3f4f6;"><td colspan="2" style="border:1px solid #999;padding:3px 7px;text-align:right;">TOTAL</td><td style="border:1px solid #999;padding:3px 7px;text-align:center;">${g}</td><td style="border:1px solid #999;padding:3px 7px;text-align:center;">${f}</td><td style="border:1px solid #999;padding:3px 7px;text-align:center;">${total}</td></tr></tbody>
+                <thead><tr style="background:var(--surface-2,#eee);"><th style="border:1px solid #999;padding:3px 7px;">N°</th><th style="border:1px solid #999;padding:3px 7px;text-align:left;">Classe</th><th style="border:1px solid #999;padding:3px 7px;">Garçons</th><th style="border:1px solid #999;padding:3px 7px;">Filles</th><th style="border:1px solid #999;padding:3px 7px;">Total</th></tr></thead>
+                <tbody>${effRows}<tr style="font-weight:700;background:var(--surface-2,#f3f4f6);"><td colspan="2" style="border:1px solid #999;padding:3px 7px;text-align:right;">TOTAL</td><td style="border:1px solid #999;padding:3px 7px;text-align:center;">${g}</td><td style="border:1px solid #999;padding:3px 7px;text-align:center;">${f}</td><td style="border:1px solid #999;padding:3px 7px;text-align:center;">${total}</td></tr></tbody>
             </table>
             <h2 style="margin:1.4rem 0 0.2rem;font-size:1.15rem;">Résultats de fin d'année</h2>
             ${resBlocks || '<p>Aucune note enregistrée pour cette année.</p>'}`;
@@ -1433,7 +1433,7 @@ function rapportArchive(annee) {
     }
     if (!html) return;
     const w = window.open('', '_blank');
-    w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Archive ${eEsc(annee)}</title></head><body style="font-family:Arial,sans-serif;padding:1.6rem;color:#111;">${html}<div style="margin-top:2rem;text-align:right;font-size:0.9rem;">Le Chef d'établissement<br><br>__________________</div></body></html>`);
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Archive ${eEsc(annee)}</title></head><body style="font-family:Arial,sans-serif;padding:1.6rem;color:var(--ink,#111);">${html}<div style="margin-top:2rem;text-align:right;font-size:0.9rem;">Le Chef d'établissement<br><br>__________________</div></body></html>`);
     w.document.close();
     setTimeout(() => w.print(), 500);
 }
@@ -1494,9 +1494,9 @@ function exMajResume() {
     const liste = eleves.filter(e => e.classe === classe);
     const s = exStats(exam, annee, liste);
     box.innerHTML = `
-        <span style="background:#eef2ff;color:#4338ca;border-radius:999px;padding:.25rem .8rem;font-weight:600;">Présentés : ${s.presentes}/${s.inscrits}</span>
-        <span style="background:#dcfce7;color:#166534;border-radius:999px;padding:.25rem .8rem;font-weight:600;">Admis : ${s.admis}</span>
-        <span style="background:#fee2e2;color:#991b1b;border-radius:999px;padding:.25rem .8rem;font-weight:600;">Ajournés : ${s.ajournes}</span>
+        <span style="background:var(--brand-bg,#eef2ff);color:var(--brand-strong,#4338ca);border-radius:999px;padding:.25rem .8rem;font-weight:600;">Présentés : ${s.presentes}/${s.inscrits}</span>
+        <span style="background:var(--ok-bg,#dcfce7);color:var(--ok-strong,#166534);border-radius:999px;padding:.25rem .8rem;font-weight:600;">Admis : ${s.admis}</span>
+        <span style="background:var(--danger-bg,#fee2e2);color:var(--danger-strong,#991b1b);border-radius:999px;padding:.25rem .8rem;font-weight:600;">Ajournés : ${s.ajournes}</span>
         <span style="background:linear-gradient(135deg,#1B6BFF,#28C6F5);color:#fff;border-radius:999px;padding:.25rem .9rem;font-weight:700;">Taux de réussite : ${s.taux}%</span>`;
 }
 
@@ -1516,19 +1516,19 @@ function renderExamens() {
     const { annee, classe } = exParams();
     const box = document.getElementById('examensBox');
     if (!box) return;
-    if (!classe) { box.innerHTML = '<p style="color:#64748b;padding:.5rem;">Choisissez une classe pour saisir les résultats.</p>'; return; }
+    if (!classe) { box.innerHTML = '<p style="color:var(--muted,#64748b);padding:.5rem;">Choisissez une classe pour saisir les résultats.</p>'; return; }
     const liste = eleves.filter(e => e.classe === classe).slice().sort((a, b) => (`${a.nom} ${a.prenom}`).localeCompare(`${b.nom} ${b.prenom}`));
-    if (!liste.length) { box.innerHTML = '<p style="color:#64748b;padding:.5rem;">Aucun élève dans cette classe.</p>'; return; }
+    if (!liste.length) { box.innerHTML = '<p style="color:var(--muted,#64748b);padding:.5rem;">Aucun élève dans cette classe.</p>'; return; }
     const withMention = (exam === 'BEPC' || exam === 'BAC');
     const lignes = liste.map(e => {
         const r = exGet(exam, annee, e.id);
         const showMention = withMention && r.resultat === 'Admis(e)';
         return `<tr>
-            <td style="font-weight:600;">${eEsc(e.nom)} ${eEsc(e.prenom)}<br><span style="color:#64748b;font-size:.78rem;font-family:monospace;">${eEsc(e.matricule || '')}</span></td>
+            <td style="font-weight:600;">${eEsc(e.nom)} ${eEsc(e.prenom)}<br><span style="color:var(--muted,#64748b);font-size:.78rem;font-family:monospace;">${eEsc(e.matricule || '')}</span></td>
             <td><select onchange="exSet('${e.id}','resultat',this.value)" style="margin:0;min-width:140px;">
                 ${EX_RESULTATS.map(x => `<option value="${eAttr(x)}" ${x === r.resultat ? 'selected' : ''}>${x || '— non saisi —'}</option>`).join('')}
             </select></td>
-            <td>${showMention ? `<select onchange="exSet('${e.id}','mention',this.value)" style="margin:0;min-width:130px;">${EX_MENTIONS.map(m => `<option value="${eAttr(m)}" ${m === r.mention ? 'selected' : ''}>${m || '—'}</option>`).join('')}</select>` : '<span style="color:#cbd5e1;">—</span>'}</td>
+            <td>${showMention ? `<select onchange="exSet('${e.id}','mention',this.value)" style="margin:0;min-width:130px;">${EX_MENTIONS.map(m => `<option value="${eAttr(m)}" ${m === r.mention ? 'selected' : ''}>${m || '—'}</option>`).join('')}</select>` : '<span style="color:var(--muted-2,#cbd5e1);">—</span>'}</td>
         </tr>`;
     }).join('');
     box.innerHTML = `
@@ -1537,7 +1537,7 @@ function renderExamens() {
             <thead><tr><th>Candidat</th><th>Résultat</th><th>Mention ${withMention ? '' : '(non applicable)'}</th></tr></thead>
             <tbody>${lignes}</tbody>
         </table>
-        <p style="color:#64748b;font-size:.8rem;margin:.75rem 0 0;">💡 Taux de réussite = Admis ÷ Présentés (les « Absent(e) » ne comptent pas comme présentés). Saisie enregistrée automatiquement.</p>`;
+        <p style="color:var(--muted,#64748b);font-size:.8rem;margin:.75rem 0 0;">💡 Taux de réussite = Admis ÷ Présentés (les « Absent(e) » ne comptent pas comme présentés). Saisie enregistrée automatiquement.</p>`;
     exMajResume();
 }
 
@@ -1556,7 +1556,7 @@ function exImprimer() {
     }).join('');
     const w = window.open('', '_blank');
     w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Résultats ${exam} ${annee} - ${eEsc(classe)}</title></head>
-        <body style="font-family:Arial,sans-serif;padding:1.6rem;color:#111;">
+        <body style="font-family:Arial,sans-serif;padding:1.6rem;color:var(--ink,#111);">
         <div style="text-align:center;border-bottom:2px solid #333;padding-bottom:.6rem;margin-bottom:1rem;">
             <p style="margin:0;font-size:.8rem;">RÉPUBLIQUE DU CONGO — Unité · Travail · Progrès</p>
             <h2 style="margin:.3rem 0;">${eEsc(ecole)}</h2>
@@ -1564,7 +1564,7 @@ function exImprimer() {
             <p style="margin:.2rem 0;font-size:.85rem;">Classe : ${eEsc(classe)} — édité le ${new Date().toLocaleDateString('fr-FR')}</p>
         </div>
         <table style="width:100%;border-collapse:collapse;font-size:.88rem;">
-            <thead><tr style="background:#eee;"><th style="border:1px solid #999;padding:3px 7px;">N°</th><th style="border:1px solid #999;padding:3px 7px;text-align:left;">Candidat</th><th style="border:1px solid #999;padding:3px 7px;">Résultat</th><th style="border:1px solid #999;padding:3px 7px;">Mention</th></tr></thead>
+            <thead><tr style="background:var(--surface-2,#eee);"><th style="border:1px solid #999;padding:3px 7px;">N°</th><th style="border:1px solid #999;padding:3px 7px;text-align:left;">Candidat</th><th style="border:1px solid #999;padding:3px 7px;">Résultat</th><th style="border:1px solid #999;padding:3px 7px;">Mention</th></tr></thead>
             <tbody>${rows}</tbody>
         </table>
         <div style="margin-top:1rem;font-size:.95rem;">
@@ -1592,15 +1592,15 @@ function exGlobal() {
     const tauxGlobal = totPres ? Math.round(totAdm / totPres * 100) : 0;
     const w = window.open('', '_blank');
     w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Taux de réussite ${exam} ${annee}</title></head>
-        <body style="font-family:Arial,sans-serif;padding:1.6rem;color:#111;">
+        <body style="font-family:Arial,sans-serif;padding:1.6rem;color:var(--ink,#111);">
         <div style="text-align:center;border-bottom:2px solid #333;padding-bottom:.6rem;margin-bottom:1rem;">
             <p style="margin:0;font-size:.8rem;">RÉPUBLIQUE DU CONGO — Unité · Travail · Progrès</p>
             <h2 style="margin:.3rem 0;">${eEsc(ecole)}</h2>
             <h3 style="margin:0;">Taux de réussite ${eEsc(exam)} — Session ${eEsc(annee)}</h3>
         </div>
         <table style="width:100%;border-collapse:collapse;font-size:.9rem;">
-            <thead><tr style="background:#eee;"><th style="border:1px solid #999;padding:4px 8px;text-align:left;">Classe</th><th style="border:1px solid #999;padding:4px 8px;">Présentés</th><th style="border:1px solid #999;padding:4px 8px;">Admis</th><th style="border:1px solid #999;padding:4px 8px;">Taux</th></tr></thead>
-            <tbody>${rows}<tr style="font-weight:700;background:#f3f4f6;"><td style="border:1px solid #999;padding:4px 8px;text-align:right;">TOTAL ÉTABLISSEMENT</td><td style="border:1px solid #999;padding:4px 8px;text-align:center;">${totPres}</td><td style="border:1px solid #999;padding:4px 8px;text-align:center;">${totAdm}</td><td style="border:1px solid #999;padding:4px 8px;text-align:center;">${tauxGlobal}%</td></tr></tbody>
+            <thead><tr style="background:var(--surface-2,#eee);"><th style="border:1px solid #999;padding:4px 8px;text-align:left;">Classe</th><th style="border:1px solid #999;padding:4px 8px;">Présentés</th><th style="border:1px solid #999;padding:4px 8px;">Admis</th><th style="border:1px solid #999;padding:4px 8px;">Taux</th></tr></thead>
+            <tbody>${rows}<tr style="font-weight:700;background:var(--surface-2,#f3f4f6);"><td style="border:1px solid #999;padding:4px 8px;text-align:right;">TOTAL ÉTABLISSEMENT</td><td style="border:1px solid #999;padding:4px 8px;text-align:center;">${totPres}</td><td style="border:1px solid #999;padding:4px 8px;text-align:center;">${totAdm}</td><td style="border:1px solid #999;padding:4px 8px;text-align:center;">${tauxGlobal}%</td></tr></tbody>
         </table>
         <div style="margin-top:2.2rem;text-align:right;font-size:.9rem;">Le Chef d'établissement<br><br>__________________</div>
         </body></html>`);
@@ -1685,13 +1685,13 @@ function renderCahier() {
     const box = document.getElementById('cahierBox');
     if (!box) return;
     const liste = ctListeFiltree();
-    if (!liste.length) { box.innerHTML = '<p style="color:#64748b;padding:0.5rem;">Aucune leçon enregistrée pour cette sélection.</p>'; return; }
+    if (!liste.length) { box.innerHTML = '<p style="color:var(--muted,#64748b);padding:0.5rem;">Aucune leçon enregistrée pour cette sélection.</p>'; return; }
     const lignes = liste.map(e => `<tr>
         <td style="white-space:nowrap;">${eEsc(new Date(e.date).toLocaleDateString('fr-FR'))}</td>
         <td>${eEsc(e.classe)}</td>
         <td>${eEsc(ctMatNom(e.matiere))}</td>
-        <td>${eEsc(e.lecon)}${e.enseignant ? `<br><span style="color:#64748b;font-size:0.78rem;">👤 ${eEsc(ctEnsNom(e.enseignant))}</span>` : ''}</td>
-        <td>${eEsc(e.devoirs || '') || '<span style="color:#cbd5e1;">—</span>'}</td>
+        <td>${eEsc(e.lecon)}${e.enseignant ? `<br><span style="color:var(--muted,#64748b);font-size:0.78rem;">👤 ${eEsc(ctEnsNom(e.enseignant))}</span>` : ''}</td>
+        <td>${eEsc(e.devoirs || '') || '<span style="color:var(--muted-2,#cbd5e1);">—</span>'}</td>
         <td style="text-align:right;white-space:nowrap;">
             <button class="btn btn-secondary" style="padding:0.25rem 0.5rem;font-size:0.78rem;" onclick="ctEditer('${e.id}')">✏️</button>
             <button class="btn btn-danger" style="padding:0.25rem 0.5rem;font-size:0.78rem;" onclick="ctSupprimer('${e.id}')">🗑️</button>
@@ -1700,7 +1700,7 @@ function renderCahier() {
     box.innerHTML = `<table>
         <thead><tr><th>Date</th><th>Classe</th><th>Matière</th><th>Leçon</th><th>Devoirs</th><th style="text-align:right;">Actions</th></tr></thead>
         <tbody>${lignes}</tbody>
-    </table><p style="color:#64748b;font-size:0.8rem;margin:0.6rem 0 0;">${liste.length} leçon(s).</p>`;
+    </table><p style="color:var(--muted,#64748b);font-size:0.8rem;margin:0.6rem 0 0;">${liste.length} leçon(s).</p>`;
 }
 
 function ctImprimer() {
@@ -1721,7 +1721,7 @@ function ctImprimer() {
     const sousTitre = [fc ? 'Classe ' + fc : '', fm ? 'Matière ' + ctMatNom(fm) : ''].filter(Boolean).join(' — ') || 'Toutes classes / matières';
     const w = window.open('', '_blank');
     w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Cahier de textes</title></head>
-        <body style="font-family:Arial,sans-serif;padding:1.6rem;color:#111;">
+        <body style="font-family:Arial,sans-serif;padding:1.6rem;color:var(--ink,#111);">
         <div style="text-align:center;border-bottom:2px solid #333;padding-bottom:.6rem;margin-bottom:1rem;">
             <p style="margin:0;font-size:.8rem;">RÉPUBLIQUE DU CONGO — Unité · Travail · Progrès</p>
             <h2 style="margin:.3rem 0;">${eEsc(ecole)}</h2>
@@ -1729,7 +1729,7 @@ function ctImprimer() {
             <p style="margin:.2rem 0;font-size:.85rem;">${eEsc(sousTitre)} — édité le ${new Date().toLocaleDateString('fr-FR')}</p>
         </div>
         <table style="width:100%;border-collapse:collapse;font-size:.85rem;">
-            <thead><tr style="background:#eee;"><th style="border:1px solid #999;padding:4px 8px;">Date</th><th style="border:1px solid #999;padding:4px 8px;">Classe</th><th style="border:1px solid #999;padding:4px 8px;">Matière</th><th style="border:1px solid #999;padding:4px 8px;text-align:left;">Leçon</th><th style="border:1px solid #999;padding:4px 8px;text-align:left;">Devoirs</th></tr></thead>
+            <thead><tr style="background:var(--surface-2,#eee);"><th style="border:1px solid #999;padding:4px 8px;">Date</th><th style="border:1px solid #999;padding:4px 8px;">Classe</th><th style="border:1px solid #999;padding:4px 8px;">Matière</th><th style="border:1px solid #999;padding:4px 8px;text-align:left;">Leçon</th><th style="border:1px solid #999;padding:4px 8px;text-align:left;">Devoirs</th></tr></thead>
             <tbody>${rows}</tbody>
         </table>
         <div style="margin-top:2rem;text-align:right;font-size:.9rem;">Visa du responsable pédagogique<br><br>__________________</div>
@@ -1787,11 +1787,11 @@ function asMajResume() {
     const box = document.getElementById('asResume'); if (!box) return;
     const s = asStatsJour(date);
     box.innerHTML = `
-        <span style="background:#dcfce7;color:#166534;border-radius:999px;padding:.25rem .8rem;font-weight:600;">Présents : ${s.present}</span>
-        <span style="background:#fee2e2;color:#991b1b;border-radius:999px;padding:.25rem .8rem;font-weight:600;">Absents : ${s.absent}</span>
-        <span style="background:#fff7ed;color:#c2410c;border-radius:999px;padding:.25rem .8rem;font-weight:600;">Retards : ${s.retard}</span>
-        <span style="background:#eef2ff;color:#4338ca;border-radius:999px;padding:.25rem .8rem;font-weight:600;">Congé/Mission : ${s.autre}</span>
-        <span style="background:#f1f5f9;color:#475569;border-radius:999px;padding:.25rem .8rem;font-weight:600;">Effectif : ${s.total}</span>`;
+        <span style="background:var(--ok-bg,#dcfce7);color:var(--ok-strong,#166534);border-radius:999px;padding:.25rem .8rem;font-weight:600;">Présents : ${s.present}</span>
+        <span style="background:var(--danger-bg,#fee2e2);color:var(--danger-strong,#991b1b);border-radius:999px;padding:.25rem .8rem;font-weight:600;">Absents : ${s.absent}</span>
+        <span style="background:var(--warn-bg,#fff7ed);color:var(--warn-strong,#c2410c);border-radius:999px;padding:.25rem .8rem;font-weight:600;">Retards : ${s.retard}</span>
+        <span style="background:var(--brand-bg,#eef2ff);color:var(--brand-strong,#4338ca);border-radius:999px;padding:.25rem .8rem;font-weight:600;">Congé/Mission : ${s.autre}</span>
+        <span style="background:var(--surface-2,#f1f5f9);color:var(--muted,#475569);border-radius:999px;padding:.25rem .8rem;font-weight:600;">Effectif : ${s.total}</span>`;
 }
 
 function renderAssiduite() {
@@ -1799,11 +1799,11 @@ function renderAssiduite() {
     const date = dEl ? dEl.value : '';
     const box = document.getElementById('assiduiteBox'); if (!box) return;
     const pers = asPersonnel();
-    if (!pers.length) { box.innerHTML = '<p style="color:#64748b;padding:.5rem;">Aucun membre du personnel. Ajoutez des enseignants (Direction des études) ou des employés (Gestion → Salaires).</p>'; asMajResume(); return; }
+    if (!pers.length) { box.innerHTML = '<p style="color:var(--muted,#64748b);padding:.5rem;">Aucun membre du personnel. Ajoutez des enseignants (Direction des études) ou des employés (Gestion → Salaires).</p>'; asMajResume(); return; }
     const lignes = pers.map(p => {
         const a = asGet(p.id, date);
         return `<tr>
-            <td style="font-weight:600;">${eEsc(p.nom)}<br><span style="color:#64748b;font-size:0.78rem;">${eEsc(p.role)}</span></td>
+            <td style="font-weight:600;">${eEsc(p.nom)}<br><span style="color:var(--muted,#64748b);font-size:0.78rem;">${eEsc(p.role)}</span></td>
             <td><select onchange="asSet('${p.id}','${date}','statut',this.value)" style="margin:0;min-width:130px;">
                 ${AS_STATUTS.map(x => `<option value="${eAttr(x)}" ${x === a.statut ? 'selected' : ''}>${x || '— non pointé —'}</option>`).join('')}
             </select></td>
@@ -1826,7 +1826,7 @@ function asImprimerJour() {
     const s = asStatsJour(date);
     const w = window.open('', '_blank');
     w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Assiduité ${date}</title></head>
-        <body style="font-family:Arial,sans-serif;padding:1.6rem;color:#111;">
+        <body style="font-family:Arial,sans-serif;padding:1.6rem;color:var(--ink,#111);">
         <div style="text-align:center;border-bottom:2px solid #333;padding-bottom:.6rem;margin-bottom:1rem;">
             <p style="margin:0;font-size:.8rem;">RÉPUBLIQUE DU CONGO — Unité · Travail · Progrès</p>
             <h2 style="margin:.3rem 0;">${eEsc(ecole)}</h2>
@@ -1834,7 +1834,7 @@ function asImprimerJour() {
             <p style="margin:.2rem 0;font-size:.85rem;">Date : ${new Date(date).toLocaleDateString('fr-FR')}</p>
         </div>
         <table style="width:100%;border-collapse:collapse;font-size:.88rem;">
-            <thead><tr style="background:#eee;"><th style="border:1px solid #999;padding:4px 8px;">N°</th><th style="border:1px solid #999;padding:4px 8px;text-align:left;">Nom</th><th style="border:1px solid #999;padding:4px 8px;">Fonction</th><th style="border:1px solid #999;padding:4px 8px;">Statut</th><th style="border:1px solid #999;padding:4px 8px;text-align:left;">Observation</th></tr></thead>
+            <thead><tr style="background:var(--surface-2,#eee);"><th style="border:1px solid #999;padding:4px 8px;">N°</th><th style="border:1px solid #999;padding:4px 8px;text-align:left;">Nom</th><th style="border:1px solid #999;padding:4px 8px;">Fonction</th><th style="border:1px solid #999;padding:4px 8px;">Statut</th><th style="border:1px solid #999;padding:4px 8px;text-align:left;">Observation</th></tr></thead>
             <tbody>${rows}</tbody>
         </table>
         <p style="margin-top:.8rem;font-size:.92rem;">Présents : <strong>${s.present}</strong> · Absents : <strong>${s.absent}</strong> · Retards : <strong>${s.retard}</strong> · Congé/Mission : <strong>${s.autre}</strong> · Effectif : <strong>${s.total}</strong></p>
@@ -1866,16 +1866,16 @@ function asRecap() {
     const box = document.getElementById('asRecapBox'); if (!box) return;
     const d = asRecapData();
     const lignes = d.rows.map(r => `<tr>
-        <td style="font-weight:600;">${eEsc(r.nom)}<br><span style="color:#64748b;font-size:0.78rem;">${eEsc(r.role)}</span></td>
-        <td style="text-align:center;color:#166534;font-weight:600;">${r['Présent']}</td>
-        <td style="text-align:center;color:#991b1b;font-weight:600;">${r['Absent']}</td>
-        <td style="text-align:center;color:#c2410c;font-weight:600;">${r['Retard']}</td>
+        <td style="font-weight:600;">${eEsc(r.nom)}<br><span style="color:var(--muted,#64748b);font-size:0.78rem;">${eEsc(r.role)}</span></td>
+        <td style="text-align:center;color:var(--ok-strong,#166534);font-weight:600;">${r['Présent']}</td>
+        <td style="text-align:center;color:var(--danger-strong,#991b1b);font-weight:600;">${r['Absent']}</td>
+        <td style="text-align:center;color:var(--warn-strong,#c2410c);font-weight:600;">${r['Retard']}</td>
         <td style="text-align:center;">${r.autre}</td>
     </tr>`).join('');
     const periode = (d.debut || d.fin) ? `du ${d.debut ? new Date(d.debut).toLocaleDateString('fr-FR') : '…'} au ${d.fin ? new Date(d.fin).toLocaleDateString('fr-FR') : '…'}` : 'toute la période enregistrée';
-    box.innerHTML = `<p style="color:#64748b;font-size:0.85rem;margin:0 0 0.5rem;">Récapitulatif ${periode} :</p>
+    box.innerHTML = `<p style="color:var(--muted,#64748b);font-size:0.85rem;margin:0 0 0.5rem;">Récapitulatif ${periode} :</p>
         <table><thead><tr><th>Personnel</th><th style="text-align:center;">Présences</th><th style="text-align:center;">Absences</th><th style="text-align:center;">Retards</th><th style="text-align:center;">Congé/Mission</th></tr></thead>
-        <tbody>${lignes || '<tr><td colspan="5" style="color:#64748b;">Aucune donnée.</td></tr>'}</tbody></table>`;
+        <tbody>${lignes || '<tr><td colspan="5" style="color:var(--muted,#64748b);">Aucune donnée.</td></tr>'}</tbody></table>`;
 }
 
 function asImprimerRecap() {
@@ -1887,7 +1887,7 @@ function asImprimerRecap() {
     const periode = (d.debut || d.fin) ? `du ${d.debut ? new Date(d.debut).toLocaleDateString('fr-FR') : '…'} au ${d.fin ? new Date(d.fin).toLocaleDateString('fr-FR') : '…'}` : 'toute la période';
     const w = window.open('', '_blank');
     w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Récapitulatif assiduité</title></head>
-        <body style="font-family:Arial,sans-serif;padding:1.6rem;color:#111;">
+        <body style="font-family:Arial,sans-serif;padding:1.6rem;color:var(--ink,#111);">
         <div style="text-align:center;border-bottom:2px solid #333;padding-bottom:.6rem;margin-bottom:1rem;">
             <p style="margin:0;font-size:.8rem;">RÉPUBLIQUE DU CONGO — Unité · Travail · Progrès</p>
             <h2 style="margin:.3rem 0;">${eEsc(ecole)}</h2>
@@ -1895,7 +1895,7 @@ function asImprimerRecap() {
             <p style="margin:.2rem 0;font-size:.85rem;">Période : ${eEsc(periode)} — édité le ${new Date().toLocaleDateString('fr-FR')}</p>
         </div>
         <table style="width:100%;border-collapse:collapse;font-size:.88rem;">
-            <thead><tr style="background:#eee;"><th style="border:1px solid #999;padding:4px 8px;">N°</th><th style="border:1px solid #999;padding:4px 8px;text-align:left;">Nom</th><th style="border:1px solid #999;padding:4px 8px;">Fonction</th><th style="border:1px solid #999;padding:4px 8px;">Présences</th><th style="border:1px solid #999;padding:4px 8px;">Absences</th><th style="border:1px solid #999;padding:4px 8px;">Retards</th><th style="border:1px solid #999;padding:4px 8px;">Congé/Mission</th></tr></thead>
+            <thead><tr style="background:var(--surface-2,#eee);"><th style="border:1px solid #999;padding:4px 8px;">N°</th><th style="border:1px solid #999;padding:4px 8px;text-align:left;">Nom</th><th style="border:1px solid #999;padding:4px 8px;">Fonction</th><th style="border:1px solid #999;padding:4px 8px;">Présences</th><th style="border:1px solid #999;padding:4px 8px;">Absences</th><th style="border:1px solid #999;padding:4px 8px;">Retards</th><th style="border:1px solid #999;padding:4px 8px;">Congé/Mission</th></tr></thead>
             <tbody>${rows}</tbody>
         </table>
         <div style="margin-top:2rem;text-align:right;font-size:.9rem;">Le Chef d'établissement<br><br>__________________</div>

@@ -47,24 +47,24 @@ function renderDepenses() {
             });
 
             if (dayDepenses.length === 0) {
-                document.getElementById('depensesContent').innerHTML = '<p style="text-align:center;color:#64748b;padding:2rem;">Aucune dépense aujourd\'hui</p>';
+                document.getElementById('depensesContent').innerHTML = '<p style="text-align:center;color:var(--muted,#64748b);padding:2rem;">Aucune dépense aujourd\'hui</p>';
                 return;
             }
 
             document.getElementById('depensesContent').innerHTML = dayDepenses.map(d => `
-                <div style="padding:1rem;background:#fff5f5;border-left:4px solid #ef4444;border-radius:10px;margin-bottom:0.75rem;">
+                <div style="padding:1rem;background:var(--danger-bg,#fff5f5);border-left:4px solid #ef4444;border-radius:10px;margin-bottom:0.75rem;">
                     <div style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
                         <div style="flex:1;">
                             <p style="font-weight:600;margin-bottom:0.5rem;">🏷️ ${d.nature || d.categorie || 'Dépense'}</p>
-                            <p style="font-size:0.875rem;color:#64748b;">${d.description || '-'}</p>
-                            <p style="font-size:0.875rem;color:#94a3b8;margin-top:0.5rem;">
+                            <p style="font-size:0.875rem;color:var(--muted,#64748b);">${d.description || '-'}</p>
+                            <p style="font-size:0.875rem;color:var(--muted-2,#94a3b8);margin-top:0.5rem;">
                                 📅 ${new Date(d.date).toLocaleDateString('fr-FR')} ${d.time}
                             </p>
                         </div>
                         <div style="text-align:right;display:flex;flex-direction:column;gap:0.5rem;">
                             <div>
-                                <p style="font-size:1.5rem;font-weight:700;color:#ef4444;">-${parseFloat(d.amount).toLocaleString()}</p>
-                                <p style="font-size:0.875rem;color:#64748b;">FCFA</p>
+                                <p style="font-size:1.5rem;font-weight:700;color:var(--danger,#ef4444);">-${parseFloat(d.amount).toLocaleString()}</p>
+                                <p style="font-size:0.875rem;color:var(--muted,#64748b);">FCFA</p>
                             </div>
                             <button class="btn btn-danger" style="padding:0.35rem 0.75rem;font-size:0.75rem;" onclick="deleteTransaction('${d.id}')">
                                 🗑️ Supprimer

@@ -203,17 +203,17 @@ function exportExcelStyled() {
     <style>
         body { font-family: Arial, sans-serif; }
         table { border-collapse: collapse; width: 100%; margin: 20px 0; }
-        th { background: #1B6BFF; color: white; padding: 12px; text-align: left; font-weight: bold; border: 1px solid #4c5fd5; }
+        th { background: var(--brand,#1B6BFF); color: white; padding: 12px; text-align: left; font-weight: bold; border: 1px solid #4c5fd5; }
         td { padding: 10px; border: 1px solid #ddd; }
-        tr:nth-child(even) { background: #f8f9fa; }
+        tr:nth-child(even) { background: var(--surface-2,#f8f9fa); }
         .header { background: linear-gradient(135deg, #1B6BFF 0%, #28C6F5 100%); color: white; padding: 30px; text-align: center; margin-bottom: 20px; }
         .header h1 { margin: 0; font-size: 32px; }
         .header p { margin: 5px 0 0 0; font-size: 14px; opacity: 0.9; }
-        .section-title { background: #1B6BFF; color: white; padding: 15px; font-size: 18px; font-weight: bold; margin: 30px 0 10px 0; }
+        .section-title { background: var(--brand,#1B6BFF); color: white; padding: 15px; font-size: 18px; font-weight: bold; margin: 30px 0 10px 0; }
         .total-row { background: #10b981 !important; color: white; font-weight: bold; }
         .depense-row { background: #ef4444 !important; color: white; font-weight: bold; }
-        .solde-row { background: #1B6BFF !important; color: white; font-weight: bold; font-size: 16px; }
-        .info-box { background: #f0f4ff; padding: 15px; margin: 20px 0; border-left: 4px solid #1B6BFF; }
+        .solde-row { background: var(--brand,#1B6BFF) !important; color: white; font-weight: bold; font-size: 16px; }
+        .info-box { background: var(--brand-bg,#f0f4ff); padding: 15px; margin: 20px 0; border-left: 4px solid #1B6BFF; }
     </style>
 </head>
 <body>
@@ -280,7 +280,7 @@ function exportExcelStyled() {
                     'depense': 'Dépense'
                 };
                 const moisList = t.moisPayes ? t.moisPayes.join(', ') : (t.nature || t.categorie || '-');
-                const rowStyle = t.type === 'depense' ? 'color: #ef4444; font-weight: bold;' : '';
+                const rowStyle = t.type === 'depense' ? 'color: var(--danger,#ef4444); font-weight: bold;' : '';
                 
                 html += `
         <tr>
@@ -310,7 +310,7 @@ function exportExcelStyled() {
             students.forEach(s => {
                 const balances = calculateMonthlyBalances(s.id);
                 const totalReste = Object.values(balances).reduce((sum, b) => sum + b.reste, 0);
-                const resteStyle = totalReste > 0 ? 'color: #ef4444; font-weight: bold;' : 'color: #10b981; font-weight: bold;';
+                const resteStyle = totalReste > 0 ? 'color: var(--danger,#ef4444); font-weight: bold;' : 'color: var(--ok,#10b981); font-weight: bold;';
                 
                 html += `
         <tr>
@@ -359,16 +359,16 @@ function exportPDF() {
         .header h1 { margin: 0; font-size: 36px; }
         .header p { margin: 8px 0 0 0; font-size: 14px; opacity: 0.95; }
         .section { margin: 30px 0; page-break-inside: avoid; }
-        .section-title { background: #1B6BFF; color: white; padding: 12px 15px; font-size: 16px; font-weight: bold; border-radius: 5px; margin-bottom: 15px; }
+        .section-title { background: var(--brand,#1B6BFF); color: white; padding: 12px 15px; font-size: 16px; font-weight: bold; border-radius: 5px; margin-bottom: 15px; }
         table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-        th { background: #1B6BFF; color: white; padding: 10px; text-align: left; font-weight: bold; border: 1px solid #4c5fd5; font-size: 11px; }
+        th { background: var(--brand,#1B6BFF); color: white; padding: 10px; text-align: left; font-weight: bold; border: 1px solid #4c5fd5; font-size: 11px; }
         td { padding: 8px; border: 1px solid #ddd; font-size: 11px; }
-        tr:nth-child(even) { background: #f8f9fa; }
+        tr:nth-child(even) { background: var(--surface-2,#f8f9fa); }
         .total-row { background: #10b981 !important; color: white; font-weight: bold; }
         .depense-row { background: #ef4444 !important; color: white; font-weight: bold; }
-        .solde-row { background: #1B6BFF !important; color: white; font-weight: bold; font-size: 14px; }
-        .info-box { background: #f0f4ff; padding: 15px; margin: 20px 0; border-left: 4px solid #1B6BFF; border-radius: 5px; }
-        .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid #ddd; color: #666; font-size: 10px; }
+        .solde-row { background: var(--brand,#1B6BFF) !important; color: white; font-weight: bold; font-size: 14px; }
+        .info-box { background: var(--brand-bg,#f0f4ff); padding: 15px; margin: 20px 0; border-left: 4px solid #1B6BFF; border-radius: 5px; }
+        .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid #ddd; color: var(--muted,#666); font-size: 10px; }
     </style>
 </head>
 <body>
@@ -438,7 +438,7 @@ function exportPDF() {
                     'depense': 'Dépense'
                 };
                 const moisList = t.moisPayes ? t.moisPayes.join(', ') : (t.nature || t.categorie || '-');
-                const rowStyle = t.type === 'depense' ? 'color: #ef4444; font-weight: bold;' : '';
+                const rowStyle = t.type === 'depense' ? 'color: var(--danger,#ef4444); font-weight: bold;' : '';
                 
                 html += `
             <tr>
@@ -491,36 +491,36 @@ function showReceipt(transaction) {
             document.getElementById('receiptContent').innerHTML = `
                 <div style="text-align:center;margin-bottom:2rem;border-bottom:3px solid #1B6BFF;padding-bottom:1rem;">
                     ${(typeof getEtab === 'function' && getEtab().logo) ? `<img src="${getEtab().logo}" alt="" style="height:60px;object-fit:contain;margin-bottom:8px;">` : ''}
-                    <h2 style="font-size:2rem;font-weight:700;color:#1B6BFF;margin:0 0 0.5rem 0;">📄 REÇU DE PAIEMENT</h2>
-                    <p style="color:#1B6BFF; font-weight: 700; font-size: 1.25rem; margin: 0.5rem 0;">${transaction.nomEcole || (typeof getEtab === 'function' ? getEtab().nom : '') || 'École'}</p>
-                    ${(typeof getEtab === 'function' && [getEtab().ville, getEtab().bp, getEtab().telephone].filter(Boolean).length) ? `<p style="color:#64748b;font-size:0.82rem;margin:0;">${[getEtab().ville, getEtab().bp ? 'BP ' + getEtab().bp : '', getEtab().telephone ? 'Tél : ' + getEtab().telephone : ''].filter(Boolean).join(' · ')}</p>` : '<p style="color:#64748b;font-size:0.875rem;">Congo Brazzaville</p>'}
+                    <h2 style="font-size:2rem;font-weight:700;color:var(--brand,#1B6BFF);margin:0 0 0.5rem 0;">📄 REÇU DE PAIEMENT</h2>
+                    <p style="color:var(--brand,#1B6BFF); font-weight: 700; font-size: 1.25rem; margin: 0.5rem 0;">${transaction.nomEcole || (typeof getEtab === 'function' ? getEtab().nom : '') || 'École'}</p>
+                    ${(typeof getEtab === 'function' && [getEtab().ville, getEtab().bp, getEtab().telephone].filter(Boolean).length) ? `<p style="color:var(--muted,#64748b);font-size:0.82rem;margin:0;">${[getEtab().ville, getEtab().bp ? 'BP ' + getEtab().bp : '', getEtab().telephone ? 'Tél : ' + getEtab().telephone : ''].filter(Boolean).join(' · ')}</p>` : '<p style="color:var(--muted,#64748b);font-size:0.875rem;">Congo Brazzaville</p>'}
                 </div>
 
-                <div style="background:#f8fafc;padding:1.5rem;border-radius:12px;margin-bottom:1.5rem;">
+                <div style="background:var(--surface-2,#f8fafc);padding:1.5rem;border-radius:12px;margin-bottom:1.5rem;">
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
                         <div>
-                            <p style="font-size:0.875rem;color:#64748b;margin:0 0 0.25rem 0;">Reference</p>
+                            <p style="font-size:0.875rem;color:var(--muted,#64748b);margin:0 0 0.25rem 0;">Reference</p>
                             <p style="font-size:1.125rem;font-weight:700;margin:0;font-family:monospace;">${transaction.reference}</p>
                         </div>
                         <div>
-                            <p style="font-size:0.875rem;color:#64748b;margin:0 0 0.25rem 0;">Date</p>
+                            <p style="font-size:0.875rem;color:var(--muted,#64748b);margin:0 0 0.25rem 0;">Date</p>
                             <p style="font-size:1.125rem;font-weight:700;margin:0;">${new Date(transaction.date).toLocaleDateString('fr-FR')}</p>
                         </div>
                     </div>
                     
                     <div style="border-top:1px solid #e2e8f0;padding-top:1rem;margin-top:1rem;">
-                        <p style="font-size:0.875rem;color:#64748b;margin:0 0 0.5rem 0;">Eleve</p>
+                        <p style="font-size:0.875rem;color:var(--muted,#64748b);margin:0 0 0.5rem 0;">Eleve</p>
                         <div style="display:flex;gap:1rem;align-items:flex-start;">
                             ${photoEleve ? `<img src="${photoEleve}" alt="" style="width:64px;height:80px;object-fit:cover;border:1px solid #cbd5e1;border-radius:8px;flex-shrink:0;">` : ''}
                             <div style="flex:1;">
                                 <p style="font-size:1.25rem;font-weight:700;margin:0 0 0.5rem 0;">${transaction.studentName}</p>
                                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
                                     <div>
-                                        <p style="font-size:0.875rem;color:#64748b;margin:0 0 0.25rem 0;">Matricule</p>
+                                        <p style="font-size:0.875rem;color:var(--muted,#64748b);margin:0 0 0.25rem 0;">Matricule</p>
                                         <p style="font-weight:600;margin:0;font-family:monospace;">${transaction.studentMatricule || '-'}</p>
                                     </div>
                                     <div>
-                                        <p style="font-size:0.875rem;color:#64748b;margin:0 0 0.25rem 0;">Classe</p>
+                                        <p style="font-size:0.875rem;color:var(--muted,#64748b);margin:0 0 0.25rem 0;">Classe</p>
                                         <p style="font-weight:600;margin:0;">${transaction.studentClasse || '-'}</p>
                                     </div>
                                 </div>
@@ -529,7 +529,7 @@ function showReceipt(transaction) {
                     </div>
                 </div>
 
-                <div style="background:#1B6BFF;color:white;padding:1.5rem;border-radius:12px;margin-bottom:1.5rem;">
+                <div style="background:var(--brand,#1B6BFF);color:white;padding:1.5rem;border-radius:12px;margin-bottom:1.5rem;">
                     <p style="font-size:0.875rem;opacity:0.9;margin:0 0 0.5rem 0;">${typeLabel}</p>
                     ${estScolarite ? `<p style="font-size:1rem;margin:0 0 0.5rem 0;">Mois: ${moisList}</p>` : ''}
                     ${transaction.isEcheance ? '<p style="font-size:0.875rem;margin:0 0 0.5rem 0;">⚡ Paiement par echeance</p>' : ''}
@@ -553,12 +553,12 @@ function showReceipt(transaction) {
                     </div>
                 </div>
 
-                <div style="border-top:2px dashed #e2e8f0;padding-top:1rem;font-size:0.875rem;color:#64748b;">
+                <div style="border-top:2px dashed #e2e8f0;padding-top:1rem;font-size:0.875rem;color:var(--muted,#64748b);">
                     <p style="margin:0.25rem 0;">⏰ Heure: ${transaction.time}</p>
                     <p style="margin:0.25rem 0;">👤 Enregistre par: Gestionnaire</p>
                 </div>
 
-                <div style="margin-top:2rem;text-align:center;font-size:0.75rem;color:#94a3b8;">
+                <div style="margin-top:2rem;text-align:center;font-size:0.75rem;color:var(--muted-2,#94a3b8);">
                     <p style="margin:0;">Merci pour votre confiance</p>
                     <p style="margin:0.25rem 0 0 0;">Ce recu fait foi de paiement</p>
                 </div>

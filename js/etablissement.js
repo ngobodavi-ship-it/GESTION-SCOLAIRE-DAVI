@@ -19,7 +19,7 @@ function etabEnteteHTML(titre, soustitre) {
         ${logo}
         <p style="margin:0;font-size:.8rem;">RÉPUBLIQUE DU CONGO — Unité · Travail · Progrès</p>
         <h2 style="margin:.3rem 0 0;text-transform:uppercase;">${etabEsc(e.nom)}</h2>
-        ${villeCoord ? `<p style="margin:.15rem 0 0;font-size:.72rem;color:#444;">${villeCoord}</p>` : ''}
+        ${villeCoord ? `<p style="margin:.15rem 0 0;font-size:.72rem;color:var(--muted,#444);">${villeCoord}</p>` : ''}
         ${titre ? `<h3 style="margin:.5rem 0 0;">${etabEsc(titre)}</h3>` : ''}
         ${soustitre ? `<p style="margin:.2rem 0 0;font-size:.85rem;">${etabEsc(soustitre)}</p>` : ''}
     </div>`;

@@ -64,8 +64,8 @@ function renderRecouvrement() {
     if (cfgBox) cfgBox.innerHTML = classes.map(c => `
         <div style="display:flex;align-items:center;gap:0.5rem;">
             <label style="flex:1;font-weight:600;margin:0;">${dEsc(c.nom)}</label>
-            <input type="number" min="0" step="1000" value="${fraisConfig[c.nom] || ''}" placeholder="0" onchange="setFrais('${dAttr(c.nom)}', this.value)" style="width:130px;margin:0;"> <span style="color:#64748b;">FCFA / an</span>
-        </div>`).join('') || '<p style="color:#64748b;">Ajoutez d\'abord des classes.</p>';
+            <input type="number" min="0" step="1000" value="${fraisConfig[c.nom] || ''}" placeholder="0" onchange="setFrais('${dAttr(c.nom)}', this.value)" style="width:130px;margin:0;"> <span style="color:var(--muted,#64748b);">FCFA / an</span>
+        </div>`).join('') || '<p style="color:var(--muted,#64748b);">Ajoutez d\'abord des classes.</p>';
 
     const filtre = document.getElementById('recClasse');
     if (filtre && !filtre.dataset.init) { filtre.innerHTML = '<option value="">Toutes les classes</option>' + classes.map(c => `<option value="${dAttr(c.nom)}">${dEsc(c.nom)}</option>`).join(''); filtre.dataset.init = '1'; }
@@ -96,19 +96,19 @@ function renderRecouvrement() {
 
     const tbody = document.getElementById('recTable');
     if (tbody) tbody.innerHTML = rows.length === 0
-        ? '<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:#64748b;">Aucune donnée. Renseignez les frais par classe ci-dessus.</td></tr>'
+        ? '<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:var(--muted,#64748b);">Aucune donnée. Renseignez les frais par classe ci-dessus.</td></tr>'
         : rows.map(r => `<tr>
             <td style="font-weight:600;">${dEsc(r.e.nom)} ${dEsc(r.e.prenom)}</td>
             <td>${dEsc(r.e.classe)}</td>
             <td style="text-align:right;">${fmtFCFA(r.attendu)}</td>
-            <td style="text-align:right;color:#16a34a;">${fmtFCFA(r.paye)}</td>
+            <td style="text-align:right;color:var(--ok,#16a34a);">${fmtFCFA(r.paye)}</td>
             <td style="text-align:right;font-weight:700;color:${r.reste > 0 ? '#dc3545' : '#16a34a'};">${fmtFCFA(r.reste)}</td>
         </tr>`).join('');
 }
 function dirKpi(label, value, color) {
-    return `<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:0.85rem;text-align:center;">
+    return `<div style="background:var(--surface-2,#f8fafc);border:1px solid #e2e8f0;border-radius:10px;padding:0.85rem;text-align:center;">
         <div style="font-size:1.25rem;font-weight:700;color:${color || '#2E2769'};">${value}</div>
-        <div style="font-size:0.8rem;color:#64748b;">${label}</div></div>`;
+        <div style="font-size:0.8rem;color:var(--muted,#64748b);">${label}</div></div>`;
 }
 function setFrais(classe, val) {
     const n = parseFloat(val);
@@ -123,14 +123,14 @@ function genererCartePersonnel(id) {
     const p = personnel.find(x => x.id === id); if (!p) return;
     const ecole = getEcoleName();
     const html = `
-    <div style="width:340px;height:215px;border:2px solid #2E2769;border-radius:12px;font-family:Arial,sans-serif;color:#111;margin:8px auto;overflow:hidden;">
+    <div style="width:340px;height:215px;border:2px solid #2E2769;border-radius:12px;font-family:Arial,sans-serif;color:var(--ink,#111);margin:8px auto;overflow:hidden;">
         <div style="background:#2E2769;color:#fff;padding:6px 10px;text-align:center;">
             <div style="font-size:0.62rem;letter-spacing:0.5px;">RÉPUBLIQUE DU CONGO &ndash; Unité, Travail, Progrès</div>
             <div style="font-weight:bold;font-size:0.82rem;text-transform:uppercase;line-height:1.1;">${dEsc(ecole)}</div>
             <div style="font-size:0.68rem;letter-spacing:2px;">CARTE PROFESSIONNELLE</div>
         </div>
         <div style="display:flex;padding:8px 10px;gap:10px;">
-            <div style="width:74px;height:92px;border:1px solid #999;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#aaa;font-size:0.6rem;flex-shrink:0;">PHOTO</div>
+            <div style="width:74px;height:92px;border:1px solid #999;border-radius:4px;display:flex;align-items:center;justify-content:center;color:var(--muted-2,#aaa);font-size:0.6rem;flex-shrink:0;">PHOTO</div>
             <div style="font-size:0.76rem;line-height:1.6;">
                 <div><strong>${dEsc(p.nom)} ${dEsc(p.prenom)}</strong></div>
                 <div>Fonction : ${dEsc(p.fonction || '-')}</div>
@@ -139,7 +139,7 @@ function genererCartePersonnel(id) {
                 <div>Année : ${anneeCourante()}</div>
             </div>
         </div>
-        <div style="text-align:right;padding:0 10px;font-size:0.6rem;color:#555;">Le Directeur ____________</div>
+        <div style="text-align:right;padding:0 10px;font-size:0.6rem;color:var(--muted,#555);">Le Directeur ____________</div>
     </div>`;
     const w = window.open('', '_blank');
     w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Carte - ${dEsc(p.nom)}</title></head><body style="text-align:center;">${html}</body></html>`);
@@ -165,7 +165,7 @@ function renderSauvegarde() {
     if (box) box.innerHTML = `
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.75rem;">
             ${[['Élèves', 'ecole_eleves'], ['Notes', 'ecole_notes'], ['Personnel', 'ecole_personnel'], ['Transactions', 'digigespro_transactions'], ['Sanctions', 'ecole_sanctions'], ['Convocations', 'ecole_convocations']]
-                .map(([lbl, k]) => `<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:0.75rem;text-align:center;"><div style="font-size:1.4rem;font-weight:700;color:#2E2769;">${compterEntrees(el(k))}</div><div style="font-size:0.8rem;color:#64748b;">${lbl}</div></div>`).join('')}
+                .map(([lbl, k]) => `<div style="background:var(--surface-2,#f8fafc);border:1px solid #e2e8f0;border-radius:8px;padding:0.75rem;text-align:center;"><div style="font-size:1.4rem;font-weight:700;color:var(--brand-strong,#2E2769);">${compterEntrees(el(k))}</div><div style="font-size:0.8rem;color:var(--muted,#64748b);">${lbl}</div></div>`).join('')}
         </div>`;
 }
 function exporterSauvegarde() {
@@ -302,7 +302,7 @@ function renderDashboard() {
 
     // Effectifs par classe
     document.getElementById('dgParClasse').innerHTML = classes.length === 0
-        ? '<p style="color:#64748b;padding:1rem;">Aucune classe enregistrée.</p>'
+        ? '<p style="color:var(--muted,#64748b);padding:1rem;">Aucune classe enregistrée.</p>'
         : `<table><thead><tr><th>Classe</th><th style="text-align:center;">Effectif</th><th style="text-align:right;">Moyenne (${dEsc(trim)})</th></tr></thead><tbody>${classes.map(c => {
             const eff = eleves.filter(e => e.classe === c.nom).length;
             const cm = eleves.filter(e => e.classe === c.nom).map(e => moyenneEleveDir(e.id, trim)).filter(m => m !== null);
@@ -315,7 +315,7 @@ function renderDashboard() {
 function renderPersonnel() {
     const tbody = document.getElementById('personnelTable');
     tbody.innerHTML = personnel.length === 0
-        ? '<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:#64748b;">Aucun membre du personnel enregistré.</td></tr>'
+        ? '<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:var(--muted,#64748b);">Aucun membre du personnel enregistré.</td></tr>'
         : personnel.map(p => `<tr>
             <td style="font-weight:600;">${dEsc(p.nom)} ${dEsc(p.prenom)}</td>
             <td>${dEsc(p.fonction)}</td>
@@ -374,7 +374,7 @@ function renderDecisions() {
     const tbody = document.getElementById('decisionsTable');
     const list = decisions.slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
     tbody.innerHTML = list.length === 0
-        ? '<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:#64748b;">Aucune décision enregistrée.</td></tr>'
+        ? '<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:var(--muted,#64748b);">Aucune décision enregistrée.</td></tr>'
         : list.map(x => `<tr>
             <td style="font-weight:600;">${dEsc(x.numero)}</td>
             <td>${x.date ? new Date(x.date).toLocaleDateString('fr-FR') : '-'}</td>
@@ -412,7 +412,7 @@ function genererDecision(id) {
     const x = decisions.find(d => d.id === id); if (!x) return;
     const ecole = getEcoleName();
     const html = `
-        <div style="font-family:Arial,sans-serif;max-width:780px;margin:0 auto;padding:2.5rem;color:#111;">
+        <div style="font-family:Arial,sans-serif;max-width:780px;margin:0 auto;padding:2.5rem;color:var(--ink,#111);">
             <div style="text-align:center;border-bottom:2px solid #333;padding-bottom:0.75rem;margin-bottom:1.5rem;">
                 <p style="margin:0;font-size:0.85rem;">RÉPUBLIQUE DU CONGO &nbsp;–&nbsp; Unité, Travail, Progrès<br>Ministère de l'Enseignement Préscolaire, Primaire, Secondaire et de l'Alphabétisation</p>
                 <h2 style="margin:0.4rem 0 0;text-transform:uppercase;">${dEsc(ecole)}</h2>
@@ -426,7 +426,7 @@ function genererDecision(id) {
             <div style="margin-top:3rem;text-align:right;">
                 <p style="margin:0;font-weight:bold;">Le Chef d'établissement</p>
                 <div style="height:70px;"></div>
-                <p style="margin:0;color:#666;">(Signature et cachet)</p>
+                <p style="margin:0;color:var(--muted,#666);">(Signature et cachet)</p>
             </div>
         </div>`;
     const w = window.open('', '_blank');
@@ -442,7 +442,7 @@ function renderConseils() {
     const tbody = document.getElementById('conseilsTable');
     const list = conseils.slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
     tbody.innerHTML = list.length === 0
-        ? '<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:#64748b;">Aucune réunion enregistrée.</td></tr>'
+        ? '<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--muted,#64748b);">Aucune réunion enregistrée.</td></tr>'
         : list.map(c => `<tr>
             <td>${c.date ? new Date(c.date).toLocaleDateString('fr-FR') : '-'}</td>
             <td style="font-weight:600;">${dEsc(c.objet)}</td>
@@ -475,7 +475,7 @@ function genererPV(id) {
     const c = conseils.find(x => x.id === id); if (!c) return;
     const ecole = getEcoleName();
     const html = `
-        <div style="font-family:Arial,sans-serif;max-width:780px;margin:0 auto;padding:2.5rem;color:#111;">
+        <div style="font-family:Arial,sans-serif;max-width:780px;margin:0 auto;padding:2.5rem;color:var(--ink,#111);">
             <div style="text-align:center;border-bottom:2px solid #333;padding-bottom:0.75rem;margin-bottom:1.5rem;">
                 <h2 style="margin:0;text-transform:uppercase;">${dEsc(ecole)}</h2>
             </div>

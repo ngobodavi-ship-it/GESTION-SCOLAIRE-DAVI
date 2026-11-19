@@ -41,10 +41,10 @@ function redMajLigne(id) {
 }
 
 function redLabelReduction(r, base) {
-    if (!r || !r.mode || r.mode === 'aucune') return '<span style="color:#94a3b8;">—</span>';
-    if (r.mode === 'gratuite') return '<span style="background:#dcfce7;color:#166534;border-radius:999px;padding:1px 9px;font-size:0.78rem;font-weight:700;">Gratuité</span>';
-    if (r.mode === 'pourcentage') return `<span style="background:#eef2ff;color:#4338ca;border-radius:999px;padding:1px 9px;font-size:0.78rem;font-weight:700;">−${parseFloat(r.valeur) || 0}%</span>`;
-    if (r.mode === 'fixe') return `<span style="background:#fff7ed;color:#c2410c;border-radius:999px;padding:1px 9px;font-size:0.78rem;font-weight:700;">Forfait ${redFCFA(parseFloat(r.valeur) || 0)}</span>`;
+    if (!r || !r.mode || r.mode === 'aucune') return '<span style="color:var(--muted-2,#94a3b8);">—</span>';
+    if (r.mode === 'gratuite') return '<span style="background:var(--ok-bg,#dcfce7);color:var(--ok-strong,#166534);border-radius:999px;padding:1px 9px;font-size:0.78rem;font-weight:700;">Gratuité</span>';
+    if (r.mode === 'pourcentage') return `<span style="background:var(--brand-bg,#eef2ff);color:var(--brand-strong,#4338ca);border-radius:999px;padding:1px 9px;font-size:0.78rem;font-weight:700;">−${parseFloat(r.valeur) || 0}%</span>`;
+    if (r.mode === 'fixe') return `<span style="background:var(--warn-bg,#fff7ed);color:var(--warn-strong,#c2410c);border-radius:999px;padding:1px 9px;font-size:0.78rem;font-weight:700;">Forfait ${redFCFA(parseFloat(r.valeur) || 0)}</span>`;
     return '—';
 }
 
@@ -62,7 +62,7 @@ function renderReductions() {
     const filtreCl = sel ? sel.value : '';
     const liste = students.filter(s => !filtreCl || s.classe === filtreCl)
         .slice().sort((a, b) => (`${a.nom} ${a.prenom}`).localeCompare(`${b.nom} ${b.prenom}`));
-    if (liste.length === 0) { box.innerHTML = '<p style="color:#64748b;padding:0.75rem;">Aucun élève sur cette sélection.</p>'; return; }
+    if (liste.length === 0) { box.innerHTML = '<p style="color:var(--muted,#64748b);padding:0.75rem;">Aucun élève sur cette sélection.</p>'; return; }
 
     const modeOpts = (m) => {
         const opts = [['aucune', 'Aucune'], ['pourcentage', 'Pourcentage (%)'], ['fixe', 'Montant fixe / mois'], ['gratuite', 'Gratuité totale']];
@@ -78,11 +78,11 @@ function renderReductions() {
         const showVal = (r.mode === 'pourcentage' || r.mode === 'fixe');
         const valPlaceholder = r.mode === 'pourcentage' ? 'ex: 50' : 'ex: 15000';
         return `<tr>
-            <td style="font-weight:600;">${redEsc(s.nom)} ${redEsc(s.prenom)}<br><span style="color:#64748b;font-size:0.78rem;font-family:monospace;">${redEsc(s.matricule || '')}</span></td>
+            <td style="font-weight:600;">${redEsc(s.nom)} ${redEsc(s.prenom)}<br><span style="color:var(--muted,#64748b);font-size:0.78rem;font-family:monospace;">${redEsc(s.matricule || '')}</span></td>
             <td>${redEsc(s.classe || '-')}</td>
-            <td style="text-align:right;color:#64748b;">${redFCFA(base)}</td>
+            <td style="text-align:right;color:var(--muted,#64748b);">${redFCFA(base)}</td>
             <td><select onchange="redSetMode('${s.id}',this.value)" style="margin:0;min-width:160px;">${modeOpts(r.mode || 'aucune')}</select></td>
-            <td><input type="number" min="0" value="${showVal ? redAttr(r.valeur) : ''}" placeholder="${valPlaceholder}" ${showVal ? '' : 'disabled style="background:#f1f5f9;"'} oninput="redSetValeur('${s.id}',this.value)" style="width:110px;margin:0;padding:0.3rem;text-align:right;${showVal ? '' : 'background:#f1f5f9;'}"></td>
+            <td><input type="number" min="0" value="${showVal ? redAttr(r.valeur) : ''}" placeholder="${valPlaceholder}" ${showVal ? '' : 'disabled style="background:var(--surface-2,#f1f5f9);"'} oninput="redSetValeur('${s.id}',this.value)" style="width:110px;margin:0;padding:0.3rem;text-align:right;${showVal ? '' : 'background:var(--surface-2,#f1f5f9);'}"></td>
             <td style="text-align:right;font-weight:700;" id="redEff_${s.id}">${redFCFA(eff)}</td>
             <td><input type="text" value="${redAttr(r.motif || '')}" placeholder="ex: fratrie, bourse…" oninput="redSetMotif('${s.id}',this.value)" style="min-width:150px;margin:0;padding:0.3rem;"></td>
         </tr>`;
@@ -90,8 +90,8 @@ function renderReductions() {
 
     box.innerHTML = `
         <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:0.85rem;">
-            <span style="background:#eef2ff;color:#4338ca;border-radius:999px;padding:0.25rem 0.8rem;font-weight:600;">${liste.length} élève(s) affiché(s)</span>
-            <span style="background:#dcfce7;color:#166534;border-radius:999px;padding:0.25rem 0.8rem;font-weight:600;">${nbReduits} avec réduction</span>
+            <span style="background:var(--brand-bg,#eef2ff);color:var(--brand-strong,#4338ca);border-radius:999px;padding:0.25rem 0.8rem;font-weight:600;">${liste.length} élève(s) affiché(s)</span>
+            <span style="background:var(--ok-bg,#dcfce7);color:var(--ok-strong,#166534);border-radius:999px;padding:0.25rem 0.8rem;font-weight:600;">${nbReduits} avec réduction</span>
         </div>
         <table>
             <thead><tr>
@@ -99,5 +99,5 @@ function renderReductions() {
             </tr></thead>
             <tbody>${lignes}</tbody>
         </table>
-        <p style="color:#64748b;font-size:0.82rem;margin:0.75rem 0 0;">💡 La réduction s'applique à la <strong>scolarité mensuelle</strong>. Elle est enregistrée automatiquement et se répercute aussitôt sur le reste à payer, les impayés et le reporting. Les frais d'inscription ne sont pas modifiés.</p>`;
+        <p style="color:var(--muted,#64748b);font-size:0.82rem;margin:0.75rem 0 0;">💡 La réduction s'applique à la <strong>scolarité mensuelle</strong>. Elle est enregistrée automatiquement et se répercute aussitôt sur le reste à payer, les impayés et le reporting. Les frais d'inscription ne sont pas modifiés.</p>`;
 }

@@ -71,13 +71,13 @@ function renderCalendrier() {
     const prefix = `${curYear}-${pad2(curMonth + 1)}`;
     const list = evenements.filter(e => (e.date || '').slice(0, 7) === prefix).sort((a, b) => (a.date || '').localeCompare(b.date || ''));
     document.getElementById('calListe').innerHTML = list.length === 0
-        ? '<p style="color:#64748b;padding:1rem;">Aucun événement ce mois-ci. Cliquez sur un jour pour en ajouter un.</p>'
+        ? '<p style="color:var(--muted,#64748b);padding:1rem;">Aucun événement ce mois-ci. Cliquez sur un jour pour en ajouter un.</p>'
         : list.map(e => `
             <div style="display:flex;align-items:center;gap:0.75rem;padding:0.6rem 0;border-bottom:1px solid #eef2f7;">
                 <div style="width:10px;height:38px;border-radius:4px;background:${EVT_TYPES[e.type] || '#64748b'};flex-shrink:0;"></div>
                 <div style="flex:1;min-width:0;">
                     <div style="font-weight:600;">${cEsc(e.titre)}</div>
-                    <div style="font-size:0.85rem;color:#64748b;">${new Date(e.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })} • ${cEsc(e.type)}${e.description ? ' — ' + cEsc(e.description) : ''}</div>
+                    <div style="font-size:0.85rem;color:var(--muted,#64748b);">${new Date(e.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })} • ${cEsc(e.type)}${e.description ? ' — ' + cEsc(e.description) : ''}</div>
                 </div>
                 <button class="btn btn-secondary" style="padding:0.3rem 0.6rem;font-size:0.85rem;" onclick="editEvt('${e.id}')">✏️</button>
                 <button class="btn btn-danger" style="padding:0.3rem 0.6rem;font-size:0.85rem;" onclick="deleteEvt('${e.id}')">🗑️</button>
@@ -87,7 +87,7 @@ function renderCalendrier() {
 // ---------- Légende ----------
 function renderLegende() {
     document.getElementById('calLegende').innerHTML = Object.keys(EVT_TYPES).map(t =>
-        `<span style="display:inline-flex;align-items:center;gap:0.35rem;font-size:0.8rem;color:#475569;margin-right:0.75rem;"><span style="width:12px;height:12px;border-radius:3px;background:${EVT_TYPES[t]};display:inline-block;"></span>${t}</span>`
+        `<span style="display:inline-flex;align-items:center;gap:0.35rem;font-size:0.8rem;color:var(--muted,#475569);margin-right:0.75rem;"><span style="width:12px;height:12px;border-radius:3px;background:${EVT_TYPES[t]};display:inline-block;"></span>${t}</span>`
     ).join('');
 }
 
