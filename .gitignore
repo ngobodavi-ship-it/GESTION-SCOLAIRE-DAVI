@@ -1,0 +1,5 @@
+# Paiement en ligne : clés et données du serveur, jamais sur GitHub
+config-paiement.php
+api/private/*
+!api/private/.htaccess
+!api/private/index.html

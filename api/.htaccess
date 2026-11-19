@@ -1,0 +1,17 @@
+# Pas de liste des fichiers
+Options -Indexes
+# Les fichiers de configuration et de données ne sont jamais servis
+<FilesMatch "^(config.*\.php|lib\.php)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+<FilesMatch "^config\.exemple\.php$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+</FilesMatch>

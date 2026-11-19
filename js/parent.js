@@ -131,6 +131,7 @@ function parInitPayer() {
     document.getElementById('pdDate').max = new Date().toISOString().slice(0, 10);
     pdMajMois();
     parRenderPayer(false);
+    pnInit();
 }
 function parRenderPayer(marquerVu) {
     const c = Comptes.paiementConfig();
@@ -193,4 +194,81 @@ function declarerPaiement() {
     ['pdRef', 'pdNote', 'pdMontant'].forEach(i => document.getElementById(i).value = '');
     pdMajMois(); parRenderPayer(true);
     uiToast('Paiement déclaré. L\'école va le vérifier : vous verrez son état ci-dessous.', 'ok');
+}
+
+// ---------- Payer maintenant (paiement en ligne MTN / Airtel) ----------
+let pnOperateur = null, pnSuivi = null;
+function pnInit() {
+    const a = Paiement.enLigne.actifs();
+    document.getElementById('pnBientot').classList.toggle('hidden', a.un);
+    document.getElementById('pnOff').classList.toggle('hidden', a.un);
+    document.getElementById('pnOn').classList.toggle('hidden', !a.un);
+    document.getElementById('pnCard').classList.toggle('pn-inactif', !a.un);
+    if (!a.un) return;
+    document.getElementById('pnEleve').innerHTML = document.getElementById('pdEleve').innerHTML;
+    const ops = [['mtn', 'MTN MoMo'], ['airtel', 'Airtel Money']].filter(o => a[o[0]]);
+    pnOperateur = ops[0][0];
+    document.getElementById('pnOp').innerHTML = ops.map(o => `<button type="button" data-v="${o[0]}" class="${o[0] === pnOperateur ? 'on' : ''}" onclick="pnChoisirOp('${o[0]}')">${o[1]}</button>`).join('');
+    document.getElementById('pnTel').value = parParent.telephone || '';
+    pnMajMois();
+}
+function pnChoisirOp(v) { pnOperateur = v; document.querySelectorAll('#pnOp button').forEach(b => b.classList.toggle('on', b.dataset.v === v)); }
+function pnMajMois() {
+    // même liste de mois que la déclaration, avec ses propres cases
+    const type = document.getElementById('pnType').value;
+    document.getElementById('pnMoisBox').classList.toggle('hidden', type !== 'scolarite');
+    const save = document.getElementById('pdEleve').value, saveT = document.getElementById('pdType').value;
+    document.getElementById('pdEleve').value = document.getElementById('pnEleve').value; document.getElementById('pdType').value = 'scolarite';
+    pdMajMois();
+    document.getElementById('pnMois').innerHTML = document.getElementById('pdMois').innerHTML.replace(/onchange="pdMajMontant\(\)"/g, 'onchange="pnMajMontant()"');
+    document.getElementById('pdEleve').value = save; document.getElementById('pdType').value = saveT; pdMajMois();
+    document.getElementById('pnMontant').value = '';
+}
+function pnMajMontant() {
+    const tot = [...document.querySelectorAll('#pnMois input:checked')].reduce((s, i) => s + Number(i.dataset.reste || 0), 0);
+    if (tot) document.getElementById('pnMontant').value = tot;
+}
+function pnAttente(html) { const w = document.getElementById('pnAttente'); w.innerHTML = html; w.classList.toggle('hidden', !html); }
+async function payerMaintenant() {
+    const e = parParent.enfants.find(x => x.id === document.getElementById('pnEleve').value);
+    const type = document.getElementById('pnType').value;
+    const mois = type === 'scolarite' ? [...document.querySelectorAll('#pnMois input:checked')].map(i => i.value) : [];
+    const montant = Number(document.getElementById('pnMontant').value), tel = document.getElementById('pnTel').value.trim();
+    if (!e) return uiToast('Choisissez l\'enfant concerné.', 'warn');
+    if (type === 'scolarite' && !mois.length && document.querySelector('#pnMois input')) return uiToast('Cochez le ou les mois à payer.', 'warn');
+    if (!montant || montant <= 0) return uiToast('Indiquez le montant à payer.', 'warn');
+    if (Comptes.normTel(tel).length < 8) return uiToast('Indiquez le numéro de téléphone qui va payer.', 'warn');
+    const nomOp = pnOperateur === 'mtn' ? 'MTN Mobile Money' : 'Airtel Money';
+    if (!confirm(`Payer ${fmtFCFA(montant)} avec ${nomOp} depuis le ${tel} ?`)) return;
+    document.getElementById('pnBtn').disabled = true;
+    pnAttente(`<div class="pn-step"><span class="spin"></span><div><strong>Envoi de la demande…</strong><small>Connexion à ${nomOp}</small></div></div>`);
+    const r = await Paiement.enLigne.lancer({ fournisseur: pnOperateur, montant, telephone: tel, contexte: { eleveId: e.id, eleveNom: e.prenom + ' ' + e.nom, type, mois, parentKey: parParent.key } });
+    if (!r.ok) { document.getElementById('pnBtn').disabled = false; pnAttente(`<div class="pn-step ko"><i class="bi bi-x-circle"></i><div><strong>Le paiement n'a pas pu être lancé</strong><small>${parEsc(r.erreur || 'Erreur inconnue')}</small></div></div>`); return; }
+    pnAttente(`<div class="pn-step"><span class="spin"></span><div><strong>Confirmez sur votre téléphone</strong><small>Une demande de ${fmtFCFA(montant)} a été envoyée au ${parEsc(tel)}. Saisissez votre code secret ${nomOp} pour valider. Ne fermez pas cette page.</small></div></div>`);
+    const debut = Date.now();
+    clearInterval(pnSuivi);
+    pnSuivi = setInterval(async () => {
+        const v = await Paiement.enLigne.verifier(r.ref);
+        if (v.ok && v.statut === 'reussi') { clearInterval(pnSuivi); pnReussi(v, { e, type, mois, montant, tel }); }
+        else if ((v.ok && v.statut === 'echec') || Date.now() - debut > 4 * 60 * 1000) {
+            clearInterval(pnSuivi); document.getElementById('pnBtn').disabled = false;
+            pnAttente(`<div class="pn-step ko"><i class="bi bi-x-circle"></i><div><strong>Paiement non effectué</strong><small>${parEsc((v && v.raison) || 'Le paiement a été refusé ou n\'a pas été confirmé à temps. Aucun montant n\'a été enregistré. Vous pouvez réessayer.')}</small></div></div>`);
+        }
+    }, 4000);
+}
+function pnReussi(v, x) {
+    const all = Comptes.declarations(), id = 'api-' + v.ref;
+    if (!all.some(d => d.id === id)) {
+        const d = { id, createdAt: new Date().toISOString(), date: new Date().toISOString().slice(0, 10), parentKey: parParent.key, parentNom: parParent.nom || 'Parent', parentTel: parParent.telephone,
+            eleveId: x.e.id, eleveNom: x.e.prenom + ' ' + x.e.nom, eleveNomSeul: x.e.nom, elevePrenom: x.e.prenom, classe: x.e.classe || '', matricule: x.e.matricule || '',
+            type: x.type, mois: x.mois, montant: v.montant || x.montant, moyen: v.fournisseur, reference: v.operateur_tx || v.externalId, numeroPayeur: x.tel,
+            status: 'valide', source: 'en_ligne', traitePar: 'Confirmé automatiquement par ' + (v.fournisseur === 'mtn' ? 'MTN' : 'Airtel'), traiteLe: new Date().toISOString(), refServeur: v.ref, vuParent: true };
+        const t = Paiement.creerTransaction(d);
+        d.transactionId = t.id; d.transactionRef = t.reference;
+        all.unshift(d); Comptes.sauverDeclarations(all);
+    }
+    document.getElementById('pnBtn').disabled = false;
+    pnAttente(`<div class="pn-step ok"><i class="bi bi-check-circle-fill"></i><div><strong>Paiement réussi</strong><small>${fmtFCFA(v.montant || x.montant)} payés avec ${v.fournisseur === 'mtn' ? 'MTN Mobile Money' : 'Airtel Money'} — réf. ${parEsc(v.operateur_tx || v.externalId)}. Il est déjà enregistré par l'école.</small></div></div>`);
+    uiToast('Paiement réussi et enregistré.', 'ok');
+    loadConsult(); parRenderKids(x.e.id); parTab('payer'); pnMajMois(); parRenderPayer(true);
 }

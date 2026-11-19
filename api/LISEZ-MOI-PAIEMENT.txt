@@ -1,0 +1,79 @@
+PAIEMENT EN LIGNE (« Payer maintenant ») — MTN MoMo et Airtel Money
+=====================================================================
+
+Le parent clique sur « Payer maintenant », reçoit une demande de paiement
+sur son téléphone, la confirme avec son code secret : le paiement est
+enregistré automatiquement. La déclaration manuelle reste disponible.
+
+Tant que rien n'est configuré, l'espace parent affiche « Bientôt disponible ».
+
+---------------------------------------------------------------------
+1. PRÉREQUIS
+---------------------------------------------------------------------
+- Hébergement avec PHP 8 et l'extension curl (offres LWS avec PHP).
+  Sur GitHub Pages, le paiement en ligne ne peut pas fonctionner (pas de PHP).
+- Un site en HTTPS (certificat SSL, fourni par LWS).
+
+---------------------------------------------------------------------
+2. LES CLÉS DES OPÉRATEURS
+---------------------------------------------------------------------
+MTN (https://momodeveloper.mtn.com)
+- Profile > Subscriptions > Collection : copiez la « Primary key »
+  (= subscription_key). Si besoin : Products > Collection > Subscribe.
+- Mode TEST : l'API User et l'API Key se créent avec l'outil
+  api/outils/mtn-creer-utilisateur.php (voir étape 4).
+- Mode PRODUCTION : MTN fournit les identifiants après validation de
+  votre compte marchand (« Go live »).
+- En mode TEST, MTN n'accepte que la devise EUR (aucun vrai argent).
+
+Airtel (https://developers.airtel.africa)
+- My Apps > votre application (produit Collection, pays Congo, XAF) :
+  copiez le Client ID et le Client Secret.
+- La production est ouverte par Airtel après validation du compte marchand.
+
+Les noms des menus des portails peuvent changer : en cas de doute,
+reportez-vous à la documentation de chaque opérateur.
+
+---------------------------------------------------------------------
+3. LE FICHIER DE CONFIGURATION (SUR LE SERVEUR UNIQUEMENT)
+---------------------------------------------------------------------
+1. Copiez api/config.exemple.php sous le nom  config-paiement.php
+2. Remplissez-le (clés, url_publique, secret_installation, actif => true).
+3. Déposez-le avec le gestionnaire de fichiers LWS :
+   - de préférence AU-DESSUS du dossier du site (il ne sera jamais
+     accessible depuis Internet) ;
+   - sinon dans  api/private/config.php  (dossier protégé par .htaccess).
+NE METTEZ JAMAIS CE FICHIER SUR GITHUB ET NE L'ENVOYEZ À PERSONNE.
+(Le fichier .gitignore du projet l'exclut automatiquement.)
+
+---------------------------------------------------------------------
+4. MTN EN MODE TEST : CRÉER L'API USER ET L'API KEY
+---------------------------------------------------------------------
+Avec subscription_key et secret_installation renseignés, ouvrez une fois :
+  https://VOTRE-SITE/api/outils/mtn-creer-utilisateur.php?secret=VOTRE_SECRET
+Recopiez api_user et api_key affichés dans la configuration.
+
+---------------------------------------------------------------------
+5. ACTIVER POUR LES PARENTS
+---------------------------------------------------------------------
+Portail > Espace admin > Paramètres > Paiement à distance >
+« Paiement en ligne » > « Vérifier le serveur ».
+Quand un opérateur est indiqué « Prêt », activez son interrupteur :
+les parents voient alors « Payer maintenant ».
+
+---------------------------------------------------------------------
+6. PASSAGE EN PRODUCTION
+---------------------------------------------------------------------
+Dans la configuration : environnement => 'production', devise => 'XAF',
+nouvelles clés de production. Vérifiez « target_environment » (MTN) et
+le format du numéro (« retirer_zero » pour Airtel) avec l'opérateur.
+
+---------------------------------------------------------------------
+FICHIERS
+---------------------------------------------------------------------
+api/lib.php              fonctions communes (opérateurs, stockage, limites)
+api/statut-serveur.php   état de la configuration (sans les clés)
+api/payer.php            lance la demande sur le téléphone du parent
+api/verifier.php         état du paiement (interroge l'opérateur)
+api/callback-*.php       confirmations envoyées par les opérateurs
+api/private/             paiements en cours et limites anti-abus (protégé)

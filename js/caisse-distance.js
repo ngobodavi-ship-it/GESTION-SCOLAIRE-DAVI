@@ -74,35 +74,7 @@ function validerDeclaration(id) {
     const all = Comptes.declarations(), d = all.find(x => x.id === id);
     if (!d || d.status !== 'en_attente') return;
     if (!confirm(`Avez-vous vérifié sur ${Comptes.MOYENS[d.moyen] || d.moyen} la réception de ${cdFCFA(d.montant)} (réf. ${d.reference}) ?\n\nLa transaction sera enregistrée à la date du paiement (${cdJour(d.date)}).`)) return;
-    const s = cdEleveCaisse(d);
-    const nomEcole = localStorage.getItem('digigespro_ecole') || localStorage.getItem('ecole_nom') || '';
-    const montant = Number(d.montant) || 0;
-    const t = {
-        id: Date.now().toString(), date: d.date, time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
-        type: d.type, nomEcole, paymentMethod: d.moyen,
-        studentId: s.id, studentName: `${s.nom} ${s.prenom}`.trim(), studentClasse: s.classe, studentMatricule: s.matricule,
-        amount: montant, refOperateur: d.reference, source: 'parent', declarationId: d.id,
-        description: `Paiement à distance (${Comptes.MOYENS[d.moyen] || d.moyen}) — réf. ${d.reference}`
-    };
-    if (d.type === 'scolarite') {
-        const mois = (d.mois && d.mois.length) ? d.mois.slice() : [];
-        if (!mois.length) return uiToast('Ce paiement de scolarité n\'indique aucun mois.', 'err');
-        // Répartition : chaque mois reçoit au plus ce qui lui reste à payer, le surplus va au dernier mois
-        const bal = typeof calculateMonthlyBalances === 'function' ? calculateMonthlyBalances(s.id) : {};
-        const mens = (typeof mensualiteEffective === 'function' && typeof grilleTarif === 'function') ? mensualiteEffective(s.id, grilleTarif(s.classe).mensualite || 0) : 0;
-        let reste = montant; const parMois = {};
-        mois.forEach((m, i) => {
-            const du = bal[m] ? Math.max(0, bal[m].reste) : mens;
-            const part = i === mois.length - 1 ? reste : Math.min(reste, du || reste / (mois.length - i));
-            parMois[m] = part; reste -= part;
-        });
-        Object.assign(t, { moisPayes: mois, montantParMois: parMois, prixFixe: mens || (montant / mois.length), isEcheance: false,
-            reference: `SCO-${String(transactions.filter(x => x.type === 'scolarite').length + 1).padStart(3, '0')}` });
-    } else {
-        t.reference = `${String(d.type).substring(0, 3).toUpperCase()}-${String(transactions.filter(x => x.type === d.type).length + 1).padStart(3, '0')}`;
-    }
-    transactions.unshift(t);
-    localStorage.setItem('digigespro_transactions', JSON.stringify(transactions));
+    const t = Paiement.creerTransaction(d);
     d.status = 'valide'; d.traitePar = cdQui(); d.traiteLe = new Date().toISOString(); d.transactionId = t.id; d.transactionRef = t.reference;
     Comptes.sauverDeclarations(all);
     if (typeof updateUI === 'function') { try { updateUI(); } catch (e) { } }
@@ -165,7 +137,7 @@ function renderCloture() {
     const details = CL_ORDRE.filter(m => T.det[m].length).map(m => `
         <details class="cl-det"><summary><span class="ui-pill ${CD_MOYEN_PILL[m]}">${Comptes.MOYENS[m]}</span> ${T.nb[m]} opération(s) · ${cdFCFA(T.tot[m])}</summary>
         <div style="overflow-x:auto;"><table><thead><tr><th>Heure</th><th>Élève</th><th>Objet</th><th>Réf. interne</th><th>Réf. opérateur</th><th style="text-align:right;">Montant</th></tr></thead>
-        <tbody>${T.det[m].map(t => `<tr><td>${cdEsc(t.time || '-')}</td><td>${cdEsc(t.studentName || '-')}</td><td>${cdEsc(CD_TYPES[t.type] || t.type)}${t.source === 'parent' ? ' <span class="ui-pill info">parent</span>' : ''}</td><td>${cdEsc(t.reference || '-')}</td><td>${cdEsc(t.refOperateur || '-')}</td><td style="text-align:right;">${cdFCFA(t.amount)}</td></tr>`).join('')}</tbody></table></div></details>`).join('');
+        <tbody>${T.det[m].map(t => `<tr><td>${cdEsc(t.time || '-')}</td><td>${cdEsc(t.studentName || '-')}</td><td>${cdEsc(CD_TYPES[t.type] || t.type)}${t.source === 'parent' ? ' <span class="ui-pill info">déclaré</span>' : t.source === 'en_ligne' ? ' <span class="ui-pill ok">en ligne</span>' : ''}</td><td>${cdEsc(t.reference || '-')}</td><td>${cdEsc(t.refOperateur || '-')}</td><td style="text-align:right;">${cdFCFA(t.amount)}</td></tr>`).join('')}</tbody></table></div></details>`).join('');
     document.getElementById('clContenu').innerHTML = `
         ${clo ? `<div class="alert ${modifie ? 'alert-warning' : 'alert-success'}"><i class="bi bi-${modifie ? 'exclamation-triangle' : 'lock'}"></i> Journée clôturée par ${cdEsc(clo.par)} le ${cdJour(clo.le)}.${modifie ? ' <strong>Des opérations ont été ajoutées ou modifiées depuis : vérifiez et clôturez à nouveau.</strong>' : ''}</div>` : ''}
         ${attente.length ? `<div class="alert alert-warning"><i class="bi bi-hourglass-split"></i> ${attente.length} paiement(s) déclaré(s) par des parents pour cette journée sont encore <strong>en attente de vérification</strong> et ne sont pas comptés. <a href="#paiements-declares" onclick="showTab('declares');return false;">Les vérifier</a></div>` : ''}

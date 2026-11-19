@@ -59,8 +59,32 @@
                 <p class="text-secondary small mb-3">Payez avec votre téléphone (MTN Mobile Money, Airtel Money) ou par virement, puis <strong>déclarez votre paiement ci-dessous</strong> avec l'identifiant de transaction reçu par SMS. L'école le vérifie puis l'enregistre : vous suivez son état ici.</p>
                 <div id="payNumeros" class="pay-nums"></div>
             </div>
+            <div class="card pn-card" id="pnCard">
+                <div class="pn-head">
+                    <span class="pn-badge"><i class="bi bi-lightning-charge-fill"></i></span>
+                    <div style="flex:1;min-width:220px;">
+                        <h3 style="margin:0;">Payer maintenant <span class="ui-pill warn hidden" id="pnBientot">Bientôt disponible</span></h3>
+                        <p class="text-secondary small mb-0">Vous recevez une demande de paiement sur votre téléphone : confirmez avec votre code secret et le paiement est enregistré immédiatement, sans attente.</p>
+                    </div>
+                </div>
+                <div id="pnOff" class="pn-off hidden"><i class="bi bi-hourglass-split"></i><span>Le paiement en ligne sera bientôt activé par l'école. En attendant, payez sur le numéro de l'école puis <strong>déclarez votre paiement</strong> ci-dessous.</span></div>
+                <div id="pnOn" class="hidden">
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-6"><label class="form-label" for="pnEleve">Enfant</label><select id="pnEleve" style="margin:0;" onchange="pnMajMois()"></select></div>
+                        <div class="col-md-6"><label class="form-label" for="pnType">Objet</label><select id="pnType" style="margin:0;" onchange="pnMajMois()"><option value="scolarite">Scolarité (mensualités)</option><option value="inscription">Frais d'inscription</option><option value="reinscription">Frais de réinscription</option></select></div>
+                        <div class="col-12" id="pnMoisBox"><label class="form-label">Mois à payer</label><div id="pnMois" class="pd-mois"></div></div>
+                        <div class="col-md-4"><label class="form-label" for="pnMontant">Montant (FCFA)</label><input type="number" id="pnMontant" min="1" step="1" style="margin:0;"></div>
+                        <div class="col-md-4"><label class="form-label">Opérateur</label><div class="seg" id="pnOp"></div></div>
+                        <div class="col-md-4"><label class="form-label" for="pnTel">Numéro qui paie</label><input type="text" id="pnTel" style="margin:0;" placeholder="Ex : 06 555 12 34"></div>
+                    </div>
+                    <div class="d-flex justify-content-end mt-3"><button class="btn btn-primary" id="pnBtn" onclick="payerMaintenant()"><i class="bi bi-lightning-charge"></i> Payer maintenant</button></div>
+                </div>
+                <div id="pnAttente" class="pn-wait hidden"></div>
+            </div>
+
             <div class="card">
-                <h3 style="margin-bottom:1rem;">Déclarer un paiement</h3>
+                <h3 style="margin-bottom:.25rem;">Déclarer un paiement déjà effectué</h3>
+                <p class="text-secondary small mb-3">Vous avez déjà payé (Mobile Money ou virement) ? Déclarez-le avec l'identifiant de transaction : l'école le vérifie puis l'enregistre.</p>
                 <div class="row g-3">
                     <div class="col-md-6"><label class="form-label" for="pdEleve">Enfant</label><select id="pdEleve" style="margin:0;" onchange="pdMajMois()"></select></div>
                     <div class="col-md-6"><label class="form-label" for="pdType">Objet</label><select id="pdType" style="margin:0;" onchange="pdMajMois()"><option value="scolarite">Scolarité (mensualités)</option><option value="inscription">Frais d'inscription</option><option value="reinscription">Frais de réinscription</option></select></div>
@@ -105,6 +129,7 @@
     <script src="js/data.js"></script>
     <script src="js/tarifs.js"></script>
     <script src="js/consultation.js"></script>
+    <script src="js/paiement-commun.js"></script>
     <script src="js/parent.js"></script>
 </body>
 </html>

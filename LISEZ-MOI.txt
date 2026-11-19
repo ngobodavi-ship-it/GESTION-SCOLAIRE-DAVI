@@ -78,3 +78,11 @@ theme. Le comportement de l'application est identique.
   historique ; alerte si des opérations sont ajoutées après la clôture.
   js/caisse-distance.js. Données : ecole_paiement_distance,
   ecole_paiements_declares, ecole_clotures_caisse.
+
+--- PAIEMENT EN LIGNE « PAYER MAINTENANT » (MTN / AIRTEL) ---
+  Préparé, désactivé par défaut (« Bientôt disponible » pour les parents).
+  Fichiers serveur PHP dans api/ (hébergement LWS requis, pas GitHub Pages).
+  Guide complet : api/LISEZ-MOI-PAIEMENT.txt
+  Activation : Espace admin > Paramètres > Paiement à distance >
+  Paiement en ligne > Vérifier le serveur, puis activer MTN / Airtel.
+  La déclaration manuelle reste toujours disponible.

@@ -335,6 +335,13 @@
                         <div class="col-md-4"><label class="form-label">RIB / numéro de compte</label><input type="text" id="payRib" class="form-control"></div>
                     </div>
                     <button class="btn btn-primary mt-3" onclick="savePaiementDistance()"><i class="bi bi-check-lg"></i> Enregistrer les moyens de paiement</button>
+                    <hr class="my-4">
+                    <h3 class="h6 fw-bold mb-1"><i class="bi bi-lightning-charge"></i> Paiement en ligne (« Payer maintenant »)</h3>
+                    <p class="text-secondary small mb-3">Le parent reçoit la demande de paiement sur son téléphone et la confirme avec son code secret : le paiement est enregistré automatiquement, sans vérification manuelle. Nécessite l'hébergement LWS (fichiers PHP du dossier <code>api/</code>) et les clés des portails développeur MTN / Airtel, saisies dans le fichier de configuration du serveur. La déclaration manuelle reste toujours disponible.</p>
+                    <div id="enLigneEtat" class="srv-etat"></div>
+                    <div class="d-flex gap-2 flex-wrap mt-3">
+                        <button class="btn btn-secondary" onclick="verifierServeurPaiement()"><i class="bi bi-arrow-repeat"></i> Vérifier le serveur</button>
+                    </div>
                 </div>
                 <div class="card-soft">
                     <h3 class="h6 fw-bold mb-1">Couleur de l'interface</h3>
@@ -395,6 +402,7 @@
 
     <script src="js/etablissement.js"></script>
     <script src="js/comptes.js"></script>
+    <script src="js/paiement-commun.js"></script>
     <script>
         // ============================================
         // Portail de gestion scolaire — configuration locale

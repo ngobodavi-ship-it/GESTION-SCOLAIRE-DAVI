@@ -451,9 +451,58 @@ function fillPaiementDistance() {
     const c = Comptes.paiementConfig(), set = (id, v) => { const e = document.getElementById(id); if (e) e.value = v || ''; };
     set('payMtnNum', c.mtn.numero); set('payMtnNom', c.mtn.nom); set('payAirtelNum', c.airtel.numero); set('payAirtelNom', c.airtel.nom);
     set('payBanque', c.banque.banque); set('payTitulaire', c.banque.titulaire); set('payRib', c.banque.rib);
+    renderEnLigne(null);
 }
 function savePaiementDistance() {
     const v = id => document.getElementById(id).value.trim();
-    Comptes.sauverPaiementConfig({ mtn: { numero: v('payMtnNum'), nom: v('payMtnNom') }, airtel: { numero: v('payAirtelNum'), nom: v('payAirtelNom') }, banque: { banque: v('payBanque'), titulaire: v('payTitulaire'), rib: v('payRib') } });
+    const old = Comptes.paiementConfig();
+    Comptes.sauverPaiementConfig({ mtn: { numero: v('payMtnNum'), nom: v('payMtnNom') }, airtel: { numero: v('payAirtelNum'), nom: v('payAirtelNom') }, banque: { banque: v('payBanque'), titulaire: v('payTitulaire'), rib: v('payRib') }, enLigne: old.enLigne || {} });
     uiToast('Moyens de paiement enregistrés : ils sont affichés aux parents.', 'ok');
+}
+
+// ---------------------------------------------------------------
+// Paramètres : paiement en ligne (activation par opérateur)
+// ---------------------------------------------------------------
+let srvEtat = null;
+function renderEnLigne(etat) {
+    if (etat !== undefined) srvEtat = etat;
+    const box = document.getElementById('enLigneEtat'); if (!box) return;
+    const act = (Comptes.paiementConfig().enLigne) || {};
+    const ligne = (id, nom) => {
+        const st = srvEtat && srvEtat.ok ? srvEtat[id] : null;
+        const pret = !!(st && st.actif && st.configure);
+        let info;
+        if (!srvEtat) info = 'Cliquez sur « Vérifier le serveur » pour contrôler la configuration.';
+        else if (!srvEtat.ok) info = 'Serveur non vérifié.';
+        else if (!st.configure) info = 'Clés manquantes dans la configuration du serveur : ' + st.manquant.join(', ') + '.';
+        else if (!st.actif) info = 'Clés présentes mais « actif » vaut false dans la configuration du serveur.';
+        else info = 'Prêt — mode ' + (st.environnement === 'sandbox' ? 'TEST (sandbox, aucun vrai argent)' : 'PRODUCTION') + (st.devise ? ' · devise ' + st.devise : '') + '.';
+        return `<div class="srv-op">
+            <div class="srv-op-txt"><strong>${nom}</strong><small>${pcEsc(info)}</small></div>
+            <label class="switch" title="${pret || act[id] ? '' : 'Disponible quand le serveur est prêt'}">
+                <input type="checkbox" ${act[id] ? 'checked' : ''} ${pret || act[id] ? '' : 'disabled'} onchange="basculerEnLigne('${id}', this.checked)"><span></span>
+            </label>
+            <span class="ui-pill ${act[id] ? 'ok' : ''}">${act[id] ? 'Activé pour les parents' : 'Désactivé'}</span>
+        </div>`;
+    };
+    const tete = !srvEtat ? '' : srvEtat.ok
+        ? `<div class="srv-ok"><i class="bi bi-hdd-network"></i> Serveur joignable · PHP ${pcEsc(srvEtat.php)} · ${srvEtat.configuration_trouvee ? 'fichier de configuration trouvé' : '<strong>aucun fichier de configuration</strong> (voir api/LISEZ-MOI-PAIEMENT.txt)'}</div>`
+        : `<div class="srv-ko"><i class="bi bi-plug"></i> ${pcEsc(srvEtat.erreur || 'Serveur injoignable.')}</div>`;
+    box.innerHTML = tete + ligne('mtn', 'MTN Mobile Money') + ligne('airtel', 'Airtel Money');
+}
+async function verifierServeurPaiement() {
+    const box = document.getElementById('enLigneEtat');
+    box.insertAdjacentHTML('afterbegin', '<div class="srv-ok" id="srvChk"><span class="spin"></span> Vérification…</div>');
+    const r = await Paiement.enLigne.statutServeur();
+    renderEnLigne(r);
+}
+function basculerEnLigne(id, on) {
+    const c = Comptes.paiementConfig();
+    c.enLigne = c.enLigne || {};
+    if (on && !(srvEtat && srvEtat.ok && srvEtat[id] && srvEtat[id].actif && srvEtat[id].configure)) { uiToast('Le serveur n\'est pas prêt pour cet opérateur.', 'err'); renderEnLigne(); return; }
+    if (on && srvEtat[id].environnement === 'sandbox' && !confirm('Ce serveur est en mode TEST (sandbox) : aucun vrai argent ne sera prélevé. Activer quand même pour les essais ?')) { renderEnLigne(); return; }
+    c.enLigne[id] = on;
+    Comptes.sauverPaiementConfig(c);
+    renderEnLigne();
+    uiToast(on ? 'Paiement en ligne activé : les parents voient « Payer maintenant ».' : 'Paiement en ligne désactivé. La déclaration manuelle reste disponible.', 'ok');
 }
