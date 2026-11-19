@@ -460,13 +460,26 @@
             { label: 'Gestion financière',             login: 'finances',     password: 'Finances@2026',  url: 'app.html' },
             { label: 'Surveillance et discipline',     login: 'surveillance', password: 'Surveil@2026',   url: 'surveillance.html' },
             { label: 'Secrétariat',                    login: 'secretariat',  password: 'Secret@2026',    url: 'secretariat.html' },
-            { label: 'Espace enseignant',              login: 'enseignant',   password: 'Prof@2026',      url: 'enseignant.html' }
+            { label: 'Espace enseignant',              login: 'enseignant',   password: 'Prof@2026',      url: 'enseignant.html' },
+            { label: 'Espace parent (1er parent enregistré)', login: 'parent', password: 'Parent@2026', parent: true }
         ];
         function testLogin(login, pass) {
             if (!MODE_TEST) return false;
             const l = (login || '').trim().toLowerCase(), p = (pass || '').trim().toLowerCase();
             const t = TEST_ACCOUNTS.find(a => a.login === l && a.password.toLowerCase() === p);
             if (!t) return false;
+            if (t.parent) {
+                // Ouvre l'espace du premier parent du registre (tuteur avec téléphone dans une fiche élève)
+                const parents = Object.values(Comptes.registreParents()).sort((a, b) => (a.nom || '').localeCompare(b.nom || ''));
+                if (!parents.length) {
+                    loginErreur("Aucun parent enregistré pour l'instant. Créez d'abord un élève avec le nom et le téléphone du tuteur (Direction de la scolarité), puis réessayez.");
+                    return true;
+                }
+                const p = parents[0];
+                setSession({ nom: p.nom || 'Parent', role: 'Parent', login: p.key, type: 'parent', test: true });
+                location.href = 'parent.html';
+                return true;
+            }
             let role = 'Administrateur';
             if (t.url) {
                 const d = config.directions.find(x => (x.url || '').toLowerCase() === t.url);
