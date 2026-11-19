@@ -45,6 +45,8 @@
     }
     applyTheme(preferredTheme());
     applyAccent(store(ACCENT_KEY) || 'indigo');
+    var NAV_W_KEY = 'ui_nav_w', NAV_COLLAPSED_KEY = 'ui_nav_collapsed', NAV_MIN = 210, NAV_MAX = 400;
+    (function () { var w = parseInt(store(NAV_W_KEY), 10); if (w >= NAV_MIN && w <= NAV_MAX) root.style.setProperty('--nav-w', w + 'px'); })();
     window.toggleTheme = function () {
         var t = root.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
         store(THEME_KEY, t); applyTheme(t);
@@ -257,10 +259,15 @@
         if (sidebar && !sidebar.dataset.uiShell) {
             sidebar.dataset.uiShell = '1';
             document.body.classList.add('ui-shell');
-            if (sidebar.classList.contains('collapsed')) document.body.classList.add('ui-collapsed');
-            // suit le bouton « Réduire » d'origine
-            new MutationObserver(function () { document.body.classList.toggle('ui-collapsed', sidebar.classList.contains('collapsed')); })
-                .observe(sidebar, { attributes: true, attributeFilter: ['class'] });
+            // état réduit mémorisé d'une page à l'autre
+            if (store(NAV_COLLAPSED_KEY) === '1' && !sidebar.classList.contains('collapsed') && innerWidth > 768) toggleNav();
+            document.body.classList.toggle('ui-collapsed', sidebar.classList.contains('collapsed'));
+            new MutationObserver(function () {
+                var c = sidebar.classList.contains('collapsed');
+                document.body.classList.toggle('ui-collapsed', c);
+                store(NAV_COLLAPSED_KEY, c ? '1' : '0');
+                syncNavBtn();
+            }).observe(sidebar, { attributes: true, attributeFilter: ['class'] });
 
             // marque
             var brand = el('div', 'sb-brand', '<div class="sb-logo">' + logoHtml + '</div><div class="sb-txt"><strong></strong><small></small></div>');
@@ -268,7 +275,29 @@
             brand.querySelector('small').textContent = schoolName();
             var close = el('button', 'tb-icon-btn sb-close', '<i class="bi bi-x-lg"></i>'); close.type = 'button'; close.setAttribute('aria-label', 'Fermer le menu'); close.onclick = closeSidebar;
             brand.appendChild(close);
+            var cb = el('button', 'sb-collapse', '<i class="bi bi-chevron-double-left"></i>'); cb.type = 'button';
+            cb.onclick = toggleNav;
+            brand.appendChild(cb);
             sidebar.insertBefore(brand, sidebar.firstChild);
+            syncNavBtn();
+
+            // poignée : tirer le bord droit pour élargir / rétrécir
+            var grip = el('div', 'sb-resizer'); grip.title = 'Tirer pour élargir ou rétrécir le menu (double-clic : taille normale)';
+            document.body.appendChild(grip);
+            grip.addEventListener('pointerdown', function (e) {
+                if (innerWidth <= 768) return;
+                e.preventDefault(); grip.setPointerCapture(e.pointerId); document.body.classList.add('ui-resizing');
+                var move = function (ev) {
+                    var x = ev.clientX;
+                    if (x < 130) { if (!sidebar.classList.contains('collapsed')) toggleNav(); return; }
+                    if (sidebar.classList.contains('collapsed')) toggleNav();
+                    var w = Math.max(NAV_MIN, Math.min(NAV_MAX, Math.round(x)));
+                    root.style.setProperty('--nav-w', w + 'px'); store(NAV_W_KEY, String(w));
+                };
+                var up = function () { grip.removeEventListener('pointermove', move); grip.removeEventListener('pointerup', up); document.body.classList.remove('ui-resizing'); };
+                grip.addEventListener('pointermove', move); grip.addEventListener('pointerup', up);
+            });
+            grip.addEventListener('dblclick', function () { root.style.removeProperty('--nav-w'); store(NAV_W_KEY, ''); if (sidebar.classList.contains('collapsed')) toggleNav(); });
 
             // groupes
             var groups = GROUPS[PAGE];
@@ -334,6 +363,19 @@
         }
         applyTheme(root.getAttribute('data-bs-theme'));
     }
+    function toggleNav() {
+        var sb = document.getElementById('sidebar'); if (!sb) return;
+        if (typeof window.toggleSidebar === 'function') window.toggleSidebar();
+        else sb.classList.toggle('collapsed');
+    }
+    function syncNavBtn() {
+        var sb = document.getElementById('sidebar'); var b = sb && sb.querySelector('.sb-collapse'); if (!b) return;
+        var c = sb.classList.contains('collapsed');
+        b.innerHTML = '<i class="bi bi-chevron-double-' + (c ? 'right' : 'left') + '"></i>';
+        b.title = (c ? 'Agrandir le menu' : 'Réduire le menu') + ' (Ctrl + B)';
+        b.setAttribute('aria-label', c ? 'Agrandir le menu' : 'Réduire le menu');
+    }
+    window.uiToggleNav = toggleNav;
     function openSidebar() { var sb = document.getElementById('sidebar'); if (!sb) return; sb.classList.add('open'); var o = document.querySelector('.sb-overlay'); if (o) o.classList.add('show'); document.body.style.overflow = 'hidden'; }
     function closeSidebar() { var sb = document.getElementById('sidebar'); if (!sb) return; sb.classList.remove('open'); var o = document.querySelector('.sb-overlay'); if (o) o.classList.remove('show'); document.body.style.overflow = ''; }
     window.uiOpenSidebar = openSidebar; window.uiCloseSidebar = closeSidebar;
@@ -397,7 +439,8 @@
     function closePalette() { if (pal) { pal.remove(); pal = null; } }
     window.uiOpenPalette = openPalette;
     document.addEventListener('keydown', function (e) {
-        if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) { e.preventDefault(); if (pal) closePalette(); else openPalette(); }
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'b' || e.key === 'B') && document.getElementById('sidebar') && innerWidth > 768) { e.preventDefault(); toggleNav(); }
+        else if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) { e.preventDefault(); if (pal) closePalette(); else openPalette(); }
         else if (e.key === 'Escape') { if (pal) closePalette(); else closeSidebar(); }
     });
 
