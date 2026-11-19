@@ -872,3 +872,42 @@ body.ui-resizing, body.ui-resizing *{ cursor:col-resize !important; user-select:
 .switch input:checked + span{ background:var(--accent); }
 .switch input:checked + span::before{ transform:translateX(20px); }
 .switch input:disabled + span{ opacity:.45; cursor:not-allowed; }
+
+/* =====================================================================
+   15. PRÉSCOLAIRE
+   ===================================================================== */
+.pr-head{ display:flex; gap:16px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+.pr-bilan{ display:flex; gap:8px; flex-wrap:wrap; }
+.pr-chip{ display:inline-flex; align-items:center; gap:6px; padding:.25rem .7rem; border-radius:999px; font-size:.78rem; font-weight:600;
+    color:var(--c); background:color-mix(in srgb,var(--c) 12%,transparent); }
+.pr-domaine h4{ font-size:.95rem !important; margin:0 0 10px !important; display:flex; align-items:center; gap:8px; }
+.pr-domaine h4::before{ content:""; width:4px; height:18px; border-radius:4px; background:var(--accent-grad); }
+.pr-item{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:9px 0; border-top:1px solid var(--line); }
+.pr-item:first-of-type{ border-top:0; }
+.pr-item > span{ flex:1; min-width:220px; font-size:.9rem; }
+.pr-niv{ display:flex; gap:6px; flex-wrap:wrap; }
+.pr-niv button{ border:1px solid var(--line-strong); background:var(--surface); color:var(--ink-2); border-radius:999px; padding:.34rem .8rem; font-size:.8rem; font-weight:600; cursor:pointer; transition:all .12s; }
+.pr-niv button:hover{ border-color:var(--c); color:var(--c); }
+.pr-niv button.on{ background:var(--c); border-color:var(--c); color:#fff; box-shadow:0 4px 12px -4px var(--c); }
+.pr-pct{ display:inline-block; min-width:52px; padding:.2rem .5rem; border-radius:8px; font-weight:700; font-size:.82rem;
+    background:linear-gradient(90deg,color-mix(in srgb,#10B981 28%,transparent) calc(var(--p)*1%),var(--surface-3) calc(var(--p)*1%)); }
+.pr-prow{ display:flex; align-items:center; gap:8px; }
+.pr-prow input[type="text"]{ flex:1; }
+.pr-prow.sub{ margin:6px 0 0 34px; }
+.pr-prow.sub > i{ color:var(--muted); }
+.pr-num{ width:26px; height:26px; border-radius:8px; background:var(--accent-soft); color:var(--accent-ink); font-weight:800; font-size:.8rem; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+.pr-items{ margin-top:6px; }
+.pr-cons-dom{ border:1px solid var(--line); border-radius:14px; padding:12px 14px; margin-bottom:10px; }
+.pr-cons-dom > strong{ display:block; margin-bottom:6px; font-family:var(--font-display); }
+.pr-cons-item{ display:flex; justify-content:space-between; gap:10px; align-items:center; padding:5px 0; border-top:1px dashed var(--line); font-size:.88rem; }
+@media (max-width:768px){ .pr-prow.sub{ margin-left:8px; } .pr-niv{ width:100%; } .pr-niv button{ flex:1; } }
+
+/* Inventaire des données (Espace admin) */
+.inv-grid{ display:grid; gap:10px; }
+.inv-cat{ font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.09em; color:var(--muted); margin:14px 0 2px; }
+.inv-row{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:10px 14px; border:1px solid var(--line); border-radius:14px; background:var(--surface); }
+.inv-row .inv-ico{ width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:var(--accent-soft); color:var(--accent-ink); flex-shrink:0; }
+.inv-row .inv-txt{ flex:1; min-width:200px; }
+.inv-row .inv-txt small{ display:block; color:var(--muted); font-size:.76rem; }
+.inv-row .inv-n{ font-family:var(--font-display); font-weight:800; font-size:1.1rem; min-width:60px; text-align:right; font-variant-numeric:tabular-nums; }
+.inv-row.vide{ opacity:.6; }

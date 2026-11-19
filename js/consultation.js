@@ -188,6 +188,7 @@ function renderEleve() {
     const stats = statsAssiduite(e);
     const frais = fraisEleve(e);
     const sit = situationEleve(e);
+    const presco = !!(window.Presco && Presco.estPrescolaire(e.classe));
     const appr = cAppr[`${e.id}|${trim}`] || {};
     const scale = cScale(e.classe);
     const lignes = cMatieresClasse(e.classe).map(m => {
@@ -211,6 +212,7 @@ function renderEleve() {
                 </div>
             </div>
         </div>
+        ${presco ? prescoCarte(e, trim) : `
         <div class="card">
             <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:0.75rem;">Résultats — ${cEsc(trim)}</h3>
             <div style="overflow-x:auto;"><table>
@@ -229,6 +231,7 @@ function renderEleve() {
                 ${appr.appreciation ? `<div><strong>Appréciation :</strong> ${cEsc(appr.appreciation)}</div>` : ''}
             </div>` : ''}
         </div>
+        `}
         <div class="card">
             <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:0.75rem;">Assiduité & discipline</h3>
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.75rem;">
@@ -265,3 +268,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const inp = document.getElementById('cSearch');
     inp.addEventListener('keydown', ev => { if (ev.key === 'Enter') rechercher(); });
 });
+
+// Préscolaire : appréciations par domaine (pas de note, ni moyenne, ni rang)
+function prescoCarte(e, trim) {
+    const c = Presco.config(), rec = Presco.evals()[e.id + '|' + trim] || {}, ev = rec.items || {}, b = Presco.bilan(e.id, trim);
+    const nivDe = code => c.niveaux.find(n => n.code === code);
+    return `<div class="card">
+        <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:0.25rem;">Évaluation — ${cEsc(trim)}</h3>
+        <p class="text-secondary small mb-3">Préscolaire : chaque compétence est appréciée, sans note ni rang. ${b.evalues}/${b.total} compétence(s) évaluée(s).</p>
+        ${b.evalues ? c.domaines.map(d => `<div class="pr-cons-dom"><strong>${cEsc(d.nom)}</strong>
+            ${d.items.map(i => { const n = nivDe(ev[i.id]); return `<div class="pr-cons-item"><span>${cEsc(i.nom)}</span>${n ? `<span class="pr-chip" style="--c:${cEsc(n.couleur)}">${cEsc(n.libelle)}</span>` : '<span class="text-secondary small">Non évalué</span>'}</div>`; }).join('')}
+        </div>`).join('') : '<div class="empty-mini"><i class="bi bi-hourglass"></i> Pas encore d\'évaluation pour ce trimestre.</div>'}
+        ${rec.observation ? `<div style="margin-top:1rem;background:var(--surface-2,#f8fafc);border-radius:12px;padding:0.75rem;"><strong>Observation de l'enseignant(e) :</strong> ${cEsc(rec.observation)}</div>` : ''}
+    </div>`;
+}

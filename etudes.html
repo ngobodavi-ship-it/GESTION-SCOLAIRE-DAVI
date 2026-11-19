@@ -38,6 +38,7 @@
                 <button class="tab" data-tab="enseignants" onclick="showSection('enseignants')"><i class="bi bi-person-workspace"></i><span class="nav-label">Enseignants</span></button>
                 <button class="tab" data-tab="notes" onclick="showSection('notes')"><i class="bi bi-pencil-square"></i><span class="nav-label">Saisie des notes</span></button>
                 <button class="tab" data-tab="bulletins" onclick="showSection('bulletins')"><i class="bi bi-file-earmark-text"></i><span class="nav-label">Bulletins</span></button>
+                <button class="tab" data-tab="presco" onclick="showSection('presco')"><i class="bi bi-balloon"></i><span class="nav-label">Préscolaire</span></button>
                 <button class="tab" data-tab="passage" onclick="showSection('passage')"><i class="bi bi-arrow-up-circle"></i><span class="nav-label">Passage / Fin d'année</span></button>
                 <button class="tab" data-tab="archives" onclick="showSection('archives')"><i class="bi bi-archive"></i><span class="nav-label">Archives (années)</span></button>
                 <button class="tab" data-tab="examens" onclick="showSection('examens')"><i class="bi bi-award"></i><span class="nav-label">Examens officiels</span></button>
@@ -151,6 +152,28 @@
                     </div>
                     <div class="card"><div id="notesGrid"></div></div>
                     <div class="card" id="notesHistoBox" style="display:none;"></div>
+                </div>
+
+                <!-- Préscolaire : évaluation par appréciations -->
+                <div id="sec-presco" class="section hidden">
+                    <div class="card">
+                        <div class="d-flex justify-content-between align-items-end flex-wrap gap-3">
+                            <div class="tabs mb-0" id="prTabs">
+                                <button class="tab active" data-v="eval" onclick="prTab('eval')"><i class="bi bi-check2-square"></i> Évaluation</button>
+                                <button class="tab" data-v="suivi" onclick="prTab('suivi')"><i class="bi bi-table"></i> Suivi de la classe</button>
+                                <button class="tab" data-v="params" onclick="prTab('params')"><i class="bi bi-sliders"></i> Paramètres</button>
+                            </div>
+                            <div class="d-flex gap-2 flex-wrap align-items-end" id="prFiltres">
+                                <div><label class="form-label">Classe</label><select id="prClasse" style="margin:0;" onchange="prChange()"></select></div>
+                                <div><label class="form-label">Trimestre</label><select id="prTrim" style="margin:0;" onchange="prTab(prVue)"></select></div>
+                                <div id="prEleveBox"><label class="form-label">Élève</label><select id="prEleve" style="margin:0;" onchange="prRenderEval()"></select></div>
+                            </div>
+                        </div>
+                        <p class="text-secondary small mb-0 mt-3"><i class="bi bi-info-circle"></i> Au préscolaire, l'enfant n'a ni note, ni moyenne, ni rang : chaque compétence est appréciée (Acquis, En cours d'acquisition, Non acquis). Le passage en classe supérieure se fait selon l'âge.</p>
+                    </div>
+                    <div id="pr-eval"></div>
+                    <div id="pr-suivi" class="hidden"></div>
+                    <div id="pr-params" class="hidden"></div>
                 </div>
 
                 <!-- Bulletins -->
@@ -344,7 +367,9 @@
     <script src="vendor/xlsx/xlsx.full.min.js"></script>
     <script src="vendor/chartjs/chart.umd.min.js"></script>
     <script src="js/theme-charts.js"></script>
+    <script src="js/prescolaire.js"></script>
     <script src="js/etudes.js"></script>
+    <script src="js/prescolaire-ui.js"></script>
     <script src="js/heures.js"></script>
     <script src="js/headerdate.js"></script>
 </body>

@@ -212,7 +212,7 @@
     var GROUPS = {
         'app.html':          [['Pilotage', 'dashboard,reports,historique'], ['Caisse & élèves', 'transactions,declares,cloture,students,tarifs,impayes,reductions,echeancier,budget'], ['Personnel', 'salaires,enseignants,vacations']],
         'scolarite.html':    [['Pilotage', 'dashboard,reporting'], ['Élèves', 'eleves,inscriptions,dossiers,preinscription,classes'], ['Documents', 'certificats,cartes,examens'], ['Vie de l\'établissement', 'plan,conseils,heures'], ['Données', 'donnees']],
-        'etudes.html':       [['Pilotage', 'dashboard,reporting'], ['Pédagogie', 'matieres,enseignants,edt,cahier'], ['Évaluations', 'notes,bulletins,examens,passage,archives'], ['Personnel', 'assiduite,heures']],
+        'etudes.html':       [['Pilotage', 'dashboard,reporting'], ['Pédagogie', 'matieres,enseignants,edt,cahier'], ['Évaluations', 'notes,bulletins,presco,examens,passage,archives'], ['Personnel', 'assiduite,heures']],
         'surveillance.html': [['Pilotage', 'dashboard,reporting'], ['Vie scolaire', 'appel,retards,permissions'], ['Discipline', 'sanctions,convocations'], ['Personnel', 'heures']],
         'secretariat.html':  [['Pilotage', 'dashboard'], ['Courrier & documents', 'courrier,documents,notes'], ['Communication', 'communication']],
         'direction.html':    [['Pilotage', 'dashboard,recouvrement'], ['Gouvernance', 'decisions,conseil'], ['Ressources', 'personnel'], ['Système', 'sauvegarde']]

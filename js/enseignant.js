@@ -137,6 +137,7 @@ function chargerGrilleEns() {
     if (!classe) { grid.innerHTML = '<p style="color:var(--danger,#dc3545);padding:0.5rem;">Choisissez une classe.</p>'; return; }
     const list = ensEleves.filter(e => e.classe === classe);
     if (!list.length) { grid.innerHTML = '<p style="color:var(--danger,#dc3545);padding:0.5rem;">Aucun élève dans cette classe.</p>'; return; }
+    if (window.Presco && Presco.estPrescolaire(classe)) { grid.innerHTML = '<div class="empty-mini"><i class="bi bi-balloon"></i> Classe du préscolaire : pas de notes. L\'évaluation par appréciations se fait dans Direction des études › Préscolaire.</div>'; return; }
     if (ensClasseCycle(classe) === 'primaire') {
         const mats = ensMatieresClasse(classe);
         if (!mats.length) { grid.innerHTML = '<p style="color:var(--danger,#dc3545);padding:0.5rem;">Aucune matière du primaire. Demandez à la Direction des études de les charger.</p>'; return; }

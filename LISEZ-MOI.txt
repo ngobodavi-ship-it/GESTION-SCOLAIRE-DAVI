@@ -86,3 +86,21 @@ theme. Le comportement de l'application est identique.
   Activation : Espace admin > Paramètres > Paiement à distance >
   Paiement en ligne > Vérifier le serveur, puis activer MTN / Airtel.
   La déclaration manuelle reste toujours disponible.
+
+--- PRÉSCOLAIRE (P1, P2, P3) ---
+  Direction des études > Préscolaire : évaluation par appréciations
+  (Acquis / En cours d'acquisition / Non acquis), sans note, ni moyenne,
+  ni rang ; suivi de la classe ; bulletin préscolaire.
+  Paramètres : domaines, compétences et niveaux entièrement modifiables
+  (ajouter, renommer, réordonner, supprimer). Proposition de départ
+  inspirée des programmes francophones, à ajuster selon le programme
+  officiel (INRAP / inspection). Passage en classe supérieure selon l'âge.
+  js/prescolaire.js, js/prescolaire-ui.js.
+  Données : ecole_presco_config, ecole_presco_evals.
+
+--- ESPACE ADMIN > TOUTES LES DONNÉES ---
+  Inventaire de toutes les données de l'application par module, avec
+  nombre d'éléments, accès à l'écran de gestion, export, suppression
+  (sauvegarde téléchargée automatiquement avant, confirmation « SUPPRIMER »)
+  et restauration d'une catégorie sans toucher au reste.
+  js/portail-inventaire.js.

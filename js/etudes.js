@@ -20,6 +20,7 @@ const ETU_SECTIONS = {
     enseignants: { titre: 'Enseignants',      icone: 'bi-person-workspace' },
     notes:       { titre: 'Saisie des notes', icone: 'bi-pencil-square' },
     bulletins:   { titre: 'Bulletins',        icone: 'bi-file-earmark-text' },
+    presco:      { titre: 'Préscolaire',      icone: 'bi-balloon' },
     edt:         { titre: 'Emplois du temps', icone: 'bi-calendar3' },
     reporting:   { titre: 'Reporting',        icone: 'bi-bar-chart-line' }
 };
@@ -80,6 +81,7 @@ function showSection(name) {
     if (name === 'enseignants') renderEnseignants();
     if (name === 'notes') renderNotesControls();
     if (name === 'bulletins') renderBulletinsControls();
+    if (name === 'presco' && typeof renderPresco === 'function') renderPresco();
     if (name === 'passage') renderPassage();
     if (name === 'archives') renderArchives();
     if (name === 'examens') renderExamens();
@@ -144,6 +146,7 @@ function saveElevesEtudes() { localStorage.setItem(ELEVES_KEY, JSON.stringify(el
 // Décision de passage calculée sur la moyenne annuelle (seuil 10/20 ou 5/10)
 function decisionAuto(eleveId) {
     const e = eleves.find(x => x.id === eleveId); if (!e) return { moy: null, seuil: 10, decision: '' };
+    if (window.Presco && Presco.estPrescolaire(e.classe)) return { moy: null, seuil: null, scale: null, decision: 'Admis(e) en classe supérieure', presco: true };
     const moy = moyenneAnnuelle(eleveId);
     const scale = scaleForClasse(e.classe);
     const seuil = scale === 10 ? 5 : 10;
@@ -568,6 +571,7 @@ function chargerNotes() {
     const trim = document.getElementById('notesTrimestre').value;
     const grid = document.getElementById('notesGrid');
     if (!classe) { grid.innerHTML = '<p style="color:var(--danger,#dc3545);padding:1rem;">Sélectionnez une classe.</p>'; return; }
+    if (window.Presco && Presco.estPrescolaire(classe)) { grid.innerHTML = `<div class="empty-mini"><i class="bi bi-balloon"></i> ${eEsc(classe)} est une classe du préscolaire : l'évaluation se fait par appréciations, sans notes. <a href="#" onclick="showSection('presco');document.getElementById('prClasse').value='${eAttr(classe)}';prChange();return false;">Ouvrir l'onglet Préscolaire</a></div>`; return; }
     const cy = classeCycleNom(classe);
     const mats = matieresPourClasse(classe);
     if (!mats.length) { grid.innerHTML = `<p style="color:var(--danger,#dc3545);padding:1rem;">${cy === 'primaire' ? 'Aucune matière du primaire. Allez dans l\'onglet « Matières » et cliquez sur « Charger les matières du primaire ».' : 'Ajoutez d\'abord des matières (onglet Matières).'}</p>`; return; }
@@ -691,6 +695,10 @@ function renderBulletinsList() {
     if (!classe) { box.innerHTML = '<p style="color:var(--muted,#64748b);padding:1rem;">Choisissez une classe.</p>'; return; }
     const list = eleves.filter(e => e.classe === classe);
     if (!list.length) { box.innerHTML = '<p style="color:var(--muted,#64748b);padding:1rem;">Aucun élève dans cette classe.</p>'; return; }
+    if (window.Presco && Presco.estPrescolaire(classe)) {
+        box.innerHTML = `<p class="text-secondary small">Classe du préscolaire : bulletin d'appréciations, sans moyenne ni rang.</p><div style="overflow-x:auto;"><table><thead><tr><th>Nom et prénom</th><th style="text-align:center;">Compétences évaluées</th><th style="text-align:right;">Bulletin</th></tr></thead><tbody>${list.map(e => { const b = Presco.bilan(e.id, trim); return `<tr><td style="font-weight:600;">${eEsc(e.nom)} ${eEsc(e.prenom)}</td><td style="text-align:center;">${b.evalues}/${b.total}</td><td style="text-align:right;"><button class="btn btn-primary" style="padding:0.3rem 0.7rem;font-size:0.85rem;" onclick="genererBulletin('${e.id}')"><i class="bi bi-printer"></i></button></td></tr>`; }).join('')}</tbody></table></div>`;
+        return;
+    }
     const { rang, effectif } = classementClasse(classe, trim);
     const scale = scaleForClasse(classe);
     const rows = list.map(e => ({ e, moy: moyenneEleve(e.id, trim) }))
@@ -795,6 +803,7 @@ function bulletinHTML(eleveId, trim) {
 
 function bulletinFor(eleveId, trim) {
     const e = eleves.find(x => x.id === eleveId); if (!e) return '';
+    if (window.Presco && Presco.estPrescolaire(e.classe)) return Presco.bulletinHTML(e, trim);
     return classeCycleNom(e.classe) === 'primaire' ? bulletinPrimaireHTML(eleveId, trim) : bulletinHTML(eleveId, trim);
 }
 
