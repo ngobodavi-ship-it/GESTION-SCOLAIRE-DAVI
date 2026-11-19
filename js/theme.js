@@ -362,6 +362,16 @@
                 actions.insertBefore(tb, actions.lastElementChild);
                 actions.insertBefore(srch, actions.firstChild);
             } else { header.appendChild(srch); header.appendChild(tb); }
+            // Cloche : préoccupations des parents (tout le personnel administratif, sauf les enseignants)
+            if (recoitPreoccupations()) {
+                var bell = el('a', 'tb-icon-btn tb-bell', '<i class="bi bi-bell"></i><span class="nav-count hidden"></span>');
+                bell.href = 'portail.html?preoc=1'; bell.title = 'Préoccupations des parents'; bell.setAttribute('aria-label', 'Préoccupations des parents');
+                bell.onclick = function (e) { if (typeof window.toggleHomePreoc === 'function' && document.getElementById('homePreoc') && !document.getElementById('homeView').classList.contains('hidden')) { e.preventDefault(); window.toggleHomePreoc(true); document.getElementById('homePreoc').scrollIntoView({ behavior: 'smooth' }); } };
+                tb.parentNode.insertBefore(bell, tb);
+                majCloche();
+                window.addEventListener('storage', function (ev) { if (ev.key === 'ecole_preoccupations') majCloche(); });
+                setInterval(majCloche, 30000);
+            }
         }
         applyTheme(root.getAttribute('data-bs-theme'));
     }
@@ -378,6 +388,23 @@
         b.setAttribute('aria-label', c ? 'Agrandir le menu' : 'Réduire le menu');
     }
     window.uiToggleNav = toggleNav;
+    function recoitPreoccupations() {
+        var s = session(); if (!s || typeof s !== 'object' || !s.role || s.role === 'Parent') return false;
+        if (s.role === 'Administrateur' || s.role === '*') return true;
+        var cfg = null; try { cfg = JSON.parse(store('portail_config_v1')); } catch (e) {}
+        var d = cfg && cfg.directions ? cfg.directions.filter(function (x) { return x.name === s.role; })[0] : null;
+        return !(d && (d.url || '').toLowerCase() === 'enseignant.html');
+    }
+    function majCloche() {
+        var b = document.querySelector('.tb-bell'); if (!b) return;
+        var list = []; try { list = JSON.parse(store('ecole_preoccupations')) || []; } catch (e) {}
+        var n = list.filter(function (p) { return p.status === 'envoyee' || p.status === 'lue'; }).length;
+        var nouv = list.filter(function (p) { return p.status === 'envoyee'; }).length;
+        var c = b.querySelector('.nav-count'); c.textContent = n; c.classList.toggle('hidden', !n);
+        b.classList.toggle('ring', nouv > 0);
+        b.title = n ? n + ' préoccupation(s) de parents à traiter' : 'Préoccupations des parents';
+    }
+    window.uiMajCloche = majCloche;
     function openSidebar() { var sb = document.getElementById('sidebar'); if (!sb) return; sb.classList.add('open'); var o = document.querySelector('.sb-overlay'); if (o) o.classList.add('show'); document.body.style.overflow = 'hidden'; }
     function closeSidebar() { var sb = document.getElementById('sidebar'); if (!sb) return; sb.classList.remove('open'); var o = document.querySelector('.sb-overlay'); if (o) o.classList.remove('show'); document.body.style.overflow = ''; }
     window.uiOpenSidebar = openSidebar; window.uiCloseSidebar = closeSidebar;

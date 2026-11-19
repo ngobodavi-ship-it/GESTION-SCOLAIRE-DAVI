@@ -190,6 +190,21 @@
                 </div>
                 <button class="btn btn-primary btn-sm" onclick="logout()"><i class="bi bi-arrow-left-right"></i> Changer de compte</button>
             </div>
+            <div id="homePreoc" class="card-soft home-preoc hidden">
+                <div class="hp-head">
+                    <span class="hp-ico"><i class="bi bi-chat-left-text"></i><span class="nav-count hidden" id="homePreocCount">0</span></span>
+                    <div style="flex:1;min-width:180px;"><h3 class="h6 fw-bold mb-0">Préoccupations des parents</h3><small class="text-secondary" id="homePreocSub"></small></div>
+                    <button class="btn btn-secondary btn-sm" id="homePreocBtn" onclick="toggleHomePreoc()"><i class="bi bi-chevron-down"></i> Afficher</button>
+                </div>
+                <div id="homePreocBody" class="hidden">
+                    <div class="d-flex justify-content-end mb-3 mt-3">
+                        <select id="preocFiltreHome" class="form-select form-select-sm" style="max-width:220px;margin:0;" onchange="renderPreocInto('preocListHome','preocFiltreHome','h')">
+                            <option value="ouvertes">À traiter</option><option value="toutes">Toutes</option><option value="traitee">Traitées</option>
+                        </select>
+                    </div>
+                    <div id="preocListHome"></div>
+                </div>
+            </div>
             <p class="section-label">Modules</p>
             <div class="dir-grid" id="dirGrid"></div>
         </div>
@@ -674,7 +689,7 @@
             if (sec === 'users') renderUsers();
             if (sec === 'parents') renderParents();
             if (sec === 'demandes') renderDemandes();
-            if (sec === 'preoc') renderPreoc();
+            if (sec === 'preoc') renderPreoc(true);
             majCompteurs();
             if (sec === 'settings') { renderAccentPicker(); fillSettings(); if (typeof loadEtablissementForm === 'function') loadEtablissementForm(); }
         }

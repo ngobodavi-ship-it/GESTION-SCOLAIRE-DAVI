@@ -334,41 +334,87 @@ function refuserDemande(id) {
 // ---------------------------------------------------------------
 const PREOC_STATUTS = { envoyee: ['Nouvelle', 'info'], lue: ['Lue', 'violet'], repondue: ['Répondue', 'ok'], traitee: ['Traitée', 'ok'] };
 function pillPreoc(st) { const s = PREOC_STATUTS[st] || ['-', '']; return `<span class="ui-pill ${s[1]}">${s[0]}</span>`; }
-function renderPreoc() {
-    const all = Comptes.preoccupations();
-    let changed = false;
-    all.forEach(p => { if (p.status === 'envoyee') { p.status = 'lue'; changed = true; } });
-    if (changed) Comptes.sauverPreoccupations(all);
-    const f = document.getElementById('preocFiltre').value;
+// Qui reçoit les préoccupations : tous les profils administratifs, sauf les enseignants
+function estEnseignant(role) {
+    const d = (config.directions || []).find(x => x.name === role);
+    return !!(d && (d.url || '').toLowerCase() === 'enseignant.html');
+}
+function recoitPreoc() {
+    const s = currentSession || {};
+    if (!s.role) return false;
+    if (s.role === 'Parent') return false;
+    return !estEnseignant(s.role);
+}
+function preocOuvertes() { return Comptes.preoccupations().filter(p => p.status === 'envoyee' || p.status === 'lue'); }
+
+function renderPreocInto(listId, filtreId, px) {
+    const box = document.getElementById(listId), sel = document.getElementById(filtreId);
+    if (!box || !sel) return;
+    const all = Comptes.preoccupations(), f = sel.value;
     const list = all.filter(p => f === 'toutes' ? true : f === 'traitee' ? p.status === 'traitee' : p.status !== 'traitee');
-    document.getElementById('preocList').innerHTML = list.length ? list.map(p => `
+    box.innerHTML = list.length ? list.map(p => `
         <div class="preoc-card">
             <div class="preoc-head">
-                <div><strong>${pcEsc(p.sujet)}</strong><div class="text-secondary small">${pcEsc(p.parentNom)} · pour ${pcEsc(p.eleveNom)} · ${pcEsc(p.service)}</div></div>
+                <div><strong>${pcEsc(p.sujet)}</strong><div class="text-secondary small">${pcEsc(p.parentNom)}${p.parentTel ? ' · ' + pcEsc(p.parentTel) : ''} · pour ${pcEsc(p.eleveNom)} · ${pcEsc(p.service)}</div></div>
                 <div class="text-end">${pillPreoc(p.status)}<div class="text-secondary small mt-1">${pcDate(p.date)}</div></div>
             </div>
             <div class="preoc-msg">${pcEsc(p.message)}</div>
-            ${(p.reponses || []).map(r => `<div class="preoc-rep ${r.auteur === 'parent' ? 'par' : 'eco'}"><small>${r.auteur === 'parent' ? 'Parent' : 'École'} · ${pcDate(r.date)}</small><div>${pcEsc(r.texte)}</div></div>`).join('')}
-            ${p.status !== 'traitee' ? `<textarea class="form-control mt-2" rows="2" id="rep_${p.id}" placeholder="Répondre au parent…"></textarea>
+            ${(p.reponses || []).map(r => `<div class="preoc-rep ${r.auteur === 'parent' ? 'par' : 'eco'}"><small>${r.auteur === 'parent' ? 'Parent' : 'École' + (r.nom ? ' · ' + pcEsc(r.nom) : '')} · ${pcDate(r.date)}</small><div>${pcEsc(r.texte)}</div></div>`).join('')}
+            ${p.status === 'traitee' && p.traiteePar ? `<div class="text-secondary small mt-2"><i class="bi bi-check2-all"></i> Traitée par ${pcEsc(p.traiteePar)}</div>` : ''}
+            ${p.status !== 'traitee' ? `<textarea class="form-control mt-2" rows="2" id="rep_${px}${p.id}" placeholder="Répondre au parent…"></textarea>
             <div class="d-flex gap-2 justify-content-end mt-2">
                 <button class="btn btn-secondary btn-sm" onclick="statutPreoc('${p.id}','traitee')"><i class="bi bi-check2-all"></i> Marquer traitée</button>
-                <button class="btn btn-primary btn-sm" onclick="repondrePreoc('${p.id}')"><i class="bi bi-send"></i> Répondre</button>
+                <button class="btn btn-primary btn-sm" onclick="repondrePreoc('${p.id}','${px}')"><i class="bi bi-send"></i> Répondre</button>
             </div>` : `<div class="text-end mt-2"><button class="btn btn-link btn-sm" onclick="statutPreoc('${p.id}','lue')">Rouvrir</button></div>`}
         </div>`).join('') : `<div class="empty-mini"><i class="bi bi-inbox"></i> ${f === 'traitee' ? 'Aucune préoccupation traitée.' : 'Aucune préoccupation à traiter.'}</div>`;
+}
+// marquerLu : les nouvelles préoccupations passent à « Lue » quand quelqu'un les affiche
+function renderPreoc(marquerLu) {
+    if (marquerLu !== false) {
+        const all = Comptes.preoccupations(); let changed = false;
+        all.forEach(p => { if (p.status === 'envoyee') { p.status = 'lue'; changed = true; } });
+        if (changed) Comptes.sauverPreoccupations(all);
+    }
+    renderPreocInto('preocList', 'preocFiltre', 'a');
+    const hb = document.getElementById('homePreocBody');
+    if (hb && !hb.classList.contains('hidden')) renderPreocInto('preocListHome', 'preocFiltreHome', 'h');
     majCompteurs();
 }
-function repondrePreoc(id) {
-    const t = (document.getElementById('rep_' + id).value || '').trim();
+function signataire() { const s = currentSession || {}; return (s.nom && s.nom !== s.role ? s.nom + ' — ' : '') + (s.role || 'Administration'); }
+function repondrePreoc(id, px) {
+    const t = (document.getElementById('rep_' + (px || 'a') + id).value || '').trim();
     if (!t) return uiToast('Écrivez une réponse avant d\'envoyer.', 'warn');
     const all = Comptes.preoccupations(), p = all.find(x => x.id === id); if (!p) return;
-    (p.reponses = p.reponses || []).push({ auteur: 'ecole', nom: (currentSession && currentSession.nom) || 'Administration', texte: t, date: new Date().toISOString() });
+    (p.reponses = p.reponses || []).push({ auteur: 'ecole', nom: signataire(), texte: t, date: new Date().toISOString() });
     p.status = 'repondue';
     Comptes.sauverPreoccupations(all); renderPreoc();
     uiToast('Réponse envoyée au parent.', 'ok');
 }
 function statutPreoc(id, st) {
     const all = Comptes.preoccupations(), p = all.find(x => x.id === id); if (!p) return;
-    p.status = st; Comptes.sauverPreoccupations(all); renderPreoc();
+    p.status = st;
+    if (st === 'traitee') { p.traiteePar = signataire(); p.traiteeLe = new Date().toISOString(); }
+    Comptes.sauverPreoccupations(all); renderPreoc();
+}
+
+// Encadré « Préoccupations des parents » sur l'accueil du portail
+function majHomePreoc() {
+    const box = document.getElementById('homePreoc'); if (!box) return;
+    if (!recoitPreoc()) { box.classList.add('hidden'); return; }
+    box.classList.remove('hidden');
+    const all = Comptes.preoccupations(), nouv = all.filter(p => p.status === 'envoyee').length, ouv = preocOuvertes().length;
+    const repondues = all.filter(p => p.status === 'repondue').length;
+    const parts = [ouv ? ouv + ' en attente de réponse' : '', nouv ? nouv + ' nouvelle(s)' : '', repondues ? repondues + ' répondue(s), à clôturer' : ''].filter(Boolean);
+    document.getElementById('homePreocSub').textContent = parts.length ? parts.join(' · ') : 'Tout est traité';
+    const c = document.getElementById('homePreocCount'); c.textContent = ouv; c.classList.toggle('hidden', !ouv);
+}
+function toggleHomePreoc(forcer) {
+    const body = document.getElementById('homePreocBody'), btn = document.getElementById('homePreocBtn');
+    const ouvrir = forcer === true ? true : body.classList.contains('hidden');
+    body.classList.toggle('hidden', !ouvrir);
+    btn.innerHTML = ouvrir ? '<i class="bi bi-chevron-up"></i> Masquer' : '<i class="bi bi-chevron-down"></i> Afficher';
+    if (ouvrir) { renderPreoc(true); renderPreocInto('preocListHome', 'preocFiltreHome', 'h'); }
+    majHomePreoc();
 }
 
 // ---------------------------------------------------------------
@@ -377,7 +423,8 @@ function statutPreoc(id, st) {
 function majCompteurs() {
     const set = (id, n) => { const e = document.getElementById(id); if (!e) return; e.textContent = n; e.classList.toggle('hidden', !n); };
     set('countDemandes', Comptes.demandesEnAttente().length);
-    set('countPreoc', Comptes.preoccupations().filter(p => p.status === 'envoyee' || p.status === 'lue').length);
+    set('countPreoc', preocOuvertes().length);
+    majHomePreoc();
 }
 (function () {
     const base = enterApp;
@@ -386,12 +433,13 @@ function majCompteurs() {
         const b = document.getElementById('btnMonMdp');
         if (b) b.classList.toggle('hidden', !compteSession());
         majCompteurs();
-        // rappel pour l'administrateur
+        // rappels : demandes (administrateur) et préoccupations (tout le personnel administratif)
         const s = currentSession || {};
-        if ((s.role === 'Administrateur' || s.role === '*')) {
-            const n = Comptes.demandesEnAttente().length, m = Comptes.preoccupations().filter(p => p.status === 'envoyee').length;
-            if (n || m) setTimeout(() => uiToast([n ? n + ' demande(s) de mot de passe à valider' : '', m ? m + ' nouvelle(s) préoccupation(s) de parents' : ''].filter(Boolean).join(' · ') + ' — voir l\'Espace admin.', 'info'), 600);
-        }
+        const admin = s.role === 'Administrateur' || s.role === '*';
+        const n = admin ? Comptes.demandesEnAttente().length : 0;
+        const m = recoitPreoc() ? Comptes.preoccupations().filter(p => p.status === 'envoyee').length : 0;
+        if (n || m) setTimeout(() => uiToast([n ? n + ' demande(s) de mot de passe à valider (Espace admin)' : '', m ? m + ' nouvelle(s) préoccupation(s) de parents (accueil du portail)' : ''].filter(Boolean).join(' · '), 'info'), 600);
+        if (new URLSearchParams(location.search).get('preoc') === '1') { history.replaceState(null, '', location.pathname); if (recoitPreoc()) { toggleHomePreoc(true); setTimeout(() => document.getElementById('homePreoc').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100); } }
     };
 })();
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !document.getElementById('acctModal').classList.contains('hidden') && !pwOpts.first) closeAcctModal(); });
