@@ -107,18 +107,46 @@
                     <div class="login-logo"><i class="bi bi-mortarboard-fill"></i></div>
                     <h1 class="h5 fw-bold mb-1" id="loginTitle">Portail de gestion scolaire</h1>
                     <p class="text-secondary mb-4" id="loginSubtitle">Espace d'administration de l'établissement</p>
-                    <label class="form-label" for="loginUser">Identifiant</label>
-                    <input type="text" id="loginUser" class="form-control mb-3" placeholder="Votre identifiant" autocomplete="username" onkeydown="if(event.key==='Enter')doLogin()">
+                    <div id="loginForm">
+                    <label class="form-label" for="loginUser">Identifiant <span class="text-secondary" style="font-weight:400;">· parents : votre numéro de téléphone</span></label>
+                    <input type="text" id="loginUser" class="form-control mb-3" placeholder="Identifiant ou numéro de téléphone" autocomplete="username" onkeydown="if(event.key==='Enter')doLogin()">
                     <label class="form-label" for="loginPassword">Mot de passe</label>
                     <div class="pw-wrap">
                         <input type="password" id="loginPassword" class="form-control mb-2" placeholder="Votre mot de passe" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
                         <button type="button" class="pw-toggle" aria-label="Afficher le mot de passe" onclick="const i=document.getElementById('loginPassword');i.type=i.type==='password'?'text':'password';this.innerHTML=i.type==='password'?'<i class=&quot;bi bi-eye&quot;></i>':'<i class=&quot;bi bi-eye-slash&quot;></i>';"><i class="bi bi-eye"></i></button>
                     </div>
-                    <p id="loginError" class="text-danger small mb-3 hidden"><i class="bi bi-exclamation-circle"></i> Identifiant ou mot de passe incorrect.</p>
+                    <div class="login-row"><span class="text-secondary small">Première connexion : utilisez le code remis par l'école.</span><a href="#" onclick="showForgot();return false;">Mot de passe oublié ?</a></div>
+                    <p id="loginError" class="login-error hidden"><i class="bi bi-exclamation-circle"></i> <span id="loginErrorText">Identifiant ou mot de passe incorrect.</span></p>
                     <button class="btn btn-primary w-100" onclick="doLogin()">Se connecter <i class="bi bi-arrow-right"></i></button>
                     <div class="login-help">
-                        <span class="text-secondary"><i class="bi bi-shield-lock"></i> Accès selon votre rôle</span>
-                        <a href="consultation.html"><i class="bi bi-search"></i> Espace parents</a>
+                        <span class="text-secondary"><i class="bi bi-shield-lock"></i> Personnel et parents : accès selon votre profil</span>
+                    </div>
+                    </div>
+
+                    <!-- MOT DE PASSE OUBLIÉ -->
+                    <div id="forgotForm" class="hidden">
+                        <button type="button" class="btn btn-link px-0 mb-2" onclick="hideForgot()"><i class="bi bi-arrow-left"></i> Retour à la connexion</button>
+                        <h2 class="forgot-title">Mot de passe oublié</h2>
+                        <p class="text-secondary small mb-3">Votre demande est envoyée à l'administration. Après vérification de votre identité, elle vous remettra un nouveau code provisoire.</p>
+                        <label class="form-label">Vous êtes</label>
+                        <div class="seg mb-3" id="fgType">
+                            <button type="button" class="on" data-v="parent" onclick="setForgotType('parent')"><i class="bi bi-people"></i> Parent</button>
+                            <button type="button" data-v="personnel" onclick="setForgotType('personnel')"><i class="bi bi-person-badge"></i> Personnel de l'école</button>
+                        </div>
+                        <label class="form-label" for="fgLogin" id="fgLoginLabel">Numéro de téléphone</label>
+                        <input type="text" id="fgLogin" class="form-control mb-3" placeholder="Ex : 06 555 12 34">
+                        <label class="form-label" for="fgNom">Nom et prénom</label>
+                        <input type="text" id="fgNom" class="form-control mb-3" placeholder="Tel qu'enregistré à l'école">
+                        <label class="form-label" for="fgMsg">Message <span class="text-secondary" style="font-weight:400;">(facultatif)</span></label>
+                        <textarea id="fgMsg" class="form-control mb-3" rows="2" placeholder="Ex : nom de votre enfant, classe…"></textarea>
+                        <p id="fgError" class="login-error hidden"><i class="bi bi-exclamation-circle"></i> <span id="fgErrorText"></span></p>
+                        <button class="btn btn-primary w-100" onclick="envoyerDemande()"><i class="bi bi-send"></i> Envoyer la demande</button>
+                    </div>
+                    <div id="forgotDone" class="hidden">
+                        <div class="done-ico"><i class="bi bi-check2-circle"></i></div>
+                        <h2 class="forgot-title">Demande envoyée</h2>
+                        <p class="text-secondary small">L'administration va vérifier votre identité. Une fois la demande validée, elle vous remettra un nouveau code provisoire. À la connexion avec ce code, vous pourrez choisir votre propre mot de passe.</p>
+                        <button class="btn btn-primary w-100 mt-2" onclick="hideForgot()">Retour à la connexion</button>
                     </div>
                     <!-- MODE TEST : comptes affichés pour les essais. Mettre MODE_TEST à false avant la mise en service. -->
                     <div id="testAccounts" class="test-accounts hidden">
@@ -139,7 +167,7 @@
                 <h1 id="portalName">Portail de gestion scolaire</h1>
                 <p id="portalSubtitle">Espace d'administration de l'établissement</p>
             </div>
-            <div class="ms-auto d-flex align-items-center gap-2"><span class="user-chip" id="userChip"><i class="bi bi-person-circle"></i> <span id="userChipName"></span></span><button class="btn btn-light btn-sm" onclick="logout()" title="Se déconnecter pour utiliser un autre compte"><i class="bi bi-box-arrow-right"></i> Changer de compte</button></div>
+            <div class="ms-auto d-flex align-items-center gap-2"><button class="btn btn-light btn-sm hidden" id="btnMonMdp" onclick="openPwModal({})" title="Changer mon mot de passe"><i class="bi bi-key"></i> Mot de passe</button><span class="user-chip" id="userChip"><i class="bi bi-person-circle"></i> <span id="userChipName"></span></span><button class="btn btn-light btn-sm" onclick="logout()" title="Se déconnecter pour utiliser un autre compte"><i class="bi bi-box-arrow-right"></i> Changer de compte</button></div>
         </div>
 
         <!-- VUE ACCUEIL -->
@@ -179,7 +207,10 @@
 
             <div class="admin-nav" id="adminNav">
                 <button data-sec="directions" class="active" onclick="showAdminSection('directions')"><i class="bi bi-grid-1x2"></i> Directions</button>
-                <button data-sec="users" onclick="showAdminSection('users')"><i class="bi bi-people"></i> Utilisateurs et rôles</button>
+                <button data-sec="users" onclick="showAdminSection('users')"><i class="bi bi-people"></i> Personnel</button>
+                <button data-sec="parents" onclick="showAdminSection('parents')"><i class="bi bi-person-hearts"></i> Comptes parents</button>
+                <button data-sec="demandes" onclick="showAdminSection('demandes')"><i class="bi bi-key"></i> Demandes <span class="nav-count hidden" id="countDemandes">0</span></button>
+                <button data-sec="preoc" onclick="showAdminSection('preoc')"><i class="bi bi-chat-left-text"></i> Préoccupations <span class="nav-count hidden" id="countPreoc">0</span></button>
                 <button data-sec="settings" onclick="showAdminSection('settings')"><i class="bi bi-gear"></i> Paramètres</button>
                 <button data-sec="backup" onclick="showAdminSection('backup')"><i class="bi bi-database"></i> Données et sauvegardes</button>
             </div>
@@ -210,6 +241,44 @@
                             <tbody id="usersTableBody"></tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+
+            <!-- Section : Comptes parents -->
+            <div id="sec-parents" class="admin-section hidden">
+                <div class="card-soft">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                        <h3 class="h6 fw-bold mb-0">Comptes parents</h3>
+                        <input type="text" id="parSearch" class="form-control form-control-sm" style="max-width:280px;margin:0;" placeholder="Rechercher un parent, un téléphone, un élève…" oninput="renderParents()">
+                    </div>
+                    <p class="text-secondary small mb-3">Un parent = le tuteur enregistré dans la fiche de l'élève (Direction de la scolarité), identifié par son <strong>numéro de téléphone</strong>. Créez son code d'accès et remettez-le lui : à la première connexion, il pourra choisir son propre mot de passe.</p>
+                    <div style="overflow-x:auto;"><table class="tbl"><thead><tr><th>Parent / tuteur</th><th>Téléphone (identifiant)</th><th>Enfant(s)</th><th>Compte</th><th style="text-align:right;">Action</th></tr></thead><tbody id="parentsBody"></tbody></table></div>
+                </div>
+            </div>
+
+            <!-- Section : Demandes de réinitialisation -->
+            <div id="sec-demandes" class="admin-section hidden">
+                <div class="card-soft">
+                    <h3 class="h6 fw-bold mb-1">Demandes de mot de passe oublié</h3>
+                    <p class="text-secondary small mb-3">Vérifiez que la personne correspond bien à la fiche trouvée dans le système avant de valider. Seul un parent ou un membre du personnel existant peut être réinitialisé.</p>
+                    <div id="demandesEnAttente"></div>
+                </div>
+                <div class="card-soft">
+                    <h3 class="h6 fw-bold mb-3">Historique</h3>
+                    <div style="overflow-x:auto;"><table class="tbl"><thead><tr><th>Date</th><th>Profil</th><th>Identifiant</th><th>Nom déclaré</th><th>Décision</th></tr></thead><tbody id="demandesHisto"></tbody></table></div>
+                </div>
+            </div>
+
+            <!-- Section : Préoccupations des parents -->
+            <div id="sec-preoc" class="admin-section hidden">
+                <div class="card-soft">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                        <h3 class="h6 fw-bold mb-0">Préoccupations des parents</h3>
+                        <select id="preocFiltre" class="form-select form-select-sm" style="max-width:220px;margin:0;" onchange="renderPreoc()">
+                            <option value="ouvertes">À traiter</option><option value="toutes">Toutes</option><option value="traitee">Traitées</option>
+                        </select>
+                    </div>
+                    <div id="preocList"></div>
                 </div>
             </div>
 
@@ -290,7 +359,13 @@
         </div>
     </div>
 
+    <!-- Fenêtre comptes (changement de mot de passe, code d'accès) -->
+    <div id="acctModal" class="app-modal-overlay hidden" role="dialog" aria-modal="true">
+        <div class="app-modal acct-modal" id="acctModalBody"></div>
+    </div>
+
     <script src="js/etablissement.js"></script>
+    <script src="js/comptes.js"></script>
     <script>
         // ============================================
         // Portail de gestion scolaire — configuration locale
@@ -309,7 +384,7 @@
                 { id: 'd5', name: 'Surveillance et discipline',     desc: 'Présences, retards et discipline',              icon: 'bi-shield-check',   status: 'available', url: 'surveillance.html' },
                 { id: 'd6', name: 'Secrétariat',                    desc: 'Courrier, documents et archives',               icon: 'bi-folder',         status: 'available', url: 'secretariat.html' },
                 { id: 'd7', name: 'Calendrier scolaire',            desc: 'Rentrée, congés, examens, conseils, réunions',  icon: 'bi-calendar-event',  status: 'available', url: 'calendrier.html' },
-                { id: 'd8', name: 'Consultation parents / élèves',  desc: 'Notes, bulletins, assiduité et frais par matricule', icon: 'bi-search',        status: 'available', url: 'consultation.html' },
+                { id: 'd8', name: 'Recherche élève & famille',       desc: 'Retrouver un élève ou un parent : fiche complète, famille, paiements', icon: 'bi-person-lines-fill', status: 'available', url: 'consultation.html' },
                 { id: 'd9', name: 'Espace enseignant',              desc: 'Saisie des devoirs et compositions par les professeurs', icon: 'bi-person-workspace', status: 'available', url: 'enseignant.html' }
             ],
             users: [
@@ -332,8 +407,17 @@
                 }
                 // Migration : ajouter la Consultation parents/élèves si elle manque
                 if (!c.directions.some(d => d.url === 'consultation.html')) {
-                    c.directions.push({ id: 'd8', name: 'Consultation parents / élèves', desc: 'Notes, bulletins, assiduité et frais par matricule', icon: 'bi-search', status: 'available', url: 'consultation.html' });
+                    c.directions.push({ id: 'd8', name: 'Recherche élève & famille', desc: 'Retrouver un élève ou un parent : fiche complète, famille, paiements', icon: 'bi-person-lines-fill', status: 'available', url: 'consultation.html' });
                 }
+                // Migration : la consultation devient la « Recherche élève & famille » (réservée au personnel)
+                c.directions.forEach(d => {
+                    if (d.url === 'consultation.html' && d.name === 'Consultation parents / élèves') {
+                        (c.users || []).forEach(u => { if (u.role === d.name) u.role = 'Recherche élève & famille'; });
+                        d.name = 'Recherche élève & famille';
+                        d.desc = 'Retrouver un élève ou un parent : fiche complète, famille, paiements';
+                        d.icon = 'bi-person-lines-fill';
+                    }
+                });
                 // Migration : ajouter l'Espace enseignant si absent
                 if (!c.directions.some(d => d.url === 'enseignant.html')) {
                     c.directions.push({ id: 'd9', name: 'Espace enseignant', desc: 'Saisie des devoirs et compositions par les professeurs', icon: 'bi-person-workspace', status: 'available', url: 'enseignant.html' });
@@ -353,6 +437,7 @@
 
         function modulesAutorises(role) {
             if (role === 'Administrateur' || role === '*') return '*';
+            if (role === 'Parent') return [];
             const urls = ['consultation.html'];
             config.directions.forEach(d => { if (d.name === role && d.url) urls.push(d.url.toLowerCase()); });
             return urls;
@@ -413,13 +498,16 @@
                 setSession({ nom: 'Administrateur', role: 'Administrateur' });
                 enterApp(); return;
             }
-            // Compte utilisateur (identifiant + mot de passe)
+            // Compte du personnel (identifiant + mot de passe)
             const u = config.users.find(x => (x.login || '').toLowerCase() === login.toLowerCase() && login);
-            if (u && pass !== '' && (u.password || '') === pass) {
-                setSession({ nom: u.nom, role: u.role, login: u.login });
-                enterApp(); return;
+            if (u && pass !== '' && Comptes.verifier(u, pass)) {
+                if (u.active === false) return loginErreur('Ce compte est désactivé. Adressez-vous à l\'administration.');
+                setSession({ nom: u.nom, role: u.role, login: u.login, type: 'personnel' });
+                return apresConnexion(!!u.mustChange);
             }
-            document.getElementById('loginError').classList.remove('hidden');
+            // Compte parent (numéro de téléphone + code / mot de passe)
+            if (!u && Comptes.estTelephone(login)) return loginParent(login, pass);
+            loginErreur('Identifiant ou mot de passe incorrect.');
         }
 
         function logout() {
@@ -430,6 +518,7 @@
             document.getElementById('loginPassword').value = '';
             document.getElementById('loginUser').value = '';
             document.getElementById('loginError').classList.add('hidden');
+            hideForgot();
         }
 
         function heroStats() {
@@ -485,6 +574,7 @@
         }
 
         function enterApp() {
+            if (currentSession && currentSession.role === 'Parent') { location.href = 'parent.html'; return; }
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('appScreen').classList.remove('hidden');
             applyIdentity();
@@ -569,6 +659,10 @@
             document.querySelectorAll('#adminNav button').forEach(b => b.classList.toggle('active', b.dataset.sec === sec));
             if (sec === 'directions') renderAdminDirections();
             if (sec === 'users') renderUsers();
+            if (sec === 'parents') renderParents();
+            if (sec === 'demandes') renderDemandes();
+            if (sec === 'preoc') renderPreoc();
+            majCompteurs();
             if (sec === 'settings') { renderAccentPicker(); fillSettings(); if (typeof loadEtablissementForm === 'function') loadEtablissementForm(); }
         }
 
@@ -674,7 +768,7 @@
                 <tr>
                     <td><input type="text" class="form-control form-control-sm" value="${escapeAttr(u.nom)}" oninput="updateUser('${u.id}','nom',this.value)"></td>
                     <td><input type="text" class="form-control form-control-sm" value="${escapeAttr(u.login)}" oninput="updateUser('${u.id}','login',this.value)"></td>
-                    <td><input type="text" class="form-control form-control-sm" value="${escapeAttr(u.password || '')}" placeholder="mot de passe" oninput="updateUser('${u.id}','password',this.value)"></td>
+                    <td>${etatMdp(u)} <button class="btn btn-secondary btn-sm ms-1" onclick="codeProvisoireUser('${u.id}')" title="Générer un code provisoire à remettre"><i class="bi bi-key"></i> Code provisoire</button></td>
                     <td><select class="form-select form-select-sm" onchange="updateUser('${u.id}','role',this.value)">${roleOptions(u.role)}</select></td>
                     <td style="text-align:right;"><button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')"><i class="bi bi-trash"></i></button></td>
                 </tr>
@@ -689,9 +783,13 @@
         }
 
         function addUser() {
-            config.users.push({ id: 'u' + Date.now(), nom: 'Nouvel utilisateur', login: '', password: '', role: 'Administrateur' });
+            const nu = { id: 'u' + Date.now(), nom: 'Nouvel utilisateur', login: '', role: 'Administrateur' };
+            const code = Comptes.genererCode();
+            Comptes.definir(nu, code, true);
+            config.users.push(nu);
             saveConfig();
             renderUsers();
+            afficherCode({ titre: 'Nouveau compte du personnel', nom: 'Renseignez le nom, l\'identifiant et le rôle dans le tableau.', code: code, identifiant: '(identifiant à saisir dans le tableau)' });
         }
 
         function deleteUser(id) {
@@ -840,11 +938,17 @@
             if (raw) {
                 try { currentSession = JSON.parse(raw); } catch (e) { currentSession = null; }
                 if (typeof currentSession !== 'object' || currentSession === null) currentSession = { nom: 'Administrateur', role: 'Administrateur' };
+                if (new URLSearchParams(location.search).get('pwd') === '1') {
+                    history.replaceState(null, '', location.pathname);
+                    if (currentSession.role === 'Parent') { openPwModal({ onDone: () => { location.href = 'parent.html'; } }); return; }
+                    enterApp(); openPwModal({}); return;
+                }
                 enterApp();
             } else {
                 document.getElementById('loginUser').focus();
             }
         });
     </script>
+    <script src="js/portail-comptes.js"></script>
 </body>
 </html>

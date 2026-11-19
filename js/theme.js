@@ -225,7 +225,7 @@
         { url: 'surveillance.html', name: 'Surveillance et discipline',   icon: 'bi-shield-check' },
         { url: 'secretariat.html',  name: 'Secrétariat',                  icon: 'bi-folder' },
         { url: 'calendrier.html',   name: 'Calendrier scolaire',          icon: 'bi-calendar-event' },
-        { url: 'consultation.html', name: 'Consultation parents / élèves', icon: 'bi-search' },
+        { url: 'consultation.html', name: 'Recherche élève & famille', icon: 'bi-person-lines-fill' },
         { url: 'enseignant.html',   name: 'Espace enseignant',            icon: 'bi-person-workspace' }
     ];
     function session() { try { return JSON.parse(sessionStorage.getItem('portail_session')) || null; } catch (e) { return null; } }
@@ -233,6 +233,7 @@
         var cfg = null; try { cfg = JSON.parse(store('portail_config_v1')); } catch (e) {}
         var dirs = (cfg && cfg.directions && cfg.directions.length) ? cfg.directions : MODULES;
         var s = session(), role = s && typeof s === 'object' ? s.role : 'Administrateur';
+        if (role === 'Parent') return [];
         return dirs.filter(function (d) {
             if (!d.url || d.status === 'hidden') return false;
             if (!role || role === 'Administrateur' || role === '*') return true;
@@ -325,6 +326,7 @@
             var who = (s && s.role) ? s.role : 'Administrateur';
             var foot = el('div', 'sb-foot', '<div class="sb-avatar"></div><div class="sb-who"><strong></strong><small></small></div>' +
                 '<a href="portail.html" title="Portail d\'accueil" aria-label="Portail d\'accueil"><i class="bi bi-grid-3x3-gap"></i></a>' +
+                (s.login ? '<a href="portail.html?pwd=1" title="Changer mon mot de passe" aria-label="Changer mon mot de passe"><i class="bi bi-key"></i></a>' : '') +
                 '<a href="portail.html?logout=1" title="Changer de compte" aria-label="Changer de compte"><i class="bi bi-box-arrow-right"></i></a>');
             foot.querySelector('.sb-avatar').textContent = initials(s.nom && s.nom !== who ? s.nom : who);
             foot.querySelector('strong').textContent = s.nom && s.nom !== who ? s.nom : who;

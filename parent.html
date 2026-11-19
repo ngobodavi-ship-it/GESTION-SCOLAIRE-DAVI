@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Espace parent</title>
+    <link href="vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link href="vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="js/etablissement.js"></script>
+    <link href="css/theme.css" rel="stylesheet">
+    <script src="js/theme.js"></script>
+    <script src="js/auth.js"></script>
+</head>
+<body class="parent-page">
+    <div class="container" style="max-width:1100px;">
+        <div class="header">
+            <div style="display:flex;align-items:center;gap:0.85rem;">
+                <div class="tb-logo"><i class="bi bi-person-hearts"></i></div>
+                <div>
+                    <h1>Espace parent</h1>
+                    <p><span id="cEcole">Établissement</span></p>
+                </div>
+            </div>
+            <div class="ms-auto" style="display:flex;align-items:center;gap:0.75rem;">
+                <span class="user-chip"><i class="bi bi-person-circle"></i> <span id="parNom">Parent</span></span>
+                <a class="btn btn-light btn-sm" href="portail.html?pwd=1" title="Changer mon mot de passe"><i class="bi bi-key"></i> Mot de passe</a>
+                <a class="btn btn-light btn-sm" href="portail.html?logout=1"><i class="bi bi-box-arrow-right"></i> Déconnexion</a>
+            </div>
+        </div>
+
+        <div class="portal-hero par-hero">
+            <div class="ph-top">
+                <div>
+                    <h2 id="parHello">Bonjour</h2>
+                    <p>Suivez la scolarité de vos enfants et écrivez à l'école en cas de besoin.</p>
+                </div>
+                <span class="ph-chip"><i class="bi bi-calendar3"></i> <span id="parDate"></span></span>
+            </div>
+            <div class="par-kids" id="parKids"></div>
+        </div>
+
+        <div class="tabs" id="parTabs">
+            <button class="tab active" data-v="suivi" onclick="parTab('suivi')"><i class="bi bi-mortarboard"></i> Suivi de l'enfant</button>
+            <button class="tab" data-v="preoc" onclick="parTab('preoc')"><i class="bi bi-chat-left-text"></i> Mes préoccupations <span class="nav-count hidden" id="parCountRep">0</span></button>
+        </div>
+
+        <div id="par-suivi">
+            <div id="cResult"></div>
+        </div>
+
+        <div id="par-preoc" class="hidden">
+            <div class="card">
+                <h3 style="margin-bottom:.25rem;">Écrire à l'école</h3>
+                <p class="text-secondary small mb-3">Une question, un problème, une demande ? Votre message est transmis à l'administration, qui vous répondra ici.</p>
+                <div class="row g-3">
+                    <div class="col-md-6"><label class="form-label" for="pqEleve">Concerne</label><select id="pqEleve" style="margin:0;"></select></div>
+                    <div class="col-md-6"><label class="form-label" for="pqService">Service</label><select id="pqService" style="margin:0;"></select></div>
+                    <div class="col-12"><label class="form-label" for="pqSujet">Sujet</label><input type="text" id="pqSujet" style="margin:0;" maxlength="120" placeholder="Ex : Absence du 12 novembre, reçu de paiement, rendez-vous…"></div>
+                    <div class="col-12"><label class="form-label" for="pqMessage">Message</label><textarea id="pqMessage" rows="4" style="margin:0;" placeholder="Décrivez votre préoccupation"></textarea></div>
+                </div>
+                <div class="d-flex justify-content-end mt-3"><button class="btn btn-primary" onclick="envoyerPreoc()"><i class="bi bi-send"></i> Envoyer à l'école</button></div>
+            </div>
+            <div class="card">
+                <h3 style="margin-bottom:1rem;">Mes échanges avec l'école</h3>
+                <div id="pqList"></div>
+            </div>
+        </div>
+        <input type="hidden" id="cSearch">
+    </div>
+
+    <script src="js/comptes.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/tarifs.js"></script>
+    <script src="js/consultation.js"></script>
+    <script src="js/parent.js"></script>
+</body>
+</html>

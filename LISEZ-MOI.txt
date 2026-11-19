@@ -46,3 +46,19 @@ theme. Le comportement de l'application est identique.
                      polices Inter et Plus Jakarta Sans : fonctionne SANS internet.
   Couleur de l'interface : Espace admin > Paramètres, ou Ctrl + K.
   Les données (localStorage) et les calculs ne sont pas modifiés.
+
+--- COMPTES ET ESPACE PARENT ---
+  parent.html          Espace parent : suivi des enfants (notes, assiduité,
+                       paiements, reste à payer mois par mois) et préoccupations.
+  consultation.html    Recherche élève & famille (réservée au personnel).
+  js/comptes.js        Mots de passe chiffrés (SHA-256 salé), comptes parents,
+                       demandes de réinitialisation, préoccupations.
+  js/portail-comptes.js  Connexion des parents, première connexion,
+                       mot de passe oublié, sections de l'Espace admin.
+  Un parent = le tuteur enregistré dans la fiche de l'élève (Scolarité),
+  identifié par son numéro de téléphone. L'administrateur crée son code
+  (Espace admin > Comptes parents) ; à la première connexion le parent
+  peut choisir son mot de passe. Mot de passe oublié : la demande est
+  validée par l'administrateur (Espace admin > Demandes), uniquement pour
+  une personne existante dans le système.
+  Données : ecole_comptes_parents, ecole_demandes_reinit, ecole_preoccupations.
