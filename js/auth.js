@@ -21,7 +21,7 @@
     } catch (e) {}
 
     if (allowed.indexOf(page) === -1) {
-        alert("Accès non autorisé pour votre profil (« " + role + " »). Vous allez être redirigé vers le portail.");
-        window.location.replace('portail.html');
+        // Le portail affiche un message clair avec un bouton « Changer de compte »
+        window.location.replace('portail.html?refus=' + encodeURIComponent(page));
     }
 })();

@@ -137,7 +137,7 @@
                 <h1 id="portalName">Portail de gestion scolaire</h1>
                 <p id="portalSubtitle">Espace d'administration de l'établissement</p>
             </div>
-            <div class="ms-auto d-flex align-items-center gap-2"><button class="btn btn-light btn-sm" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Déconnexion</button></div>
+            <div class="ms-auto d-flex align-items-center gap-2"><span class="user-chip" id="userChip"><i class="bi bi-person-circle"></i> <span id="userChipName"></span></span><button class="btn btn-light btn-sm" onclick="logout()" title="Se déconnecter pour utiliser un autre compte"><i class="bi bi-box-arrow-right"></i> Changer de compte</button></div>
         </div>
 
         <!-- VUE ACCUEIL -->
@@ -148,6 +148,14 @@
                     <p id="heroSub">Choisissez un module pour commencer.</p>
                 </div>
                 <span class="ph-chip"><i class="bi bi-calendar3"></i> <span id="heroDate"></span></span>
+            </div>
+            <div id="refusBanner" class="refus-banner hidden" role="alert">
+                <i class="bi bi-lock"></i>
+                <div>
+                    <strong>Accès non autorisé</strong>
+                    <p id="refusText"></p>
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="logout()"><i class="bi bi-arrow-left-right"></i> Changer de compte</button>
             </div>
             <p class="section-label">Modules</p>
             <div class="dir-grid" id="dirGrid"></div>
@@ -340,6 +348,9 @@
             return urls;
         }
         function setSession(sess) {
+            // Les modules lisent les droits d'accès dans la configuration enregistrée :
+            // on l'enregistre si elle ne l'a jamais été (premier usage sur cet appareil).
+            try { if (!localStorage.getItem(STORAGE_KEY)) saveConfig(); } catch (e) {}
             currentSession = sess;
             sessionStorage.setItem('portail_session', JSON.stringify(sess));
         }
@@ -418,6 +429,17 @@
             const nom = s.nom && s.nom !== 'Administrateur' ? ', ' + s.nom : '';
             document.getElementById('heroHello').textContent = salut + nom;
             document.getElementById('heroSub').textContent = (s.role ? 'Connecté en tant que ' + s.role + '. ' : '') + 'Choisissez un module pour commencer.';
+            document.getElementById('userChipName').textContent = s.role === 'Administrateur' ? 'Administrateur' : (s.role || s.nom || '');
+            // Message quand un module a refusé l'accès (redirection depuis auth.js)
+            const refus = new URLSearchParams(location.search).get('refus');
+            const ban = document.getElementById('refusBanner');
+            if (refus) {
+                const dir = config.directions.find(x => (x.url || '').toLowerCase() === refus.toLowerCase());
+                const nomModule = dir ? dir.name : refus;
+                document.getElementById('refusText').textContent = 'Votre compte « ' + (s.role || s.nom || '') + ' » ne peut pas ouvrir « ' + nomModule + ' ». Utilisez les modules ci-dessous, ou changez de compte (par exemple « admin » pour tout voir).';
+                ban.classList.remove('hidden');
+                history.replaceState(null, '', location.pathname);
+            } else ban.classList.add('hidden');
             const d = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
             document.getElementById('heroDate').textContent = d.charAt(0).toUpperCase() + d.slice(1);
         }
@@ -761,6 +783,7 @@
 
         // ---------- Démarrage ----------
         window.addEventListener('DOMContentLoaded', function() {
+            try { if (!localStorage.getItem(STORAGE_KEY)) saveConfig(); } catch (e) {}
             applyIdentity();
             renderTestAccounts();
             const raw = sessionStorage.getItem('portail_session');

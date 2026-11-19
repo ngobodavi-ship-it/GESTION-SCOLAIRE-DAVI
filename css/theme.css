@@ -505,3 +505,13 @@ body.portal-page{ background:var(--bg) !important; }
 .test-accounts code{ color:var(--ink); background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:1px 5px; font-size:.76rem; }
 .test-accounts .ta-foot{ margin:8px 0 0; color:var(--muted); font-size:.72rem; }
 .login-panel{ overflow-y:auto; }
+
+/* Compte connecté + message de refus d'accès */
+.user-chip{ display:inline-flex; align-items:center; gap:6px; font-size:.8rem; font-weight:600; color:var(--ink-2); background:var(--surface-3); border-radius:999px; padding:.35rem .75rem; max-width:240px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.refus-banner{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; background:var(--warn-bg); border:1px solid #F59E0B; border-radius:var(--radius); padding:14px 16px; margin:0 0 20px; }
+.refus-banner > i{ font-size:1.3rem; color:var(--warn); }
+.refus-banner > div{ flex:1; min-width:220px; }
+.refus-banner strong{ color:var(--warn-strong); }
+.refus-banner p{ margin:2px 0 0; color:var(--ink-2); font-size:.875rem; }
+.refus-banner.hidden{ display:none !important; }
+@media (max-width:768px){ .user-chip{ display:none; } }
