@@ -45,11 +45,39 @@
 
         <div class="tabs" id="parTabs">
             <button class="tab active" data-v="suivi" onclick="parTab('suivi')"><i class="bi bi-mortarboard"></i> Suivi de l'enfant</button>
+            <button class="tab" data-v="payer" onclick="parTab('payer')"><i class="bi bi-wallet2"></i> Payer <span class="nav-count hidden" id="parCountPay">0</span></button>
             <button class="tab" data-v="preoc" onclick="parTab('preoc')"><i class="bi bi-chat-left-text"></i> Mes préoccupations <span class="nav-count hidden" id="parCountRep">0</span></button>
         </div>
 
         <div id="par-suivi">
             <div id="cResult"></div>
+        </div>
+
+        <div id="par-payer" class="hidden">
+            <div class="card">
+                <h3 style="margin-bottom:.25rem;">Payer à distance</h3>
+                <p class="text-secondary small mb-3">Payez avec votre téléphone (MTN Mobile Money, Airtel Money) ou par virement, puis <strong>déclarez votre paiement ci-dessous</strong> avec l'identifiant de transaction reçu par SMS. L'école le vérifie puis l'enregistre : vous suivez son état ici.</p>
+                <div id="payNumeros" class="pay-nums"></div>
+            </div>
+            <div class="card">
+                <h3 style="margin-bottom:1rem;">Déclarer un paiement</h3>
+                <div class="row g-3">
+                    <div class="col-md-6"><label class="form-label" for="pdEleve">Enfant</label><select id="pdEleve" style="margin:0;" onchange="pdMajMois()"></select></div>
+                    <div class="col-md-6"><label class="form-label" for="pdType">Objet</label><select id="pdType" style="margin:0;" onchange="pdMajMois()"><option value="scolarite">Scolarité (mensualités)</option><option value="inscription">Frais d'inscription</option><option value="reinscription">Frais de réinscription</option></select></div>
+                    <div class="col-12" id="pdMoisBox"><label class="form-label">Mois payés</label><div id="pdMois" class="pd-mois"></div></div>
+                    <div class="col-md-4"><label class="form-label" for="pdMontant">Montant payé (FCFA)</label><input type="number" id="pdMontant" min="1" step="1" style="margin:0;"></div>
+                    <div class="col-md-4"><label class="form-label" for="pdMoyen">Moyen de paiement</label><select id="pdMoyen" style="margin:0;"><option value="mtn">MTN Mobile Money</option><option value="airtel">Airtel Money</option><option value="virement">Virement bancaire</option></select></div>
+                    <div class="col-md-4"><label class="form-label" for="pdDate">Date du paiement</label><input type="date" id="pdDate" style="margin:0;"></div>
+                    <div class="col-md-6"><label class="form-label" for="pdRef">Identifiant de la transaction</label><input type="text" id="pdRef" maxlength="60" style="margin:0;" placeholder="Reçu par SMS après le paiement"></div>
+                    <div class="col-md-6"><label class="form-label" for="pdNumero">Numéro qui a payé</label><input type="text" id="pdNumero" maxlength="30" style="margin:0;" placeholder="Ex : 06 555 12 34"></div>
+                    <div class="col-12"><label class="form-label" for="pdNote">Remarque <span class="text-secondary" style="font-weight:400;">(facultatif)</span></label><input type="text" id="pdNote" maxlength="200" style="margin:0;"></div>
+                </div>
+                <div class="d-flex justify-content-end mt-3"><button class="btn btn-primary" onclick="declarerPaiement()"><i class="bi bi-send-check"></i> Déclarer mon paiement</button></div>
+            </div>
+            <div class="card">
+                <h3 style="margin-bottom:1rem;">Mes paiements déclarés</h3>
+                <div id="pdList"></div>
+            </div>
         </div>
 
         <div id="par-preoc" class="hidden">

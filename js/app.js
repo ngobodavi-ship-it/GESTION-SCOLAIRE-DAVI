@@ -18,7 +18,9 @@ const MODULE_INFO = {
             salaires:     { titre: 'Salaires',        icone: 'bi-briefcase' },
             enseignants:  { titre: 'Enseignants (paie)', icone: 'bi-person-badge' },
             vacations:    { titre: 'Vacations enseignants', icone: 'bi-clock-history' },
-            reports:      { titre: 'Reporting',       icone: 'bi-bar-chart-line' }
+            reports:      { titre: 'Reporting',       icone: 'bi-bar-chart-line' },
+            declares:     { titre: 'Paiements déclarés', icone: 'bi-phone' },
+            cloture:      { titre: 'Clôture de caisse', icone: 'bi-calculator' }
         };
 
         function setModuleTitle(tabName) {
@@ -43,7 +45,9 @@ const SLUG = {
             salaires: 'salaires',
             enseignants: 'enseignants',
             vacations: 'vacations',
-            reports: 'reporting'
+            reports: 'reporting',
+            declares: 'paiements-declares',
+            cloture: 'cloture-caisse'
         };
         const TAB_BY_SLUG = {};
         Object.keys(SLUG).forEach(function(k){ TAB_BY_SLUG[SLUG[k]] = k; });
@@ -65,6 +69,8 @@ const SLUG = {
             if (tabName === 'reductions' && typeof renderReductions === 'function') renderReductions();
             if (tabName === 'echeancier' && typeof renderEcheancier === 'function') renderEcheancier();
             if (tabName === 'budget' && typeof renderBudget === 'function') renderBudget();
+            if (tabName === 'declares' && typeof renderDeclares === 'function') renderDeclares();
+            if (tabName === 'cloture' && typeof renderCloture === 'function') renderCloture();
             if (updateHash !== false) {
                 const slug = SLUG[tabName] || tabName;
                 if (location.hash !== '#' + slug) location.hash = slug;

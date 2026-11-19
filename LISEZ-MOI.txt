@@ -62,3 +62,19 @@ theme. Le comportement de l'application est identique.
   validée par l'administrateur (Espace admin > Demandes), uniquement pour
   une personne existante dans le système.
   Données : ecole_comptes_parents, ecole_demandes_reinit, ecole_preoccupations.
+
+--- PAIEMENT À DISTANCE ET CLÔTURE DE CAISSE ---
+  Espace admin > Paramètres > Paiement à distance : numéros marchands MTN /
+  Airtel et compte bancaire affichés aux parents (laisser vide si non disponible).
+  Espace parent > Payer : le parent paie depuis son téléphone puis déclare
+  le paiement (mois, montant, moyen, identifiant de transaction reçu par SMS).
+  DigiGesPro > Paiements déclarés : le caissier vérifie sur le téléphone
+  marchand / le relevé puis valide → la transaction est créée à la date du
+  paiement (même format qu'un paiement au guichet). Refus avec motif visible
+  par le parent. Un identifiant de transaction ne peut être déclaré qu'une fois.
+  DigiGesPro > Clôture de caisse : totaux du jour par moyen (Espèces =
+  encaissements − dépenses, MTN, Airtel, Virement), saisie du montant
+  réellement constaté, écart calculé, clôture enregistrée et imprimable,
+  historique ; alerte si des opérations sont ajoutées après la clôture.
+  js/caisse-distance.js. Données : ecole_paiement_distance,
+  ecole_paiements_declares, ecole_clotures_caisse.

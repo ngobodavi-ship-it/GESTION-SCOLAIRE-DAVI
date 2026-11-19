@@ -123,7 +123,24 @@
     function preoccupations() { var p = lire(K_PREOC, []); return Array.isArray(p) ? p : []; }
     function sauverPreoccupations(p) { ecrire(K_PREOC, p); }
 
+    // ---------- Paiement à distance ----------
+    // ecole_paiement_distance  { mtn:{numero,nom}, airtel:{numero,nom}, banque:{banque,titulaire,rib} }
+    // ecole_paiements_declares [ { id, createdAt, date, parentKey, parentNom, parentTel, eleveId, eleveNom, classe, matricule,
+    //                              type, mois:[], montant, moyen, reference, numeroPayeur, note, status, motif, traitePar, traiteLe, transactionId } ]
+    // ecole_clotures_caisse    { 'AAAA-MM-JJ': { date, totaux, nb, constate, ecart, note, par, le } }
+    var K_PAYCFG = 'ecole_paiement_distance', K_DECL = 'ecole_paiements_declares', K_CLOT = 'ecole_clotures_caisse';
+    function paiementConfig() { var c = lire(K_PAYCFG, {}); c.mtn = c.mtn || {}; c.airtel = c.airtel || {}; c.banque = c.banque || {}; return c; }
+    function sauverPaiementConfig(c) { ecrire(K_PAYCFG, c); }
+    function declarations() { var d = lire(K_DECL, []); return Array.isArray(d) ? d : []; }
+    function sauverDeclarations(d) { ecrire(K_DECL, d); }
+    function clotures() { return lire(K_CLOT, {}); }
+    function sauverClotures(c) { ecrire(K_CLOT, c); }
+    var MOYENS = { especes: 'Espèces', mtn: 'MTN Mobile Money', airtel: 'Airtel Money', virement: 'Virement bancaire' };
+
     window.Comptes = {
+        paiementConfig: paiementConfig, sauverPaiementConfig: sauverPaiementConfig,
+        declarations: declarations, sauverDeclarations: sauverDeclarations,
+        clotures: clotures, sauverClotures: sauverClotures, MOYENS: MOYENS,
         sha256: sha256, empreinte: empreinte, genererCode: genererCode, verifier: verifier, definir: definir,
         normTel: normTel, estTelephone: estTelephone, eleves: eleves,
         registreParents: registreParents, trouverParent: trouverParent,

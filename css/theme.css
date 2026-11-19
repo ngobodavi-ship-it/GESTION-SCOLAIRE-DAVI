@@ -793,3 +793,54 @@ body.ui-resizing, body.ui-resizing *{ cursor:col-resize !important; user-select:
 .hp-head{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
 .hp-ico{ position:relative; width:42px; height:42px; border-radius:13px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; color:#fff; background:var(--accent-grad); box-shadow:var(--glow); }
 .hp-ico .nav-count{ position:absolute; top:-6px; right:-6px; margin:0; border:2px solid var(--surface); }
+
+/* =====================================================================
+   14. PAIEMENT À DISTANCE & CLÔTURE DE CAISSE
+   ===================================================================== */
+.pay-nums{ display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; }
+.pay-num{ display:flex; gap:12px; align-items:center; padding:14px; border-radius:16px; border:1px solid var(--line); background:var(--surface-2); }
+.pay-num small{ display:block; color:var(--muted); font-size:.74rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
+.pay-num strong{ display:block; font-family:var(--font-display); font-size:1.2rem; letter-spacing:.02em; }
+.pay-num strong.rib{ font-size:.95rem; font-family:ui-monospace,Consolas,monospace; word-break:break-all; }
+.pay-num span:not(.pn-ico){ display:block; color:var(--muted); font-size:.8rem; }
+.pn-ico{ width:42px; height:42px; border-radius:12px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:1.1rem; color:#fff; }
+.pay-num.mtn .pn-ico{ background:linear-gradient(135deg,#F59E0B,#FACC15); color:#1F1300; }
+.pay-num.airtel .pn-ico{ background:linear-gradient(135deg,#DC2626,#F43F5E); }
+.pay-num.banque .pn-ico{ background:linear-gradient(135deg,#0284C7,#06B6D4); }
+.pd-mois{ display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:8px; }
+.pd-m{ display:flex; gap:10px; align-items:center; padding:9px 11px; border-radius:12px; border:1px solid var(--line-strong); background:var(--surface); cursor:pointer; font-weight:400; margin:0; transition:all .15s; }
+.pd-m:hover{ border-color:var(--accent); }
+.pd-m:has(input:checked){ border-color:var(--accent); background:var(--accent-soft); box-shadow:var(--ring); }
+.pd-m.paye{ opacity:.55; cursor:default; background:var(--ok-bg); border-color:transparent; }
+.pd-m input{ width:auto; margin:0; }
+.pd-m strong{ display:block; font-size:.86rem; color:var(--ink); }
+.pd-m small{ display:block; font-size:.72rem; color:var(--muted); }
+
+.dp-card{ padding:20px !important; }
+.dp-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:14px; }
+.dp-amount{ display:flex; flex-direction:column; gap:6px; align-items:flex-start; }
+.dp-amount strong{ font-family:var(--font-display); font-size:1.6rem; font-weight:800; letter-spacing:-.02em; }
+.dp-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px; background:var(--surface-2); border-radius:14px; padding:14px; }
+.dp-grid small{ display:block; color:var(--muted); font-size:.72rem; font-weight:600; }
+.dp-grid strong{ display:block; font-size:.92rem; }
+.dp-grid .ui-pill{ display:inline-flex; }
+.dp-ref{ font-family:ui-monospace,Consolas,monospace; letter-spacing:.03em; }
+.dp-actions{ display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap; margin-top:14px; }
+
+.cl-summary{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-bottom:18px; }
+.cl-summary > div{ padding:14px 16px; border-radius:16px; background:var(--surface-2); border:1px solid var(--line); }
+.cl-summary small{ display:block; color:var(--muted); font-size:.74rem; font-weight:600; }
+.cl-summary strong{ display:block; font-family:var(--font-display); font-size:1.35rem; font-weight:800; letter-spacing:-.02em; margin-top:2px; }
+.cl-moyen{ display:flex; gap:12px; align-items:center; }
+.cl-moyen small{ display:block; color:var(--muted); font-size:.75rem; }
+.cl-ico{ width:36px; height:36px; border-radius:11px; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#fff; }
+.cl-ico.especes{ background:linear-gradient(135deg,#059669,#22C55E); }
+.cl-ico.mtn{ background:linear-gradient(135deg,#F59E0B,#FACC15); color:#1F1300; }
+.cl-ico.airtel{ background:linear-gradient(135deg,#DC2626,#F43F5E); }
+.cl-ico.virement{ background:linear-gradient(135deg,#0284C7,#06B6D4); }
+.cl-input{ text-align:right; font-variant-numeric:tabular-nums; font-weight:600; }
+.cl-det{ border:1px solid var(--line); border-radius:14px; padding:10px 14px; margin-bottom:10px; }
+.cl-det summary{ cursor:pointer; font-weight:600; display:flex; gap:10px; align-items:center; }
+.cl-det table{ margin-top:10px; }
+@media (max-width:768px){ .cl-summary{ grid-template-columns:1fr; } }
+.pd-m.attente{ opacity:.6; cursor:default; background:var(--warn-bg); border-color:transparent; }

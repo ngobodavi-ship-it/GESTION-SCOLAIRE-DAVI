@@ -443,3 +443,17 @@ function majCompteurs() {
     };
 })();
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !document.getElementById('acctModal').classList.contains('hidden') && !pwOpts.first) closeAcctModal(); });
+
+// ---------------------------------------------------------------
+// Paramètres : moyens de paiement à distance
+// ---------------------------------------------------------------
+function fillPaiementDistance() {
+    const c = Comptes.paiementConfig(), set = (id, v) => { const e = document.getElementById(id); if (e) e.value = v || ''; };
+    set('payMtnNum', c.mtn.numero); set('payMtnNom', c.mtn.nom); set('payAirtelNum', c.airtel.numero); set('payAirtelNom', c.airtel.nom);
+    set('payBanque', c.banque.banque); set('payTitulaire', c.banque.titulaire); set('payRib', c.banque.rib);
+}
+function savePaiementDistance() {
+    const v = id => document.getElementById(id).value.trim();
+    Comptes.sauverPaiementConfig({ mtn: { numero: v('payMtnNum'), nom: v('payMtnNom') }, airtel: { numero: v('payAirtelNum'), nom: v('payAirtelNom') }, banque: { banque: v('payBanque'), titulaire: v('payTitulaire'), rib: v('payRib') } });
+    uiToast('Moyens de paiement enregistrés : ils sont affichés aux parents.', 'ok');
+}

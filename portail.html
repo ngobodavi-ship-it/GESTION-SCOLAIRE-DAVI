@@ -323,6 +323,20 @@
                     <button class="btn btn-primary mt-3" onclick="saveEtablissement()"><i class="bi bi-check-lg"></i> Enregistrer l'identité de l'établissement</button>
                 </div>
                 <div class="card-soft">
+                    <h3 class="h6 fw-bold mb-1">Paiement à distance</h3>
+                    <p class="text-secondary small mb-3">Numéros marchands et compte bancaire affichés aux parents dans leur espace. Laissez vide ce que l'école n'a pas encore : les parents verront seulement les moyens renseignés.</p>
+                    <div class="row g-3">
+                        <div class="col-md-6"><label class="form-label">Numéro marchand MTN Mobile Money</label><input type="text" id="payMtnNum" class="form-control" placeholder="Ex : 06 000 00 00"></div>
+                        <div class="col-md-6"><label class="form-label">Nom affiché (MTN)</label><input type="text" id="payMtnNom" class="form-control" placeholder="Ex : Complexe Scolaire Les Élites"></div>
+                        <div class="col-md-6"><label class="form-label">Numéro marchand Airtel Money</label><input type="text" id="payAirtelNum" class="form-control" placeholder="Ex : 05 000 00 00"></div>
+                        <div class="col-md-6"><label class="form-label">Nom affiché (Airtel)</label><input type="text" id="payAirtelNom" class="form-control"></div>
+                        <div class="col-md-4"><label class="form-label">Banque</label><input type="text" id="payBanque" class="form-control" placeholder="Nom de la banque"></div>
+                        <div class="col-md-4"><label class="form-label">Titulaire du compte</label><input type="text" id="payTitulaire" class="form-control"></div>
+                        <div class="col-md-4"><label class="form-label">RIB / numéro de compte</label><input type="text" id="payRib" class="form-control"></div>
+                    </div>
+                    <button class="btn btn-primary mt-3" onclick="savePaiementDistance()"><i class="bi bi-check-lg"></i> Enregistrer les moyens de paiement</button>
+                </div>
+                <div class="card-soft">
                     <h3 class="h6 fw-bold mb-1">Couleur de l'interface</h3>
                     <p class="text-secondary small mb-3">Choisissez la couleur qui représente l'établissement. Elle s'applique à tous les modules sur cet appareil.</p>
                     <div class="accent-picker" id="accentPicker"></div>
@@ -691,7 +705,7 @@
             if (sec === 'demandes') renderDemandes();
             if (sec === 'preoc') renderPreoc(true);
             majCompteurs();
-            if (sec === 'settings') { renderAccentPicker(); fillSettings(); if (typeof loadEtablissementForm === 'function') loadEtablissementForm(); }
+            if (sec === 'settings') { renderAccentPicker(); fillPaiementDistance(); fillSettings(); if (typeof loadEtablissementForm === 'function') loadEtablissementForm(); }
         }
 
         // ---------- Admin : directions ----------
