@@ -81,18 +81,22 @@ function selectTeacher() {
     remplirSelecteursHeures();
     remplirInfos();
     updateNotifBadge();
+    updateCircBadge();
     ensTab('notes');
+    const nc = window.Circulaires ? Circulaires.nonLues(teacher) : 0;
+    if (nc && window.uiToast) uiToast(`Vous avez ${nc} note${nc > 1 ? 's' : ''} ou circulaire${nc > 1 ? 's' : ''} non lue${nc > 1 ? 's' : ''}.`, 'info');
 }
 
 // ---- onglets ----
 function ensTab(name) {
-    ['notes', 'resultats', 'heures', 'planning', 'infos'].forEach(t => {
+    ['notes', 'resultats', 'heures', 'planning', 'circulaires', 'infos'].forEach(t => {
         document.getElementById('ens-' + t).classList.toggle('hidden', t !== name);
         document.getElementById('tab-' + t).className = 'btn ' + (t === name ? 'btn-primary' : 'btn-secondary');
     });
     if (name === 'resultats') renderResultatsEns();
     if (name === 'heures') renderMesHeures();
     if (name === 'planning') renderPlanning();
+    if (name === 'circulaires') renderCirculairesEns();
 }
 
 // ---- matières / classes du prof ----
@@ -442,3 +446,41 @@ function ensPrNoter(classe, trim, itemId, code) {
     ensPresco(classe, trim, ensPrEleve);
 }
 function ensPrObs(trim, v) { clearTimeout(ensPrTimer); ensPrTimer = setTimeout(() => ensPrRec(trim, r => { r.observation = v; }), 500); }
+
+// ---- Notes & circulaires reçues ----
+function updateCircBadge() {
+    const b = document.getElementById('ensCircBadge');
+    if (!b || !teacher || !window.Circulaires) return;
+    const nb = Circulaires.nonLues(teacher);
+    b.textContent = nb; b.classList.toggle('hidden', nb === 0);
+}
+function renderCirculairesEns() {
+    const box = document.getElementById('ensCircListe');
+    if (!box || !teacher || !window.Circulaires) return;
+    const list = Circulaires.pourEnseignant(teacher);
+    if (!list.length) { box.innerHTML = '<div class="card" style="text-align:center;color:var(--muted,#64748b);padding:2rem;"><i class="bi bi-inbox" style="font-size:1.6rem;"></i><p style="margin:0.5rem 0 0;">Aucune note ni circulaire pour le moment.</p></div>'; return; }
+    box.innerHTML = list.map(c => {
+        const lu = c.lectures && c.lectures[teacher.id];
+        return `<div class="card" style="border-left:4px solid ${lu ? 'var(--line,#e2e8f0)' : 'var(--brand,#4f46e5)'};">
+            <div style="display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;flex-wrap:wrap;">
+                <div>
+                    <div style="font-size:0.8rem;font-weight:700;color:var(--brand,#4f46e5);text-transform:uppercase;letter-spacing:0.04em;">${enEsc(c.type)} · ${enEsc(c.numero)}</div>
+                    <h4 style="font-size:1.05rem;font-weight:700;margin:0.2rem 0;">${enEsc(c.objet)}</h4>
+                    <div style="font-size:0.85rem;color:var(--muted,#64748b);">De : <strong>${enEsc(c.service)}</strong> · le ${c.date ? new Date(c.date).toLocaleDateString('fr-FR') : ''} · pour : ${enEsc(Circulaires.libelleCible(c))}</div>
+                </div>
+                ${lu ? `<span style="background:#dcfce7;color:#166534;padding:0.2rem 0.65rem;border-radius:999px;font-size:0.8rem;font-weight:600;white-space:nowrap;"><i class="bi bi-check2"></i> Lu le ${new Date(lu.le).toLocaleDateString('fr-FR')}</span>`
+                     : '<span style="background:#ede9fe;color:#5b21b6;padding:0.2rem 0.65rem;border-radius:999px;font-size:0.8rem;font-weight:700;white-space:nowrap;">Nouveau</span>'}
+            </div>
+            <div style="white-space:pre-wrap;line-height:1.6;margin:0.9rem 0;padding:0.9rem 1rem;border-radius:12px;background:var(--surface-2,#f8fafc);">${enEsc(c.contenu)}</div>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                ${lu ? '' : `<button class="btn btn-primary" onclick="lireCirculaire('${c.id}')"><i class="bi bi-check2-circle"></i> J'ai lu</button>`}
+                <button class="btn btn-secondary" onclick="Circulaires.imprimer('${c.id}')"><i class="bi bi-printer"></i> Imprimer</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+function lireCirculaire(id) {
+    Circulaires.marquerLu(id, teacher);
+    renderCirculairesEns(); updateCircBadge();
+    if (window.uiToast) uiToast('Lecture confirmée. Le service émetteur le voit.', 'success');
+}

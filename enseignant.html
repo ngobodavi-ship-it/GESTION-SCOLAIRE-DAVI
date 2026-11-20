@@ -58,7 +58,16 @@
                     <button class="btn btn-secondary" id="tab-resultats" onclick="ensTab('resultats')"><i class="bi bi-bar-chart"></i> Mes résultats</button>
                     <button class="btn btn-secondary" id="tab-heures" onclick="ensTab('heures')"><i class="bi bi-clock-history"></i> Mes heures <span id="ensNotifBadge" class="hidden" style="background:#dc3545;color:#fff;border-radius:999px;padding:0 0.45rem;font-size:0.72rem;font-weight:700;">0</span></button>
                     <button class="btn btn-secondary" id="tab-planning" onclick="ensTab('planning')"><i class="bi bi-calendar3"></i> Mon planning</button>
+                    <button class="btn btn-secondary" id="tab-circulaires" onclick="ensTab('circulaires')"><i class="bi bi-envelope-paper"></i> Notes & circulaires <span id="ensCircBadge" class="hidden" style="background:#dc3545;color:#fff;border-radius:999px;padding:0 0.45rem;font-size:0.72rem;font-weight:700;">0</span></button>
                     <button class="btn btn-secondary" id="tab-infos" onclick="ensTab('infos')"><i class="bi bi-person-badge"></i> Mes informations</button>
+                </div>
+
+                <div id="ens-circulaires" class="hidden">
+                    <div class="card">
+                        <h3 style="font-size:1.15rem;font-weight:700;margin-bottom:0.25rem;">Notes & circulaires</h3>
+                        <p style="color:var(--muted,#64748b);margin:0;font-size:0.9rem;">Les notes de service et circulaires envoyées par la direction et les services. Cliquez sur « J'ai lu » pour confirmer votre lecture.</p>
+                    </div>
+                    <div id="ensCircListe"></div>
                 </div>
 
                 <div id="ens-notes">
@@ -126,6 +135,7 @@
 
     <script src="js/heures.js"></script>
     <script src="js/prescolaire.js"></script>
+    <script src="js/circulaires.js"></script>
     <script src="js/enseignant.js"></script>
     <script src="js/headerdate.js"></script>
 </body>

@@ -51,6 +51,7 @@ const INVENTAIRE = [
     ['Direction générale', [
         ['ecole_personnel', 'Personnel', '', 'bi-people-fill', 'direction.html#personnel', true],
         ['ecole_decisions', 'Décisions et circulaires', '', 'bi-megaphone', 'direction.html#decisions', true],
+        ['ecole_circulaires', 'Notes et circulaires envoyées aux enseignants', 'Tous services, avec accusés de lecture', 'bi-send', 'direction.html#circulaires', true],
         ['ecole_conseils', 'Conseil de gestion', '', 'bi-people', 'direction.html#conseil', true],
     ]],
     ['Gestion financière (DigiGesPro)', [
