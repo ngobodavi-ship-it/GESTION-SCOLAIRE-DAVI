@@ -2,10 +2,9 @@
 
 function loadData() {
             const saved = localStorage.getItem('digigespro_students');
-            students = saved ? JSON.parse(saved) : [
-                {id: '1', nom: 'MBEMBA', prenom: 'Jean', classe: '6eme A', matricule: 'MAT-001'},
-                {id: '2', nom: 'NZAMBI', prenom: 'Grace', classe: '5eme B', matricule: 'MAT-002'}
-            ];
+            students = saved ? JSON.parse(saved) : [];
+            const savedTx0 = localStorage.getItem('digigespro_transactions');
+            transactions = savedTx0 ? JSON.parse(savedTx0) : [];
 
             syncStudentsFromScolarite(); // récupère les élèves créés en Scolarité
 
@@ -18,13 +17,39 @@ function loadData() {
             updateUI();
         }
 
-// Récupère dans la caisse tous les élèves du registre Scolarité (ecole_eleves),
-// pour que les élèves créés en Scolarité apparaissent aussi côté Gestion.
+// Synchronisation des deux registres d'élèves.
+// Le registre principal (ecole_eleves, Scolarité) fait référence ; la caisse
+// (digigespro_students) en est le reflet :
+//  • élèves du registre → copiés / mis à jour dans la caisse ;
+//  • élèves présents seulement dans la caisse (anciens imports Excel) → ajoutés
+//    au registre, sauf s'ils ont été supprimés volontairement (liste ecole_eleves_supprimes) ;
+//  • les 2 élèves de démonstration (MBEMBA, NZAMBI) sans paiement → retirés.
 function syncStudentsFromScolarite() {
             let eco = [];
             try { eco = JSON.parse(localStorage.getItem('ecole_eleves')) || []; } catch (e) { eco = []; }
-            if (!Array.isArray(eco) || eco.length === 0) return;
-            let changed = false;
+            if (!Array.isArray(eco)) eco = [];
+            let supprimes = [];
+            try { supprimes = JSON.parse(localStorage.getItem('ecole_eleves_supprimes')) || []; } catch (e) { supprimes = []; }
+            const estSupprime = s => supprimes.some(x => x.id === s.id || (s.matricule && x.matricule === s.matricule));
+            const aPaiement = s => (transactions || []).some(t => t.studentId === s.id);
+            let changed = false, ecoChanged = false;
+            // élèves de démonstration d'origine
+            const demo = s => (s.id === '1' && s.matricule === 'MAT-001' && s.nom === 'MBEMBA') || (s.id === '2' && s.matricule === 'MAT-002' && s.nom === 'NZAMBI');
+            const avantDemo = students.length;
+            students = students.filter(s => !(demo(s) && !aPaiement(s)));
+            if (students.length !== avantDemo) changed = true;
+            // élèves supprimés volontairement : retirés de la caisse (leurs paiements restent dans la comptabilité)
+            const avantSup = students.length;
+            students = students.filter(s => !(estSupprime(s) && !eco.some(e => e.id === s.id)));
+            if (students.length !== avantSup) changed = true;
+            // élèves présents seulement dans la caisse → ajoutés au registre principal
+            const anneeSco = (() => { const d = new Date(), y = d.getFullYear(); return d.getMonth() >= 8 ? `${y}-${y + 1}` : `${y - 1}-${y}`; })();
+            students.forEach(s => {
+                if (eco.some(e => e.id === s.id || (s.matricule && e.matricule === s.matricule))) return;
+                eco.push({ id: s.id, nom: s.nom, prenom: s.prenom, classe: s.classe || '', matricule: s.matricule || '', statut: 'Nouveau', anneeScolaire: anneeSco, dateInscription: new Date().toISOString().split('T')[0], source: 'caisse' });
+                ecoChanged = true;
+            });
+            if (ecoChanged) localStorage.setItem('ecole_eleves', JSON.stringify(eco));
             eco.forEach(e => {
                 if (!e || !e.id) return;
                 const s = students.find(x => x.id === e.id || (e.matricule && x.matricule === e.matricule));
@@ -40,6 +65,14 @@ function syncStudentsFromScolarite() {
                 }
             });
             if (changed) localStorage.setItem('digigespro_students', JSON.stringify(students));
+        }
+
+// Note qu'un élève a été supprimé volontairement (pour qu'il ne revienne pas par la synchronisation)
+function noterEleveSupprime(id, matricule) {
+            let l = [];
+            try { l = JSON.parse(localStorage.getItem('ecole_eleves_supprimes')) || []; } catch (e) { l = []; }
+            l.push({ id: id, matricule: matricule || '', le: new Date().toISOString() });
+            localStorage.setItem('ecole_eleves_supprimes', JSON.stringify(l.slice(-2000)));
         }
 
 // Ordre des mois de l'année scolaire (le calendrier congolais démarre en octobre)

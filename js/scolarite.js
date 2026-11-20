@@ -264,13 +264,20 @@ function deleteEleve(id) {
     let msg = 'Supprimer cet élève du registre ?\nIl sera aussi retiré de la caisse (Gestion).';
     if (aPaiements) msg += '\n\n⚠️ Cet élève a déjà des paiements enregistrés : ils resteront dans la comptabilité, mais l\'élève disparaîtra des listes.';
     if (!confirm(msg)) return;
+    const supprime = eleves.find(x => x.id === id) || {};
     eleves = eleves.filter(x => x.id !== id);
     saveEleves();
-    // Retirer aussi l'élève de la caisse (digigespro_students)
+    // Mémoriser la suppression (l'élève ne revient pas par la synchronisation avec la caisse)
+    try {
+        const l = JSON.parse(localStorage.getItem('ecole_eleves_supprimes')) || [];
+        l.push({ id: id, matricule: supprime.matricule || '', le: new Date().toISOString() });
+        localStorage.setItem('ecole_eleves_supprimes', JSON.stringify(l.slice(-2000)));
+    } catch (e) { }
+    // Retirer aussi l'élève de la caisse (digigespro_students), par identifiant ou par matricule
     try {
         let dg = JSON.parse(localStorage.getItem('digigespro_students')) || [];
         const avant = dg.length;
-        dg = dg.filter(s => s.id !== id);
+        dg = dg.filter(s => s.id !== id && !(supprime.matricule && s.matricule === supprime.matricule));
         if (dg.length !== avant) localStorage.setItem('digigespro_students', JSON.stringify(dg));
     } catch (e) { }
     renderEleves();

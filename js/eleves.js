@@ -1,17 +1,19 @@
 // ===== Élèves : liste, import, historique =====
 
-function clearAllStudents() {
-            if (!confirm('⚠️ ATTENTION : Voulez-vous vraiment supprimer TOUS les élèves ?\n\nCette action est irréversible !')) return;
-            if (!confirm('🚨 CONFIRMATION FINALE : Tous les élèves et leurs paiements seront supprimés définitivement !')) return;
-            
+async function clearAllStudents() {
+            let eco = []; try { eco = JSON.parse(localStorage.getItem('ecole_eleves')) || []; } catch (e) { eco = []; }
+            const nbPay = transactions.filter(t => t.type !== 'depense').length;
+            const rep = prompt(`SUPPRIMER TOUS LES ÉLÈVES de l'établissement ?\n\n• ${eco.length || students.length} élève(s) retiré(s) du registre (Scolarité, Études, Surveillance, espace parent…) et de la caisse\n• ${nbPay} paiement(s) d'élèves supprimé(s) (les dépenses sont conservées)\n\nUne copie de sécurité est faite avant (Espace admin › Données et sauvegardes).\nPour confirmer, tapez : SUPPRIMER`);
+            if (rep === null) return;
+            if (rep.trim().toUpperCase() !== 'SUPPRIMER') { alert('Annulé : le mot de confirmation ne correspond pas.'); return; }
+            try { if (window.SecuriteDonnees) await SecuriteDonnees.copieDuJour(true, true); } catch (e) { }
             students = [];
             transactions = transactions.filter(t => t.type === 'depense'); // Garder seulement les dépenses
-            
+            localStorage.setItem('ecole_eleves', JSON.stringify([]));
             localStorage.setItem('digigespro_students', JSON.stringify(students));
             localStorage.setItem('digigespro_transactions', JSON.stringify(transactions));
-            
             updateUI();
-            alert('✅ Tous les élèves ont été supprimés');
+            alert('Tous les élèves ont été supprimés (registre et caisse). Une copie de sécurité permet de revenir en arrière si besoin.');
         }
 
 function renderStudents() {
@@ -235,11 +237,22 @@ function handleFileUpload(event) {
                         return;
                     }
 
-                    students = [...students, ...imported];
+                    // Registre principal (Scolarité) : ajout, ou mise à jour si le matricule existe déjà
+                    let eco = []; try { eco = JSON.parse(localStorage.getItem('ecole_eleves')) || []; } catch (e) { eco = []; }
+                    const d0 = new Date(), y0 = d0.getFullYear(), annee = d0.getMonth() >= 8 ? `${y0}-${y0 + 1}` : `${y0 - 1}-${y0}`;
+                    let ajoutes = 0, majs = 0;
+                    imported.forEach(im => {
+                        const ex = eco.find(e => im.matricule && e.matricule === im.matricule);
+                        if (ex) { ex.nom = im.nom; ex.prenom = im.prenom; if (im.classe && im.classe !== 'Non definie') ex.classe = im.classe; im.id = ex.id; majs++; }
+                        else { eco.push({ id: im.id, nom: im.nom, prenom: im.prenom, classe: im.classe, matricule: im.matricule, statut: 'Nouveau', anneeScolaire: annee, dateInscription: d0.toISOString().split('T')[0], source: 'import caisse' }); ajoutes++; }
+                        const i = students.findIndex(st => st.id === im.id || (im.matricule && st.matricule === im.matricule));
+                        if (i >= 0) students[i] = Object.assign(students[i], { nom: im.nom, prenom: im.prenom, classe: im.classe, matricule: im.matricule }); else students.push(im);
+                    });
+                    localStorage.setItem('ecole_eleves', JSON.stringify(eco));
                     localStorage.setItem('digigespro_students', JSON.stringify(students));
                     updateUI();
                     
-                    let message = `✅ ${imported.length} eleve(s) importe(s) avec succes !`;
+                    let message = `✅ ${ajoutes} nouvel(s) élève(s) importé(s)${majs ? `, ${majs} mis à jour (matricule déjà connu)` : ''}. Ils apparaissent aussi dans la Direction de la scolarité et les autres modules.`;
                     if (errorCount > 0) {
                         message += `\n⚠️ ${errorCount} ligne(s) ignoree(s) (donnees invalides)`;
                     }

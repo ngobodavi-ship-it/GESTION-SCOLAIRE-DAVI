@@ -116,3 +116,16 @@ theme. Le comportement de l'application est identique.
     Rappel si aucune sauvegarde n'a été téléchargée depuis 7 jours.
   - Mot de passe maître chiffré ; changement obligatoire s'il vaut « 2025 ».
   - Comptes d'essai : Espace admin > Paramètres (interrupteur).
+
+--- SYNCHRONISATION DES ÉLÈVES (même appareil) ---
+  Registre principal : ecole_eleves (Scolarité) — référence pour tous les modules.
+  Caisse : digigespro_students — reflet automatique (js/data.js,
+  syncStudentsFromScolarite) :
+  - inscription en Gestion ou en Scolarité → visible partout ;
+  - import Excel de la Gestion → ajouté aussi au registre (doublons évités par matricule) ;
+  - suppression en Scolarité → retiré de la caisse (par identifiant ou matricule),
+    noté dans ecole_eleves_supprimes pour ne pas revenir ; paiements conservés ;
+  - « Vider tout » (Gestion) → vide registre et caisse, confirmation SUPPRIMER,
+    copie de sécurité préalable ;
+  - plus d'élèves de démonstration (MBEMBA / NZAMBI retirés s'ils n'ont aucun paiement).
+  Entre appareils différents : pas de synchronisation (nécessite le serveur).
