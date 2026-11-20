@@ -41,6 +41,7 @@ function noteVal(v) {
 function ensMatchFonction(p, fonction) {
     const niv = p.niveau || '';
     if (!niv) return true; // enseignant sans niveau défini : visible partout
+    if (fonction === 'Préscolaire') return niv === 'Préscolaire';
     if (fonction === 'Primaire') return niv === 'Primaire';
     if (fonction === 'Collège') return niv === 'Collège' || niv === 'Collège et Lycée';
     if (fonction === 'Lycée') return niv === 'Lycée' || niv === 'Collège et Lycée';
@@ -104,7 +105,9 @@ function mesClasses() {
     if (teacher.classes && teacher.classes.length) return teacher.classes;
     // sinon, classes correspondant au niveau de l'enseignant
     const niv = teacher.niveau || '';
-    if (niv === 'Primaire') return ensClasses.filter(c => c.cycle === 'primaire').map(c => c.nom);
+    const presco = c => window.Presco && Presco.estPrescolaire(c.nom);
+    if (niv === 'Préscolaire') return ensClasses.filter(presco).map(c => c.nom);
+    if (niv === 'Primaire') return ensClasses.filter(c => c.cycle === 'primaire' && !presco(c)).map(c => c.nom);
     if (niv === 'Collège' || niv === 'Lycée' || niv === 'Collège et Lycée') return ensClasses.filter(c => c.cycle !== 'primaire').map(c => c.nom);
     return ensClasses.map(c => c.nom);
 }
@@ -137,7 +140,7 @@ function chargerGrilleEns() {
     if (!classe) { grid.innerHTML = '<p style="color:var(--danger,#dc3545);padding:0.5rem;">Choisissez une classe.</p>'; return; }
     const list = ensEleves.filter(e => e.classe === classe);
     if (!list.length) { grid.innerHTML = '<p style="color:var(--danger,#dc3545);padding:0.5rem;">Aucun élève dans cette classe.</p>'; return; }
-    if (window.Presco && Presco.estPrescolaire(classe)) { grid.innerHTML = '<div class="empty-mini"><i class="bi bi-balloon"></i> Classe du préscolaire : pas de notes. L\'évaluation par appréciations se fait dans Direction des études › Préscolaire.</div>'; return; }
+    if (window.Presco && Presco.estPrescolaire(classe)) { ensPresco(classe, trim); return; }
     if (ensClasseCycle(classe) === 'primaire') {
         const mats = ensMatieresClasse(classe);
         if (!mats.length) { grid.innerHTML = '<p style="color:var(--danger,#dc3545);padding:0.5rem;">Aucune matière du primaire. Demandez à la Direction des études de les charger.</p>'; return; }
@@ -405,3 +408,37 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('ensEcole').textContent = getEcoleName();
     populateTeacherSelect();
 });
+
+// ---------- Préscolaire : évaluation par appréciations (P1, P2, P3) ----------
+let ensPrEleve = null, ensPrTimer = null;
+function ensPresco(classe, trim, eleveId) {
+    const grid = document.getElementById('ensGrille');
+    const list = ensEleves.filter(e => e.classe === classe).sort((a, b) => (a.nom + a.prenom).localeCompare(b.nom + b.prenom));
+    const e = list.find(x => x.id === (eleveId || ensPrEleve)) || list[0];
+    if (!e) return;
+    ensPrEleve = e.id;
+    const c = Presco.config(), rec = Presco.evals()[e.id + '|' + trim] || {}, ev = rec.items || {}, b = Presco.bilan(e.id, trim);
+    const idx = list.indexOf(e);
+    grid.innerHTML = `
+        <p class="text-secondary small"><i class="bi bi-balloon"></i> Préscolaire : pas de notes. Appréciez chaque compétence ; tout est enregistré automatiquement et transmis à la Direction des études.</p>
+        <div class="d-flex gap-2 align-items-end flex-wrap mb-3">
+            <div style="flex:1;min-width:220px;"><label class="form-label">Élève (${idx + 1}/${list.length})</label><select style="margin:0;" onchange="ensPresco('${enAttr(classe)}','${enAttr(trim)}',this.value)">${list.map(x => `<option value="${enAttr(x.id)}" ${x.id === e.id ? 'selected' : ''}>${enEsc(x.nom)} ${enEsc(x.prenom)}</option>`).join('')}</select></div>
+            <button class="btn btn-secondary" ${idx === 0 ? 'disabled' : ''} onclick="ensPresco('${enAttr(classe)}','${enAttr(trim)}','${enAttr((list[idx - 1] || {}).id || '')}')"><i class="bi bi-chevron-left"></i></button>
+            <button class="btn btn-primary" ${idx === list.length - 1 ? 'disabled' : ''} onclick="ensPresco('${enAttr(classe)}','${enAttr(trim)}','${enAttr((list[idx + 1] || {}).id || '')}')">Suivant <i class="bi bi-chevron-right"></i></button>
+        </div>
+        <div class="pr-bilan mb-3">${c.niveaux.map(n => `<span class="pr-chip" style="--c:${enAttr(n.couleur)}">${enEsc(n.libelle)} : <strong>${b.parNiv[n.code] || 0}</strong></span>`).join('')}<span class="text-secondary small">${b.evalues}/${b.total} évaluée(s)</span></div>
+        ${c.domaines.map(d => `<div class="pr-cons-dom"><strong>${enEsc(d.nom)}</strong>${d.items.map(i => `<div class="pr-item"><span>${enEsc(i.nom)}</span><div class="pr-niv">${c.niveaux.map(n => `<button type="button" class="${ev[i.id] === n.code ? 'on' : ''}" style="--c:${enAttr(n.couleur)}" onclick="ensPrNoter('${enAttr(classe)}','${enAttr(trim)}','${i.id}','${enAttr(n.code)}')">${enEsc(n.libelle)}</button>`).join('')}</div></div>`).join('')}</div>`).join('')}
+        <label class="form-label mt-2">Observation</label>
+        <textarea rows="3" style="margin:0;" oninput="ensPrObs('${enAttr(trim)}',this.value)">${enEsc(rec.observation || '')}</textarea>`;
+}
+function ensPrRec(trim, fn) {
+    const all = Presco.evals(), k = ensPrEleve + '|' + trim;
+    all[k] = all[k] || { items: {} }; all[k].items = all[k].items || {};
+    fn(all[k]); all[k].maj = new Date().toISOString(); all[k].par = teacher ? ((teacher.nom || '') + ' ' + (teacher.prenom || '')).trim() : 'Enseignant';
+    Presco.sauverEvals(all);
+}
+function ensPrNoter(classe, trim, itemId, code) {
+    ensPrRec(trim, r => { if (r.items[itemId] === code) delete r.items[itemId]; else r.items[itemId] = code; });
+    ensPresco(classe, trim, ensPrEleve);
+}
+function ensPrObs(trim, v) { clearTimeout(ensPrTimer); ensPrTimer = setTimeout(() => ensPrRec(trim, r => { r.observation = v; }), 500); }

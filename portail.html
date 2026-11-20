@@ -76,6 +76,7 @@
     </style>
     <link href="css/theme.css" rel="stylesheet">
     <script src="js/theme.js"></script>
+    <script src="js/securite-donnees.js"></script>
 </head>
 <body class="portal-page">
 
@@ -148,7 +149,7 @@
                         <p class="text-secondary small">L'administration va vérifier votre identité. Une fois la demande validée, elle vous remettra un nouveau code provisoire. À la connexion avec ce code, vous pourrez choisir votre propre mot de passe.</p>
                         <button class="btn btn-primary w-100 mt-2" onclick="hideForgot()">Retour à la connexion</button>
                     </div>
-                    <!-- MODE TEST : comptes affichés pour les essais. Mettre MODE_TEST à false avant la mise en service. -->
+                    <!-- MODE TEST : comptes affichés pour les essais. Désactivable dans Espace admin > Paramètres. -->
                     <div id="testAccounts" class="test-accounts hidden">
                         <div class="ta-head"><i class="bi bi-cone-striped"></i> Mode test : comptes d'essai <span>cliquez sur une ligne pour remplir</span></div>
                         <table><thead><tr><th>Accès</th><th>Identifiant</th><th>Mot de passe</th></tr></thead><tbody id="testAccountsBody"></tbody></table>
@@ -228,6 +229,7 @@
                 <button data-sec="preoc" onclick="showAdminSection('preoc')"><i class="bi bi-chat-left-text"></i> Préoccupations <span class="nav-count hidden" id="countPreoc">0</span></button>
                 <button data-sec="settings" onclick="showAdminSection('settings')"><i class="bi bi-gear"></i> Paramètres</button>
                 <button data-sec="inventaire" onclick="showAdminSection('inventaire')"><i class="bi bi-collection"></i> Toutes les données</button>
+                <button data-sec="journal" onclick="showAdminSection('journal')"><i class="bi bi-journal-text"></i> Journal des actions</button>
                 <button data-sec="backup" onclick="showAdminSection('backup')"><i class="bi bi-database"></i> Données et sauvegardes</button>
             </div>
 
@@ -362,7 +364,13 @@
                     <label class="form-label">Nouveau mot de passe</label>
                     <input type="text" id="setPassword" class="form-control mb-3" placeholder="Nouveau mot de passe">
                     <button class="btn btn-primary" onclick="savePassword()"><i class="bi bi-shield-check"></i> Modifier le mot de passe</button>
-                    <p class="text-secondary small mt-2 mb-0">Protection simple, stockée localement sur cet appareil.</p>
+                    <p class="text-secondary small mt-2 mb-0">Mot de passe maître : connexion sans identifiant. Il est enregistré de façon chiffrée.</p>
+                </div>
+                <div class="card-soft">
+                    <div class="srv-op">
+                        <div class="srv-op-txt"><strong>Comptes d'essai sur l'écran de connexion</strong><small>À désactiver avant l'utilisation réelle par l'école : les comptes d'essai ne s'affichent plus et ne permettent plus de se connecter.</small></div>
+                        <label class="switch"><input type="checkbox" id="setModeTest" onchange="basculerModeTest(this.checked)"><span></span></label>
+                    </div>
                 </div>
             </div>
 
@@ -378,8 +386,33 @@
                 </div>
             </div>
 
+            <!-- Section : Journal des actions -->
+            <div id="sec-journal" class="admin-section hidden">
+                <div class="card-soft">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                        <div><h3 class="h6 fw-bold mb-1">Journal des actions</h3><p class="text-secondary small mb-0">Chaque ajout, modification ou suppression de données, avec le profil qui l'a faite. <span id="jnResume"></span></p></div>
+                        <div class="d-flex gap-2"><button class="btn btn-secondary btn-sm" onclick="exporterJournal()"><i class="bi bi-filetype-csv"></i> Exporter (Excel)</button><button class="btn btn-danger btn-sm" onclick="viderJournal()"><i class="bi bi-trash3"></i> Effacer</button></div>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-3"><select id="jnPeriode" class="form-select form-select-sm" onchange="renderJournal()"><option value="jour">Aujourd'hui</option><option value="7" selected>7 derniers jours</option><option value="30">30 derniers jours</option><option value="tout">Tout</option></select></div>
+                        <div class="col-md-3"><select id="jnProfil" class="form-select form-select-sm" onchange="renderJournal()"><option value="">Tous les profils</option></select></div>
+                        <div class="col-md-6"><input type="text" id="jnRecherche" class="form-control form-control-sm" placeholder="Rechercher une donnée, un profil…" oninput="renderJournal()"></div>
+                    </div>
+                    <div style="overflow-x:auto;"><table class="tbl"><thead><tr><th>Date</th><th>Profil</th><th>Action</th><th>Donnée</th><th>Page</th><th style="text-align:right;">Éléments</th></tr></thead><tbody id="jnCorps"></tbody></table></div>
+                </div>
+            </div>
+
             <!-- Section : Sauvegardes -->
             <div id="sec-backup" class="admin-section hidden">
+                <div id="rappelSauvegarde" class="alert"></div>
+                <div class="card-soft">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+                        <div><h3 class="h6 fw-bold mb-1"><i class="bi bi-clock-history"></i> Copies automatiques (14 derniers jours)</h3>
+                        <p class="text-secondary small mb-0">Une copie complète est faite automatiquement chaque jour sur cet appareil. En cas d'erreur (suppression, mauvaise manipulation), revenez à une date précédente. <strong>Ces copies disparaissent si le navigateur est vidé</strong> : téléchargez aussi une sauvegarde régulièrement.</p></div>
+                        <button class="btn btn-secondary btn-sm" onclick="copieMaintenant()"><i class="bi bi-camera"></i> Faire une copie maintenant</button>
+                    </div>
+                    <div class="inv-grid mt-2" id="copiesListe"></div>
+                </div>
                 <div class="card-soft mb-3" style="border:2px solid #4338ca;">
                     <h3 class="h6 fw-bold mb-2"><i class="bi bi-shield-check"></i> Sauvegarde complète de l'école</h3>
                     <p class="text-secondary small mb-3">Enregistre <strong>toutes les données</strong> dans un seul fichier : élèves, classes, matières, notes, bulletins, enseignants, heures, paiements/caisse, grille tarifaire, paramètres… Conservez ce fichier en lieu sûr (clé USB, e-mail). En cas de problème (cache effacé, nouveau PC), vous restaurez tout en un clic.</p>
@@ -501,7 +534,8 @@
         }
         // ---------- MODE TEST (comptes d'essai affichés sur l'écran de connexion) ----------
         // Mettre à false pour masquer et désactiver ces comptes avant la mise en service.
-        const MODE_TEST = true;
+        // Mode test : réglable dans Espace admin > Paramètres (affiché par défaut tant que l'admin ne l'a pas désactivé)
+        function modeTestActif() { return config.modeTest !== false; }
         const TEST_ACCOUNTS = [
             { label: 'Administrateur (accès complet)', login: 'admin',        password: 'Admin@2026',     url: null },
             { label: 'Direction générale',             login: 'direction',    password: 'Direction@2026', url: 'direction.html' },
@@ -514,7 +548,7 @@
             { label: 'Espace parent (1er parent enregistré)', login: 'parent', password: 'Parent@2026', parent: true }
         ];
         function testLogin(login, pass) {
-            if (!MODE_TEST) return false;
+            if (!modeTestActif()) return false;
             const l = (login || '').trim().toLowerCase(), p = (pass || '').trim().toLowerCase();
             const t = TEST_ACCOUNTS.find(a => a.login === l && a.password.toLowerCase() === p);
             if (!t) return false;
@@ -540,7 +574,7 @@
             return true;
         }
         function renderTestAccounts() {
-            if (!MODE_TEST) return;
+            if (!modeTestActif()) { document.getElementById('testAccounts').classList.add('hidden'); return; }
             const body = document.getElementById('testAccountsBody');
             body.innerHTML = TEST_ACCOUNTS.map((a, i) => `<tr onclick="fillTest(${i})"><td>${escapeHtml(a.label)}</td><td><code>${escapeHtml(a.login)}</code></td><td><code>${escapeHtml(a.password)}</code></td></tr>`).join('');
             document.getElementById('testAccounts').classList.remove('hidden');
@@ -557,8 +591,9 @@
             const pass = document.getElementById('loginPassword').value;
             if (testLogin(login, pass)) return;
             // Accès administrateur global via le mot de passe maître (sans identifiant)
-            if (!login && pass === config.password) {
+            if (!login && pass && (config.master ? Comptes.verifier(config.master, pass) : pass === config.password)) {
                 setSession({ nom: 'Administrateur', role: 'Administrateur' });
+                if (!config.master && config.password === '2025') { openMaitreModal(true); return; }
                 enterApp(); return;
             }
             // Compte du personnel (identifiant + mot de passe)
@@ -726,6 +761,8 @@
             if (sec === 'demandes') renderDemandes();
             if (sec === 'preoc') renderPreoc(true);
             if (sec === 'inventaire') renderInventaire();
+            if (sec === 'journal') renderJournal();
+            if (sec === 'backup') renderCopies();
             majCompteurs();
             if (sec === 'settings') { renderAccentPicker(); fillPaiementDistance(); fillSettings(); if (typeof loadEtablissementForm === 'function') loadEtablissementForm(); }
         }
@@ -868,6 +905,7 @@
             document.getElementById('setName').value = config.name;
             document.getElementById('setSubtitle').value = config.subtitle;
             document.getElementById('setPassword').value = '';
+            const mt = document.getElementById('setModeTest'); if (mt) mt.checked = modeTestActif();
         }
 
         function saveIdentity() {
@@ -878,13 +916,42 @@
             alert('Identité enregistrée.');
         }
 
+        function definirMaitre(np) {
+            config.master = Comptes.definir({}, np, false);
+            delete config.password;
+            saveConfig();
+        }
         function savePassword() {
             const np = document.getElementById('setPassword').value.trim();
-            if (!np) { alert('Saisissez un nouveau mot de passe.'); return; }
-            config.password = np;
-            saveConfig();
+            if (np.length < 8) { alert('Le mot de passe maître doit contenir au moins 8 caractères.'); return; }
+            if (np === '2025') { alert('Choisissez un mot de passe différent de celui par défaut.'); return; }
+            definirMaitre(np);
             document.getElementById('setPassword').value = '';
-            alert('Mot de passe modifié.');
+            alert('Mot de passe maître modifié (enregistré de façon chiffrée).');
+        }
+        // Changement obligatoire du mot de passe maître par défaut
+        function openMaitreModal(obligatoire) {
+            openAcctModal(`<div class="acct-head"><span class="acct-ico"><i class="bi bi-shield-exclamation"></i></span><div>
+                <h3>Changez le mot de passe maître</h3><p>Le mot de passe maître est encore celui par défaut (« 2025 »), visible publiquement dans le code. Choisissez-en un nouveau pour protéger l'accès administrateur.</p></div></div>
+                <label class="form-label">Nouveau mot de passe maître <span class="text-secondary" style="font-weight:400;">(8 caractères minimum)</span></label>
+                <input type="password" id="mmNouveau" class="form-control mb-3" autocomplete="new-password">
+                <label class="form-label">Confirmer</label>
+                <input type="password" id="mmConfirme" class="form-control mb-2" autocomplete="new-password" onkeydown="if(event.key==='Enter')enregistrerMaitre()">
+                <p id="mmErreur" class="login-error hidden"><i class="bi bi-exclamation-circle"></i> <span></span></p>
+                <div class="acct-actions"><button class="btn btn-secondary" onclick="logout();closeAcctModal()">Annuler</button><button class="btn btn-primary" onclick="enregistrerMaitre()"><i class="bi bi-check-lg"></i> Enregistrer et continuer</button></div>`);
+            setTimeout(() => document.getElementById('mmNouveau').focus(), 30);
+        }
+        function enregistrerMaitre() {
+            const n = document.getElementById('mmNouveau').value, c = document.getElementById('mmConfirme').value;
+            const err = t => { const e = document.getElementById('mmErreur'); e.querySelector('span').textContent = t; e.classList.remove('hidden'); };
+            if (n.length < 8) return err('8 caractères minimum.');
+            if (n === '2025') return err('Choisissez un mot de passe différent de celui par défaut.');
+            if (n !== c) return err('Les deux mots de passe ne sont pas identiques.');
+            definirMaitre(n); closeAcctModal(); uiToast('Mot de passe maître changé et chiffré.', 'ok'); enterApp();
+        }
+        function basculerModeTest(on) {
+            config.modeTest = !!on; saveConfig();
+            uiToast(on ? 'Comptes d\'essai affichés sur l\'écran de connexion.' : 'Comptes d\'essai masqués et désactivés.', 'ok');
         }
 
         // ---------- Admin : sauvegardes ----------
@@ -897,6 +964,7 @@
                 if (_estCleApp(k)) data[k] = localStorage.getItem(k);
             }
             const nb = Object.keys(data).length;
+            if (typeof marquerSauvegardeTelechargee === 'function') marquerSauvegardeTelechargee();
             const payload = { _type: 'sauvegarde_ecole', _date: new Date().toISOString(), _version: 1, data: data };
             const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
             const a = document.createElement('a');

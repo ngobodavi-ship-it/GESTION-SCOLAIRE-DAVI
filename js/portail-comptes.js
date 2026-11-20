@@ -439,6 +439,10 @@ function majCompteurs() {
         const n = admin ? Comptes.demandesEnAttente().length : 0;
         const m = recoitPreoc() ? Comptes.preoccupations().filter(p => p.status === 'envoyee').length : 0;
         if (n || m) setTimeout(() => uiToast([n ? n + ' demande(s) de mot de passe à valider (Espace admin)' : '', m ? m + ' nouvelle(s) préoccupation(s) de parents (accueil du portail)' : ''].filter(Boolean).join(' · '), 'info'), 600);
+        if (admin && typeof joursDepuisSauvegarde === 'function') {
+            const j = joursDepuisSauvegarde();
+            if (j === null || j >= 7) setTimeout(() => uiToast(j === null ? 'Aucune sauvegarde téléchargée sur cet appareil : Espace admin › Données et sauvegardes.' : `Dernière sauvegarde téléchargée il y a ${j} jours : pensez à en refaire une (Espace admin › Données et sauvegardes).`, 'warn'), 1200);
+        }
         if (new URLSearchParams(location.search).get('preoc') === '1') { history.replaceState(null, '', location.pathname); if (recoitPreoc()) { toggleHomePreoc(true); setTimeout(() => document.getElementById('homePreoc').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100); } }
     };
 })();

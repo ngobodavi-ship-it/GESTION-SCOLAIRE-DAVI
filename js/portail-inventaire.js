@@ -144,3 +144,85 @@ function invRestaurer(event) {
     };
     r.readAsText(f); event.target.value = '';
 }
+
+// =====================================================================
+// Journal des actions (qui a modifié quoi, quand)
+// =====================================================================
+function invNomCle(cle) {
+    for (const [, lignes] of INVENTAIRE) for (const l of lignes) if (l[0] === cle) return l[1];
+    if (cle === 'ecole_restauration') return 'Restauration d\'une sauvegarde';
+    return cle;
+}
+function journal() { try { return JSON.parse(localStorage.getItem('ecole_journal')) || []; } catch (e) { return []; } }
+const JN_ACTIONS = { ajout: ['Ajout', 'ok'], modification: ['Modification', 'info'], suppression: ['Suppression', 'warn'], vidage: ['Vidage complet', 'danger'] };
+function renderJournal() {
+    const j = journal(), per = document.getElementById('jnPeriode').value, prof = document.getElementById('jnProfil').value, q = (document.getElementById('jnRecherche').value || '').toLowerCase();
+    const profils = [...new Set(j.map(e => e.role).filter(Boolean))].sort();
+    const sel = document.getElementById('jnProfil');
+    if (sel.options.length !== profils.length + 1) { sel.innerHTML = '<option value="">Tous les profils</option>' + profils.map(p => `<option>${pcEsc(p)}</option>`).join(''); sel.value = prof; }
+    const depuis = per === 'jour' ? new Date(new Date().toDateString()).getTime() : per === '7' ? Date.now() - 7 * 864e5 : per === '30' ? Date.now() - 30 * 864e5 : 0;
+    const list = j.filter(e => e.t >= depuis && (!prof || e.role === prof) && (!q || (invNomCle(e.cle) + ' ' + e.nom + ' ' + e.role + ' ' + e.page).toLowerCase().includes(q)));
+    document.getElementById('jnResume').textContent = `${list.length} action(s) affichée(s) · ${j.length} enregistrée(s) au total (les 4000 plus récentes sont gardées)`;
+    document.getElementById('jnCorps').innerHTML = list.length ? list.slice(0, 500).map(e => {
+        const a = JN_ACTIONS[e.action] || ['-', ''];
+        return `<tr><td style="white-space:nowrap;">${pcDate(new Date(e.t).toISOString())}</td>
+            <td><strong>${pcEsc(e.role)}</strong>${e.nom && e.nom !== e.role ? `<div class="text-secondary small">${pcEsc(e.nom)}</div>` : ''}</td>
+            <td><span class="ui-pill ${a[1]}">${a[0]}</span>${e.n > 1 ? ` <span class="text-secondary small">×${e.n}</span>` : ''}</td>
+            <td>${pcEsc(invNomCle(e.cle))}</td><td class="text-secondary small">${pcEsc(e.page)}</td>
+            <td style="text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;">${e.avant} → <strong>${e.apres}</strong></td></tr>`;
+    }).join('') : '<tr><td colspan="6"><div class="empty-mini"><i class="bi bi-journal"></i> Aucune action pour ces critères.</div></td></tr>';
+}
+function exporterJournal() {
+    const lignes = [['Date', 'Profil', 'Nom', 'Action', 'Donnée', 'Page', 'Avant', 'Après', 'Regroupées']].concat(journal().map(e => [new Date(e.t).toLocaleString('fr-FR'), e.role, e.nom, (JN_ACTIONS[e.action] || [''])[0], invNomCle(e.cle), e.page, e.avant, e.apres, e.n || 1]));
+    const csv = '﻿' + lignes.map(l => l.map(v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"').join(';')).join('\r\n');
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    a.download = 'journal_actions_' + new Date().toISOString().slice(0, 10) + '.csv'; document.body.appendChild(a); a.click(); a.remove();
+}
+function viderJournal() {
+    const rep = prompt('Effacer tout le journal des actions ? Il est conseillé de l\'exporter avant.\nPour confirmer, tapez : EFFACER');
+    if (rep === null) return;
+    if (rep.trim().toUpperCase() !== 'EFFACER') return uiToast('Annulé : le mot de confirmation ne correspond pas.', 'warn');
+    localStorage.setItem('ecole_journal', JSON.stringify([{ t: Date.now(), cle: 'ecole_journal', role: (currentSession || {}).role || 'Administrateur', nom: (currentSession || {}).nom || '', page: 'portail', avant: 0, apres: 0, action: 'vidage' }]));
+    renderJournal(); uiToast('Journal effacé (cette action reste notée).', 'ok');
+}
+
+// =====================================================================
+// Copies automatiques et rappel de sauvegarde
+// =====================================================================
+function marquerSauvegardeTelechargee() { try { localStorage.setItem('ui_derniere_sauvegarde', String(Date.now())); } catch (e) { } }
+function joursDepuisSauvegarde() { const t = Number(localStorage.getItem('ui_derniere_sauvegarde') || 0); return t ? Math.floor((Date.now() - t) / 864e5) : null; }
+async function renderCopies() {
+    const box = document.getElementById('copiesListe'); if (!box) return;
+    const j = joursDepuisSauvegarde(), rappel = document.getElementById('rappelSauvegarde');
+    rappel.innerHTML = j === null ? '<i class="bi bi-exclamation-triangle"></i> Aucune sauvegarde n\'a encore été téléchargée sur cet appareil. Téléchargez-en une et gardez-la sur une clé USB ou par e-mail.'
+        : j >= 7 ? `<i class="bi bi-exclamation-triangle"></i> Dernière sauvegarde téléchargée il y a ${j} jours. Pensez à en télécharger une nouvelle.`
+        : `<i class="bi bi-check-circle"></i> Dernière sauvegarde téléchargée il y a ${j === 0 ? 'moins d\'un jour' : j + ' jour(s)'}.`;
+    rappel.className = 'alert ' + (j === null || j >= 7 ? 'alert-warning' : 'alert-success');
+    if (!window.SecuriteDonnees) { box.innerHTML = '<div class="empty-mini">Copies automatiques indisponibles sur ce navigateur.</div>'; return; }
+    let liste = [];
+    try { liste = await SecuriteDonnees.lister(); } catch (e) { box.innerHTML = '<div class="empty-mini">Copies automatiques indisponibles sur ce navigateur (navigation privée ?).</div>'; return; }
+    box.innerHTML = liste.length ? liste.map(c => `<div class="inv-row">
+        <span class="inv-ico"><i class="bi bi-clock-history"></i></span>
+        <div class="inv-txt"><strong>${new Date(c.le).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}${c.securite ? ' <span class="ui-pill info">copie de sécurité avant restauration</span>' : ''}</strong><small>Faite à ${new Date(c.le).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} · ${c.nb} catégorie(s) · ${invTaille(c.taille || 0)}</small></div>
+        <div class="d-flex gap-2"><button class="btn btn-secondary btn-sm" onclick="telechargerCopie('${c.jour}')"><i class="bi bi-download"></i> Télécharger</button>
+        <button class="btn btn-danger btn-sm" onclick="restaurerCopie('${c.jour}')"><i class="bi bi-arrow-counterclockwise"></i> Revenir à cette date</button></div></div>`).join('')
+        : '<div class="empty-mini"><i class="bi bi-clock-history"></i> Pas encore de copie automatique (elle est faite au premier passage de la journée).</div>';
+}
+async function copieMaintenant() {
+    try { await SecuriteDonnees.copieDuJour(true); uiToast('Copie du jour enregistrée.', 'ok'); renderCopies(); } catch (e) { uiToast('Copie impossible : ' + e.message, 'err'); }
+}
+async function telechargerCopie(jour) {
+    const c = await SecuriteDonnees.lire(jour); if (!c) return;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([JSON.stringify({ _type: 'sauvegarde_ecole', _date: c.le, _version: 1, data: c.data })], { type: 'application/json' }));
+    a.download = 'sauvegarde_ecole_' + jour + '.json'; document.body.appendChild(a); a.click(); a.remove();
+    marquerSauvegardeTelechargee(); renderCopies();
+}
+async function restaurerCopie(jour) {
+    const c0 = await SecuriteDonnees.lire(jour);
+    const rep = prompt(`Revenir aux données du ${new Date(c0 ? c0.le : Date.now()).toLocaleString('fr-FR')} ?\n\nToutes les modifications faites depuis seront perdues (une copie de sécurité de l'état actuel est faite avant, pour pouvoir annuler).\nPour confirmer, tapez : RESTAURER`);
+    if (rep === null) return;
+    if (rep.trim().toUpperCase() !== 'RESTAURER') return uiToast('Annulé : le mot de confirmation ne correspond pas.', 'warn');
+    try { await SecuriteDonnees.copieDuJour(true, true); await SecuriteDonnees.restaurer(jour); alert('Données restaurées. La page va se recharger.'); location.reload(); }
+    catch (e) { uiToast('Restauration impossible : ' + e.message, 'err'); }
+}

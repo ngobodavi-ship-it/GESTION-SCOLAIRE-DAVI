@@ -228,6 +228,8 @@ function showAddTransactionModal() {
             editingTransactionId = null;
             
             document.getElementById('modalTitle').textContent = 'Nouvelle transaction';
+            // Nom de l'école pré-rempli (identité de l'établissement, sinon dernière saisie)
+            { const ne = document.getElementById('nomEcole'); if (ne && !ne.value.trim()) ne.value = (typeof getEtab === 'function' && getEtab().nom && getEtab().nom !== 'Établissement scolaire') ? getEtab().nom : (localStorage.getItem('digigespro_ecole') || (typeof getEtab === 'function' ? getEtab().nom : '')); }
             document.getElementById('editTransactionId').value = '';
             
             // Réinitialiser le type de transaction
@@ -238,7 +240,7 @@ function showAddTransactionModal() {
             
             // Réinitialiser les champs manuellement
             document.getElementById('transDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('nomEcole').value = localStorage.getItem('digigespro_ecole') || '';
+            document.getElementById('nomEcole').value = localStorage.getItem('digigespro_ecole') || (typeof getEtab === 'function' ? getEtab().nom : '') || '';
             document.getElementById('studentSelect').value = '';
             document.getElementById('studentClasse').value = '';
             document.getElementById('prixFixeMensuel').value = '';

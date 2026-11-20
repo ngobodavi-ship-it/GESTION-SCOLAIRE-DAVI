@@ -104,3 +104,15 @@ theme. Le comportement de l'application est identique.
   (sauvegarde téléchargée automatiquement avant, confirmation « SUPPRIMER »)
   et restauration d'une catégorie sans toucher au reste.
   js/portail-inventaire.js.
+
+--- SÉCURITÉ DES DONNÉES ---
+  js/securite-donnees.js (toutes les pages) :
+  - Journal des actions : chaque ajout, modification, suppression de données
+    est noté (profil, date, donnée, nombre d'éléments). Espace admin >
+    Journal des actions (filtres, export CSV). Donnée : ecole_journal.
+  - Copies automatiques : une copie complète par jour (14 jours) dans le
+    navigateur (IndexedDB), restaurable : Espace admin > Données et
+    sauvegardes. Une copie de sécurité est faite avant chaque restauration.
+    Rappel si aucune sauvegarde n'a été téléchargée depuis 7 jours.
+  - Mot de passe maître chiffré ; changement obligatoire s'il vaut « 2025 ».
+  - Comptes d'essai : Espace admin > Paramètres (interrupteur).
