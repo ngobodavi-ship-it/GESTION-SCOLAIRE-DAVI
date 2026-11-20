@@ -47,6 +47,7 @@
         <div class="tabs" id="parTabs">
             <button class="tab active" data-v="suivi" onclick="parTab('suivi')"><i class="bi bi-mortarboard"></i> Suivi de l'enfant</button>
             <button class="tab" data-v="payer" onclick="parTab('payer')"><i class="bi bi-wallet2"></i> Payer <span class="nav-count hidden" id="parCountPay">0</span></button>
+            <button class="tab" data-v="comm" onclick="parTab('comm')"><i class="bi bi-megaphone"></i> Communiqués <span class="nav-count hidden" id="parCountComm">0</span></button>
             <button class="tab" data-v="preoc" onclick="parTab('preoc')"><i class="bi bi-chat-left-text"></i> Mes préoccupations <span class="nav-count hidden" id="parCountRep">0</span></button>
         </div>
 
@@ -105,6 +106,14 @@
             </div>
         </div>
 
+        <div id="par-comm" class="hidden">
+            <div class="card">
+                <h3 style="margin-bottom:.25rem;">Communiqués de l'école</h3>
+                <p class="text-secondary small mb-0">Les informations envoyées par la direction et les services de l'école. Cliquez sur « J'ai lu » pour confirmer à l'école que vous avez pris connaissance du message.</p>
+            </div>
+            <div id="parCommListe"></div>
+        </div>
+
         <div id="par-preoc" class="hidden">
             <div class="card">
                 <h3 style="margin-bottom:.25rem;">Écrire à l'école</h3>
@@ -132,6 +141,7 @@
     <script src="js/prescolaire.js"></script>
     <script src="js/consultation.js"></script>
     <script src="js/paiement-commun.js"></script>
+    <script src="js/circulaires.js"></script>
     <script src="js/parent.js"></script>
 </body>
 </html>

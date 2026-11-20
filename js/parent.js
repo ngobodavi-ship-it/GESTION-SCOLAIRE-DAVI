@@ -33,6 +33,9 @@ function parInit() {
     parRenderKids(parParent.enfants[0].id);
     parInitPreoc();
     parInitPayer();
+    parMajComm();
+    const nc = window.Circulaires ? Circulaires.nonLuesParent(parParent) : 0;
+    if (nc && window.uiToast) uiToast(`L'école vous a envoyé ${nc} communiqué${nc > 1 ? 's' : ''} non lu${nc > 1 ? 's' : ''}.`, 'info');
 }
 
 function parRenderKids(activeId) {
@@ -59,6 +62,8 @@ function parTab(v) {
     document.getElementById('par-suivi').classList.toggle('hidden', v !== 'suivi');
     document.getElementById('par-preoc').classList.toggle('hidden', v !== 'preoc');
     document.getElementById('par-payer').classList.toggle('hidden', v !== 'payer');
+    document.getElementById('par-comm').classList.toggle('hidden', v !== 'comm');
+    if (v === 'comm') parRenderComm();
     if (v === 'preoc') parRenderPreoc(true);
     if (v === 'payer') parRenderPayer(true);
 }
@@ -271,4 +276,42 @@ function pnReussi(v, x) {
     pnAttente(`<div class="pn-step ok"><i class="bi bi-check-circle-fill"></i><div><strong>Paiement réussi</strong><small>${fmtFCFA(v.montant || x.montant)} payés avec ${v.fournisseur === 'mtn' ? 'MTN Mobile Money' : 'Airtel Money'} — réf. ${parEsc(v.operateur_tx || v.externalId)}. Il est déjà enregistré par l'école.</small></div></div>`);
     uiToast('Paiement réussi et enregistré.', 'ok');
     loadConsult(); parRenderKids(x.e.id); parTab('payer'); pnMajMois(); parRenderPayer(true);
+}
+
+// ---------- Communiqués de l'école ----------
+function parMajComm() {
+    const b = document.getElementById('parCountComm');
+    if (!b || !parParent || !window.Circulaires) return;
+    const n = Circulaires.nonLuesParent(parParent);
+    b.textContent = n; b.classList.toggle('hidden', n === 0);
+}
+function parRenderComm() {
+    const box = document.getElementById('parCommListe');
+    if (!box || !parParent || !window.Circulaires) return;
+    const list = Circulaires.pourParent(parParent);
+    if (!list.length) { box.innerHTML = '<div class="card text-center text-secondary" style="padding:2rem;"><i class="bi bi-inbox" style="font-size:1.6rem;"></i><p class="mb-0 mt-2">Aucun communiqué pour le moment.</p></div>'; return; }
+    const cle = 'p:' + parParent.key;
+    box.innerHTML = list.map(c => {
+        const lu = c.lectures && c.lectures[cle];
+        return `<div class="card" style="border-left:4px solid ${lu ? 'var(--line,#e2e8f0)' : 'var(--brand,#4f46e5)'};">
+            <div class="d-flex justify-content-between gap-3 flex-wrap align-items-start">
+                <div>
+                    <div style="font-size:.78rem;font-weight:700;color:var(--brand,#4f46e5);text-transform:uppercase;letter-spacing:.04em;">${parEsc(c.type)} · ${parEsc(c.numero)}</div>
+                    <h4 style="font-size:1.05rem;font-weight:700;margin:.2rem 0;">${parEsc(c.objet)}</h4>
+                    <div class="small text-secondary">De : <strong>${parEsc(c.service)}</strong> · le ${c.date ? new Date(c.date).toLocaleDateString('fr-FR') : ''} · ${parEsc(Circulaires.libelleCible(c))}</div>
+                </div>
+                ${lu ? `<span class="ui-pill ok">Lu le ${new Date(lu.le).toLocaleDateString('fr-FR')}</span>` : '<span class="ui-pill violet">Nouveau</span>'}
+            </div>
+            <div style="white-space:pre-wrap;line-height:1.6;margin:.9rem 0;padding:.9rem 1rem;border-radius:12px;background:var(--surface-2,#f8fafc);">${parEsc(c.contenu)}</div>
+            <div class="d-flex gap-2 flex-wrap">
+                ${lu ? '' : `<button class="btn btn-primary" onclick="parLireComm('${c.id}')"><i class="bi bi-check2-circle"></i> J'ai lu</button>`}
+                <button class="btn btn-secondary" onclick="Circulaires.imprimer('${c.id}')"><i class="bi bi-printer"></i> Imprimer</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+function parLireComm(id) {
+    Circulaires.marquerLuParent(id, parParent);
+    parRenderComm(); parMajComm();
+    if (window.uiToast) uiToast("Merci ! L'école sait que vous avez lu ce communiqué.", 'success');
 }

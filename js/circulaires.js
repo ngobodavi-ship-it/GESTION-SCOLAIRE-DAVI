@@ -7,7 +7,7 @@
 //   data-service="Direction des études" (par exemple).
 (function () {
     const CLE = 'ecole_circulaires';
-    const TYPES = ['Note de service', 'Circulaire', "Note d'information", 'Convocation'];
+    const TYPES = ['Note de service', 'Circulaire', "Note d'information", 'Communiqué', 'Convocation'];
     const NIVEAUX = ['Préscolaire', 'Primaire', 'Collège', 'Lycée'];
     const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     const lire = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } };
@@ -26,6 +26,7 @@
         if (niv === 'Collège et Lycée') return vise === 'Collège' || vise === 'Lycée';
         return niv === vise;
     }
+    const estPourParents = c => !!(c.cible && /^parents/.test(c.cible.mode));
     function concerne(c, e) {
         const m = c.cible ? c.cible.mode : 'tous', v = c.cible ? c.cible.valeur : '';
         if (m === 'tous' || m === 'personnel') return true;
@@ -34,9 +35,42 @@
         if (m === 'enseignant') return e.id === v;
         return false;
     }
-    function destinataires(c) { return enseignants().filter(e => concerne(c, e)); }
+    // ---- familles : un parent = un numéro de téléphone de tuteur (même règle que les comptes parents) ----
+    function normTel(t) {
+        let d = String(t || '').replace(/\D/g, '');
+        if (d.length > 9 && d.indexOf('242') === 0) d = d.slice(3);
+        if (d.length > 9 && d.indexOf('00242') === 0) d = d.slice(5);
+        return d;
+    }
+    function familles() {
+        const map = {};
+        lire('ecole_eleves', []).forEach(e => {
+            if (!e || !e.telephone) return;
+            const key = normTel(e.telephone); if (key.length < 8) return;
+            if (!map[key]) map[key] = { key, telephone: e.telephone, nom: (e.tuteur || '').trim(), enfants: [] };
+            if (!map[key].nom && e.tuteur) map[key].nom = e.tuteur.trim();
+            map[key].enfants.push(e);
+        });
+        return Object.values(map);
+    }
+    function concerneFamille(c, f) {
+        const m = c.cible ? c.cible.mode : '', v = c.cible ? c.cible.valeur : '';
+        if (m === 'parents_tous') return true;
+        if (m === 'parents_classe') return f.enfants.some(e => e.classe === v);
+        return false;
+    }
+    // Destinataires uniformisés : { id (clé des lectures), nom, info }
+    function destinataires(c) {
+        if (estPourParents(c)) return familles().filter(f => concerneFamille(c, f)).map(f => ({
+            id: 'p:' + f.key, nom: f.nom || ('Parent ' + f.telephone),
+            info: f.enfants.map(e => (e.prenom || '') + ' (' + (e.classe || '-') + ')').join(', ')
+        }));
+        return enseignants().filter(e => concerne(c, e)).map(e => ({ id: e.id, nom: (e.nom + ' ' + (e.prenom || '')).trim(), info: e.matiere || e.niveau || '' }));
+    }
     function libelleCible(c) {
         const m = c.cible ? c.cible.mode : 'tous', v = c.cible ? c.cible.valeur : '';
+        if (m === 'parents_tous') return 'Tous les parents';
+        if (m === 'parents_classe') return 'Parents de la ' + v;
         if (m === 'tous') return 'Tous les enseignants';
         if (m === 'personnel') return 'Tout le personnel';
         if (m === 'niveau') return 'Enseignants du ' + v.toLowerCase().replace('préscolaire', 'préscolaire');
@@ -74,10 +108,13 @@
         if (!c.lectures[ens.id]) c.lectures[ens.id] = { le: new Date().toISOString(), nom: (ens.nom + ' ' + (ens.prenom || '')).trim() };
         sauver(arr);
     }
-    function pourEnseignant(e) {
-        return liste().filter(c => concerne(c, e)).sort((a, b) => (b.date || '').localeCompare(a.date || '') || b.id.localeCompare(a.id));
-    }
+    const recent = (a, b) => (b.date || '').localeCompare(a.date || '') || b.id.localeCompare(a.id);
+    function pourEnseignant(e) { return liste().filter(c => !estPourParents(c) && concerne(c, e)).sort(recent); }
     function nonLues(e) { return pourEnseignant(e).filter(c => !(c.lectures && c.lectures[e.id])).length; }
+    // côté parent : p = { key, nom, enfants } (registre des comptes parents)
+    function pourParent(p) { return liste().filter(c => estPourParents(c) && concerneFamille(c, p)).sort(recent); }
+    function nonLuesParent(p) { return pourParent(p).filter(c => !(c.lectures && c.lectures['p:' + p.key])).length; }
+    function marquerLuParent(id, p) { marquerLu(id, { id: 'p:' + p.key, nom: p.nom || 'Parent' }); }
 
     function imprimer(id) {
         const c = liste().find(x => x.id === id); if (!c) return;
@@ -105,7 +142,7 @@
     let SERVICE = '';
     function optionsValeur(mode) {
         if (mode === 'niveau') return NIVEAUX.map(n => `<option>${n}</option>`).join('');
-        if (mode === 'classe') { const cl = classesConnues(); return cl.length ? cl.map(n => `<option>${esc(n)}</option>`).join('') : '<option value="">Aucune classe</option>'; }
+        if (mode === 'classe' || mode === 'parents_classe') { const cl = classesConnues(); return cl.length ? cl.map(n => `<option>${esc(n)}</option>`).join('') : '<option value="">Aucune classe</option>'; }
         if (mode === 'enseignant') {
             const e = enseignants().slice().sort((a, b) => (a.nom + a.prenom).localeCompare(b.nom + b.prenom));
             return e.length ? e.map(x => `<option value="${esc(x.id)}">${esc(x.nom)} ${esc(x.prenom || '')}${x.matiere ? ' (' + esc(x.matiere) + ')' : ''}</option>`).join('') : '<option value="">Aucun enseignant</option>';
@@ -114,26 +151,28 @@
     }
     function majValeur() {
         const mode = document.getElementById('ncMode').value, col = document.getElementById('ncValeurCol');
-        col.style.display = (mode === 'tous' || mode === 'personnel') ? 'none' : '';
+        col.style.display = (mode === 'tous' || mode === 'personnel' || mode === 'parents_tous') ? 'none' : '';
         document.getElementById('ncValeur').innerHTML = optionsValeur(mode);
-        document.getElementById('ncValeurLbl').textContent = ({ niveau: 'Niveau', classe: 'Classe', enseignant: 'Enseignant' })[mode] || '';
+        document.getElementById('ncValeurLbl').textContent = ({ niveau: 'Niveau', classe: 'Classe', enseignant: 'Enseignant', parents_classe: 'Classe des enfants' })[mode] || '';
         apercuDest();
     }
     function cibleForm() {
         const mode = document.getElementById('ncMode').value;
-        return { mode, valeur: (mode === 'tous' || mode === 'personnel') ? '' : document.getElementById('ncValeur').value };
+        return { mode, valeur: (mode === 'tous' || mode === 'personnel' || mode === 'parents_tous') ? '' : document.getElementById('ncValeur').value };
     }
     function apercuDest() {
-        const n = destinataires({ cible: cibleForm() }).length;
+        const c = { cible: cibleForm() }, n = destinataires(c).length, par = estPourParents(c);
+        const qui = par ? `famille${n > 1 ? 's' : ''}` : `enseignant${n > 1 ? 's' : ''}`;
         document.getElementById('ncApercu').innerHTML = n
-            ? `<i class="bi bi-people"></i> ${n} enseignant${n > 1 ? 's' : ''} recevr${n > 1 ? 'ont' : 'a'} ce document dans leur espace.`
-            : `<i class="bi bi-exclamation-triangle"></i> Aucun enseignant ne correspond pour l'instant (vérifiez les enseignants dans la Direction des études).`;
+            ? `<i class="bi bi-people"></i> ${n} ${qui} recevr${n > 1 ? 'ont' : 'a'} ce document dans ${par ? "l'espace parent" : 'leur espace'}.`
+            : (par ? `<i class="bi bi-exclamation-triangle"></i> Aucune famille ne correspond (il faut un numéro de téléphone du tuteur dans la fiche de l'élève).`
+                   : `<i class="bi bi-exclamation-triangle"></i> Aucun enseignant ne correspond pour l'instant (vérifiez les enseignants dans la Direction des études).`);
     }
     function envoyer() {
         const objet = document.getElementById('ncObjet').value.trim(), contenu = document.getElementById('ncContenu').value.trim();
         if (!objet || !contenu) { toast("L'objet et le contenu sont obligatoires.", 'warning'); return; }
         const cible = cibleForm();
-        if (cible.mode !== 'tous' && cible.mode !== 'personnel' && !cible.valeur) { toast('Choisissez le destinataire.', 'warning'); return; }
+        if (['tous', 'personnel', 'parents_tous'].indexOf(cible.mode) < 0 && !cible.valeur) { toast('Choisissez le destinataire.', 'warning'); return; }
         const c = publier({ type: document.getElementById('ncType').value, service: SERVICE, date: document.getElementById('ncDate').value || aujourdhui(), objet, contenu, cible });
         ['ncObjet', 'ncContenu'].forEach(i => document.getElementById(i).value = '');
         toast(`${c.type} ${c.numero} envoyée à : ${libelleCible(c)}.`, 'success');
@@ -144,7 +183,7 @@
         const dest = destinataires(c), lu = c.lectures || {};
         const lignes = dest.map(e => {
             const l = lu[e.id];
-            return `<tr><td style="font-weight:600;">${esc(e.nom)} ${esc(e.prenom || '')}</td><td>${esc(e.matiere || e.niveau || '')}</td>
+            return `<tr><td style="font-weight:600;">${esc(e.nom)}</td><td>${esc(e.info)}</td>
               <td>${l ? `<span class="pill pill-success" style="background:#dcfce7;color:#166534;padding:0.15rem 0.55rem;border-radius:999px;font-size:0.8rem;font-weight:600;">Lu le ${new Date(l.le).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}</span>` : '<span style="background:#fef3c7;color:#92400e;padding:0.15rem 0.55rem;border-radius:999px;font-size:0.8rem;font-weight:600;">Pas encore lu</span>'}</td></tr>`;
         }).join('');
         const box = document.getElementById('ncDetail');
@@ -155,8 +194,8 @@
               <button class="btn btn-secondary" onclick="Circulaires.fermerDetail()"><i class="bi bi-x-lg"></i> Fermer</button>
             </div>
             <div style="white-space:pre-wrap;line-height:1.6;margin:1rem 0;padding:0.9rem 1rem;border-radius:12px;background:var(--surface-2,#f8fafc);">${esc(c.contenu)}</div>
-            <div style="overflow-x:auto;"><table><thead><tr><th>Enseignant</th><th>Matière / niveau</th><th>Lecture</th></tr></thead>
-            <tbody>${lignes || '<tr><td colspan="3" style="text-align:center;color:var(--muted,#64748b);">Aucun enseignant concerné.</td></tr>'}</tbody></table></div></div>`;
+            <div style="overflow-x:auto;"><table><thead><tr><th>${estPourParents(c) ? 'Parent' : 'Enseignant'}</th><th>${estPourParents(c) ? 'Enfant(s)' : 'Matière / niveau'}</th><th>Lecture</th></tr></thead>
+            <tbody>${lignes || '<tr><td colspan="3" style="text-align:center;color:var(--muted,#64748b);">Aucun destinataire.</td></tr>'}</tbody></table></div></div>`;
         box.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
     function rendreAdmin() {
@@ -192,7 +231,7 @@
         return `<div id="sec-circulaires" class="section hidden">
           <div class="card">
             <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:0.25rem;">Envoyer une note ou une circulaire</h3>
-            <p style="color:var(--muted,#64748b);margin:0 0 1rem;font-size:0.9rem;">Le document arrive dans l'onglet « Notes & circulaires » de l'espace enseignant. Vous voyez ensuite qui l'a lu.</p>
+            <p style="color:var(--muted,#64748b);margin:0 0 1rem;font-size:0.9rem;">Le document arrive dans l'espace des enseignants (onglet « Notes & circulaires ») ou dans l'espace des parents (onglet « Communiqués »). Vous voyez ensuite qui l'a lu.</p>
             <div class="row g-2">
               <div class="col-md-4"><label class="form-label" style="font-weight:600;">Type</label><select id="ncType" style="margin:0;">${TYPES.map(t => `<option>${t}</option>`).join('')}</select></div>
               <div class="col-md-4"><label class="form-label" style="font-weight:600;">Date</label><input type="date" id="ncDate" style="margin:0;"></div>
@@ -201,7 +240,8 @@
                 <select id="ncMode" onchange="Circulaires.majValeur()" style="margin:0;">
                   <option value="tous">Tous les enseignants</option><option value="niveau">Les enseignants d'un niveau</option>
                   <option value="classe">Les professeurs d'une classe</option><option value="enseignant">Un enseignant précis</option>
-                  <option value="personnel">Tout le personnel</option></select></div>
+                  <option value="personnel">Tout le personnel</option>
+                  <optgroup label="Parents d'élèves"><option value="parents_tous">Tous les parents</option><option value="parents_classe">Les parents d'une classe</option></optgroup></select></div>
               <div class="col-md-6" id="ncValeurCol" style="display:none;"><label class="form-label" style="font-weight:600;" id="ncValeurLbl"></label><select id="ncValeur" onchange="Circulaires.apercuDest()" style="margin:0;"></select></div>
               <div class="col-md-12"><label class="form-label" style="font-weight:600;">Objet</label><input type="text" id="ncObjet" placeholder="Ex : Réunion pédagogique du vendredi" style="margin:0;"></div>
               <div class="col-md-12"><label class="form-label" style="font-weight:600;">Contenu</label><textarea id="ncContenu" rows="6" style="margin:0;"></textarea></div>
@@ -254,7 +294,7 @@
     }
     function fermerDetail() { document.getElementById('ncDetail').innerHTML = ''; }
 
-    window.Circulaires = { CLE, liste, publier, supprimer, marquerLu, pourEnseignant, nonLues, destinataires, libelleCible, imprimer,
+    window.Circulaires = { CLE, liste, publier, supprimer, marquerLu, pourEnseignant, nonLues, pourParent, nonLuesParent, marquerLuParent, destinataires, libelleCible, imprimer,
         installerAdmin, envoyer, majValeur, apercuDest, rendreAdmin, detail: detailLecture, fermerDetail, supprimerUI };
 
     // installation automatique sur les pages des services
